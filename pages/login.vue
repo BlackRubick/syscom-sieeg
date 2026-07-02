@@ -16,8 +16,8 @@
 
         <!-- Logo -->
         <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:32px;">
-          <div style="font-weight:800;font-size:22px;color:#FFFFFF;letter-spacing:-0.5px;line-height:1;">SIEEG INTEGRADORES</div>
-          <div style="font-size:11px;color:rgba(100,116,139,0.9);margin-top:5px;letter-spacing:1.5px;">PLATAFORMA EMPRESARIAL</div>
+          <img src="/logosieeg.jpg" alt="SIEEG INTEGRADORES" style="height:72px;object-fit:contain;margin-bottom:10px;" />
+          <div style="font-size:11px;color:rgba(100,116,139,0.9);letter-spacing:1.5px;">PLATAFORMA EMPRESARIAL</div>
         </div>
 
         <!-- Título -->
