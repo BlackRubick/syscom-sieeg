@@ -4,7 +4,7 @@
     <!-- Header -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
       <div>
-        <h1 style="font-size:22px;font-weight:800;color:#F1F5F9;margin:0;line-height:1.2;">Catálogo SYSCOM</h1>
+        <h1 style="font-size:22px;font-weight:800;color:#F1F5F9;margin:0;line-height:1.2;">Catálogo</h1>
         <p style="font-size:13px;color:rgba(100,116,139,0.85);margin:5px 0 0;">
           {{ categories.length > 0 ? `${categories.length} categorías disponibles` : 'Cargando catálogo…' }}
         </p>
@@ -92,7 +92,7 @@
       <div style="width:56px;height:56px;border-radius:16px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.18);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
         <Loader2 :size="24" color="#38bdf8" :stroke-width="1.8" class="spin" />
       </div>
-      <div style="font-size:16px;font-weight:700;color:#94a3b8;">Conectando con SYSCOM…</div>
+      <div style="font-size:16px;font-weight:700;color:#94a3b8;">Cargando inventario Sieeg…</div>
     </div>
 
     <!-- Skeletons (only for filtered searches) -->

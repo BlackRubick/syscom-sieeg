@@ -3,10 +3,8 @@
 
     <!-- Logo -->
     <div style="height:60px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;gap:10px;overflow:hidden;">
-      <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#0EA5E9,#22D3EE);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 14px rgba(14,165,233,0.35);">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-        </svg>
+      <div style="width:30px;height:30px;border-radius:8px;overflow:hidden;flex-shrink:0;box-shadow:0 0 14px rgba(14,165,233,0.35);">
+        <img src="/logosieeg.jpg" alt="SIEEG" style="width:100%;height:100%;object-fit:cover;" />
       </div>
       <div v-if="!collapsed" style="overflow:hidden;white-space:nowrap;transition:opacity 0.2s;" >
         <div style="font-size:13px;font-weight:800;color:#F1F5F9;line-height:1;letter-spacing:-0.3px;">SIEEG</div>
