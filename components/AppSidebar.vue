@@ -10,7 +10,7 @@
       </div>
       <div v-if="!collapsed" style="overflow:hidden;white-space:nowrap;transition:opacity 0.2s;" >
         <div style="font-size:13px;font-weight:800;color:#F1F5F9;line-height:1;letter-spacing:-0.3px;">SIEEG</div>
-        <div style="font-size:9px;color:rgba(100,116,139,0.7);font-weight:500;letter-spacing:0.8px;margin-top:2px;">SYSCOM</div>
+        <div style="font-size:9px;color:rgba(100,116,139,0.7);font-weight:500;letter-spacing:0.8px;margin-top:2px;">INTEGRADORES</div>
       </div>
     </div>
 
