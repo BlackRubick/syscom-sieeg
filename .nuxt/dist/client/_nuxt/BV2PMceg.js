@@ -1,0 +1,1 @@
+import{_ as t,o,c as s,N as c}from"./DrebPg4s.js";const n={},r={style:{"min-height":"100vh",background:"#040C1A"}};function a(e,_){return o(),s("div",r,[c(e.$slots,"default")])}const l=t(n,[["render",a]]);export{l as default};

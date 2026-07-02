@@ -1,0 +1,1 @@
+{"file":"index-DvDd1RKe.js","mappings":";;;;;;;;;;;;;;;;AAEA,eAAW,YAAY;;;;;;;;;;;","names":[],"sources":["../../../../pages/index.vue"],"sourcesContent":["<script setup lang=\"ts\">\ndefinePageMeta({ middleware: 'auth' })\nnavigateTo('/dashboard')\n</script>\n"],"version":3}

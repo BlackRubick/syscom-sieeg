@@ -1,0 +1,6 @@
+import { SESSION_COOKIE } from '~/server/utils/session'
+
+export default defineEventHandler((event) => {
+  deleteCookie(event, SESSION_COOKIE)
+  return { ok: true }
+})
