@@ -2088,7 +2088,7 @@ async function errorHandler(error, event) {
 
 const rootDir = "/Users/blackrubick/Desktop/sieeg-syscom-nuxt";
 
-const appHead = {"meta":[{"name":"viewport","content":"width=device-width, initial-scale=1"},{"charset":"utf-8"}],"link":[{"rel":"preconnect","href":"https://fonts.googleapis.com"},{"rel":"preconnect","href":"https://fonts.gstatic.com","crossorigin":""},{"rel":"stylesheet","href":"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"}],"style":[],"script":[],"noscript":[],"title":"SIEEG SYSCOM"};
+const appHead = {"meta":[{"name":"viewport","content":"width=device-width, initial-scale=1"},{"charset":"utf-8"}],"link":[{"rel":"icon","type":"image/jpeg","href":"/logosieeg.jpg"},{"rel":"preconnect","href":"https://fonts.googleapis.com"},{"rel":"preconnect","href":"https://fonts.gstatic.com","crossorigin":""},{"rel":"stylesheet","href":"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"}],"style":[],"script":[],"noscript":[],"title":"SIEEG INTEGRADORES"};
 
 const appRootTag = "div";
 
@@ -2192,22 +2192,7 @@ const plugins = [
 _wH6JrtIxmaSoA8lCPWFnE9z4lQeXW6H5z3l5aymEQw
 ];
 
-const assets = {
-  "/index.mjs": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": "\"2b0a1-Aaggzj25kZvmkqgZW+0rG6un+Nc\"",
-    "mtime": "2026-06-28T23:49:58.716Z",
-    "size": 176289,
-    "path": "index.mjs"
-  },
-  "/index.mjs.map": {
-    "type": "application/json",
-    "etag": "\"a250b-Kwhl2WU/VUYYzpL05zo/ODf9iYo\"",
-    "mtime": "2026-06-28T23:49:58.718Z",
-    "size": 664843,
-    "path": "index.mjs.map"
-  }
-};
+const assets = {};
 
 function readAsset (id) {
   const serverDir = dirname$1(fileURLToPath(globalThis._importMeta_.url));

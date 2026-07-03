@@ -240,9 +240,9 @@ async function loadDetail() {
 
   const id = props.product.id
   const [det, rel, acc] = await Promise.all([
-    $fetch<Record<string, unknown>>(`/api/syscom/productos/${id}`).catch(() => null),
-    $fetch<unknown[]>(`/api/syscom/productos/${id}/relacionados`).catch(() => []),
-    $fetch<unknown[]>(`/api/syscom/productos/${id}/accesorios`).catch(() => []),
+    $fetch<Record<string, unknown>>(`/api/syscom/productos/${id}?moneda=MXN`).catch(() => null),
+    $fetch<unknown[]>(`/api/syscom/productos/${id}/relacionados?moneda=MXN`).catch(() => []),
+    $fetch<unknown[]>(`/api/syscom/productos/${id}/accesorios?moneda=MXN`).catch(() => []),
   ])
 
   if (!det || (det as Record<string,unknown>).error) {

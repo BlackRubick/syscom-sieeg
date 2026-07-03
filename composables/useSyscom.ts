@@ -60,6 +60,7 @@ export async function fetchProductos(opts: FetchProductosOpts): Promise<Producto
   if (opts.marca)     params.set('marca',     opts.marca)
   if (opts.pagina && opts.pagina > 1) params.set('pagina', String(opts.pagina))
   if (opts.orden && opts.orden !== 'relevancia') params.set('orden', opts.orden)
+  params.set('moneda', 'MXN')
   const url = `/api/syscom/productos?${params}`
   const cached = get<ProductosResult>(url); if (cached) return cached
   try {

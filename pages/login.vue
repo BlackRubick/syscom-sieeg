@@ -22,7 +22,7 @@
 
         <!-- Título -->
         <div style="margin-bottom:24px;">
-          <div style="font-size:22px;font-weight:700;color:#F1F5F9;margin-bottom:5px;">Bienvenido de vuelta</div>
+          <div style="font-size:22px;font-weight:700;color:#F1F5F9;margin-bottom:5px;">Bienvenido</div>
           <div style="font-size:13px;color:rgba(100,116,139,0.9);">Ingresa tus credenciales para continuar</div>
         </div>
 
