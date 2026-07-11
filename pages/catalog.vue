@@ -1,6 +1,13 @@
 <template>
   <div style="font-family:'Inter',system-ui,sans-serif;display:flex;flex-direction:column;gap:24px;">
 
+    <!-- ═══ BANDA DE VERIFICACIÓN — confirma que el nuevo diseño cargó correctamente ═══ -->
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:12px;background:linear-gradient(135deg,rgba(14,165,233,0.12),rgba(129,140,248,0.12));border:1px solid rgba(14,165,233,0.25);">
+      <div style="width:8px;height:8px;border-radius:50%;background:#0EA5E9;flex-shrink:0;box-shadow:0 0 6px #0EA5E9;"></div>
+      <span style="font-size:13px;font-weight:600;color:#38bdf8;">Nuevo diseño cargado</span>
+      <span style="font-size:12px;color:rgba(148,163,184,0.7);">— Buscador mejorado · Filtros reorganizados · Cards actualizadas</span>
+    </div>
+
     <!-- ══════════ HEADER ══════════ -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
