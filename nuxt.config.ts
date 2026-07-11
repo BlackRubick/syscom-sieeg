@@ -3,9 +3,14 @@ export default defineNuxtConfig({
   modules: ['@pinia/nuxt'],
 
   runtimeConfig: {
-    sessionSecret:     process.env.SESSION_SECRET     ?? 'dev-secret',
-    syscomClientId:    process.env.SYSCOM_CLIENT_ID   ?? '',
+    sessionSecret:      process.env.SESSION_SECRET      ?? 'dev-secret',
+    syscomClientId:     process.env.SYSCOM_CLIENT_ID    ?? '',
     syscomClientSecret: process.env.SYSCOM_CLIENT_SECRET ?? '',
+    smtpHost:    process.env.SMTP_HOST     ?? '',
+    smtpPort:    process.env.SMTP_PORT     ?? '465',
+    smtpUser:    process.env.SMTP_USER     ?? '',
+    smtpPass:    process.env.SMTP_PASS     ?? '',
+    smtpAdminTo: process.env.SMTP_ADMIN_TO ?? '',
   },
 
   css: ['~/assets/css/main.css'],

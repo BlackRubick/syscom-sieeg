@@ -17,6 +17,16 @@ import { NuxtModule, ModuleDependencyMeta } from '@nuxt/schema'
 
    syscomClientSecret: string,
 
+   smtpHost: string,
+
+   smtpPort: string,
+
+   smtpUser: string,
+
+   smtpPass: string,
+
+   smtpAdminTo: string,
+
    nitro: {
       envPrefix: string,
    },

@@ -116,6 +116,7 @@ declare global {
   const sanitizeStatusMessage: typeof import('../../node_modules/h3').sanitizeStatusMessage
   const sealSession: typeof import('../../node_modules/h3').sealSession
   const send: typeof import('../../node_modules/h3').send
+  const sendAccessRequestEmail: typeof import('../../server/utils/email').sendAccessRequestEmail
   const sendError: typeof import('../../node_modules/h3').sendError
   const sendIterable: typeof import('../../node_modules/h3').sendIterable
   const sendNoContent: typeof import('../../node_modules/h3').sendNoContent
@@ -178,6 +179,7 @@ export { defineNitroErrorHandler } from 'nitropack/runtime/internal/error/utils'
 export { buildAssetsURL as __buildAssetsURL, publicAssetsURL as __publicAssetsURL } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/@nuxt/nitro-server/dist/runtime/utils/paths';
 export { defineAppConfig } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/@nuxt/nitro-server/dist/runtime/utils/config';
 export { getPool, query } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/db';
+export { sendAccessRequestEmail } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/email';
 export { getFacturaEnv, getFacturaHost, getFacturaHeaders, facturaFetch, listarClientes, obtenerCliente, crearCliente, actualizarCliente, eliminarCliente, buildCfdiConcepto, crearCFDI, listarCFDIs } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/factura';
 export { default as prisma } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/prisma';
 export { SESSION_COOKIE, createToken, verifyToken, getSession, requireSession } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/session';

@@ -15,6 +15,9 @@ declare module "nitropack/types" {
     '/api/auth/me': {
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/me.get').default>>>>
     }
+    '/api/contact/request': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/contact/request.post').default>>>>
+    }
     '/api/factura/cfdi/:uid/:format': {
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/factura/cfdi/[uid]/[format].get').default>>>>
     }

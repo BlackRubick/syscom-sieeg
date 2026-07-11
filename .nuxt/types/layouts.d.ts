@@ -8,6 +8,7 @@ declare module 'nuxt/app' {
   interface NuxtLayouts {
     auth: ComponentProps<typeof import("/Users/blackrubick/Desktop/sieeg-syscom-nuxt/layouts/auth.vue").default>,
     default: ComponentProps<typeof import("/Users/blackrubick/Desktop/sieeg-syscom-nuxt/layouts/default.vue").default>,
+    landing: ComponentProps<typeof import("/Users/blackrubick/Desktop/sieeg-syscom-nuxt/layouts/landing.vue").default>,
 }
   export type LayoutKey = keyof NuxtLayouts extends never ? string : keyof NuxtLayouts
   interface PageMeta {
