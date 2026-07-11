@@ -1,162 +1,210 @@
 <template>
-  <div :style="{ fontFamily:`'Inter',system-ui,sans-serif`, display:'flex', flexDirection:'column', gap:'22px' }">
+  <div class="catalog-root">
 
-    <!-- Header -->
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <!-- ───── HEADER ───── -->
+    <div class="catalog-header">
       <div>
-        <h1 style="font-size:22px;font-weight:800;color:#F1F5F9;margin:0;line-height:1.2;">Catálogo</h1>
-        <p style="font-size:13px;color:rgba(100,116,139,0.85);margin:5px 0 0;">
+        <div class="catalog-title-row">
+          <h1 class="catalog-title">Catálogo</h1>
+          <div v-if="loading && hasFilter" class="status-chip loading-chip">
+            <Loader2 :size="11" class="spin" />
+            <span>Buscando…</span>
+          </div>
+          <div v-else-if="hasFilter" class="status-chip results-chip">
+            {{ cantidad.toLocaleString('es-MX') }} resultados
+          </div>
+        </div>
+        <p class="catalog-subtitle">
           {{ categories.length > 0 ? `${categories.length} categorías disponibles` : 'Cargando catálogo…' }}
         </p>
       </div>
-      <div v-if="hasFilter" style="display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);">
-        <div style="width:7px;height:7px;border-radius:50%;background:#0EA5E9;" />
-        <span style="font-size:12px;font-weight:600;color:#38bdf8;">{{ loading ? '…' : `${cantidad.toLocaleString('es-MX')} resultados` }}</span>
-      </div>
+      <button v-if="hasFilter" @click="clearAll()" class="clear-all-btn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Limpiar filtros
+      </button>
     </div>
 
-    <!-- Filters -->
-    <div style="border-radius:16px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);padding:16px;display:flex;flex-direction:column;gap:14px;">
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <!-- Search -->
-        <div style="flex:1;min-width:200px;position:relative;">
-          <Search :size="15" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocused?'#0EA5E9':'rgba(100,116,139,0.7)'" />
-          <input v-model="search" placeholder="Buscar por nombre, modelo, marca…"
-            @focus="searchFocused=true" @blur="searchFocused=false"
-            :style="{ width:'100%', height:'42px', background:searchFocused?'rgba(14,165,233,0.06)':'rgba(255,255,255,0.04)', border:`1px solid ${searchFocused?'rgba(14,165,233,0.5)':'rgba(255,255,255,0.1)'}`, borderRadius:'11px', paddingLeft:'40px', paddingRight:search?'36px':'14px', fontSize:'13px', color:'#E2E8F0', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
-          <button v-if="search" @click="search=''" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.08);border:none;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(148,163,184,0.8);font-size:12px;">×</button>
-        </div>
-        <!-- Sort -->
-        <div style="position:relative;flex-shrink:0;">
-          <select v-model="sortBy" @change="pagina=1"
-            style="height:42px;padding-left:14px;padding-right:36px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:11px;font-size:13px;color:#CBD5E1;outline:none;appearance:none;cursor:pointer;font-family:inherit;min-width:160px;">
-            <option v-for="o in SORT_OPTIONS" :key="o.value" :value="o.value" style="background:#0D1B35;">{{ o.label }}</option>
-          </select>
-          <ChevronDown :size="14" color="rgba(100,116,139,0.8)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;" />
-        </div>
-        <!-- Brand filter -->
-        <div style="position:relative;flex-shrink:0;">
-          <button @click="openBrandDrop()"
-            :style="{ height:'42px', padding:'0 14px', borderRadius:'11px', border:`1px solid ${activeBrandId?'rgba(14,165,233,0.4)':'rgba(255,255,255,0.1)'}`, background:activeBrandId?'rgba(14,165,233,0.1)':'rgba(255,255,255,0.04)', color:activeBrandId?'#38bdf8':'#CBD5E1', fontSize:'13px', fontWeight:activeBrandId?600:400, cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'7px', minWidth:'150px', justifyContent:'space-between' }">
-            <div style="display:flex;align-items:center;gap:6px;overflow:hidden;">
-              <Tag :size="13" :stroke-width="1.8" />
-              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px;">{{ activeBrandId ? (brands.find(b=>b.id===activeBrandId)?.nombre ?? activeBrandId) : 'Marca' }}</span>
-            </div>
-            <span v-if="activeBrandId" @click.stop="clearBrand()" style="font-size:14px;line-height:1;cursor:pointer;">×</span>
-            <ChevronDown v-else :size="13" color="rgba(100,116,139,0.7)" />
-          </button>
-          <Transition name="dropdown">
-            <div v-if="brandDropOpen" style="position:absolute;right:0;top:48px;width:240px;background:#0D1B35;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;z-index:50;box-shadow:0 16px 40px rgba(0,0,0,0.5);">
-              <div style="padding:8px;">
-                <input v-model="brandSearch" autofocus placeholder="Buscar marca..." style="width:100%;height:34px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0 10px;font-size:12px;color:#E2E8F0;outline:none;font-family:inherit;box-sizing:border-box;" />
+    <!-- ───── FILTER PANEL ───── -->
+    <div class="filter-panel">
+
+      <!-- Search — full width, protagonista -->
+      <div class="search-wrapper">
+        <svg class="search-icon" :class="{ active: searchFocused }" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input v-model="search" placeholder="Buscar por nombre, modelo, marca o SKU…"
+          @focus="searchFocused=true" @blur="searchFocused=false"
+          class="search-input" :class="{ focused: searchFocused }" />
+        <button v-if="search" @click="search=''" class="search-clear" title="Limpiar búsqueda">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Controls row: sort + brand + active chips -->
+      <div class="controls-row">
+        <div class="controls-left">
+
+          <!-- Sort -->
+          <div class="select-wrap">
+            <svg class="select-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="9" y2="18"/>
+            </svg>
+            <select v-model="sortBy" @change="pagina=1" class="styled-select">
+              <option v-for="o in SORT_OPTIONS" :key="o.value" :value="o.value" style="background:#0D1B35;">{{ o.label }}</option>
+            </select>
+            <ChevronDown :size="13" class="select-arrow" />
+          </div>
+
+          <!-- Brand filter -->
+          <div style="position:relative;flex-shrink:0;">
+            <button @click="openBrandDrop()" class="brand-btn" :class="{ active: activeBrandId }">
+              <Tag :size="13" :stroke-width="1.8" style="flex-shrink:0;" />
+              <span class="brand-label">{{ activeBrandId ? (brands.find(b=>b.id===activeBrandId)?.nombre ?? activeBrandId) : 'Marca' }}</span>
+              <span v-if="activeBrandId" @click.stop="clearBrand()" class="brand-x">×</span>
+              <ChevronDown v-else :size="12" style="flex-shrink:0;color:rgba(100,116,139,0.7);" />
+            </button>
+            <Transition name="dropdown">
+              <div v-if="brandDropOpen" class="brand-dropdown">
+                <div style="padding:8px 8px 4px;">
+                  <input v-model="brandSearch" autofocus placeholder="Buscar marca…" class="brand-search-input" />
+                </div>
+                <div style="max-height:220px;overflow-y:auto;padding-bottom:6px;">
+                  <div v-if="loadingBrands" style="padding:16px;text-align:center;font-size:12px;color:rgba(100,116,139,0.7);">Cargando marcas…</div>
+                  <button v-else v-for="b in filteredBrands" :key="b.id" @click="selectBrand(b.id)"
+                    class="brand-option" :class="{ active: activeBrandId===b.id }">
+                    {{ b.nombre }}
+                  </button>
+                </div>
               </div>
-              <div style="max-height:220px;overflow-y:auto;padding-bottom:6px;">
-                <div v-if="loadingBrands" style="padding:16px;text-align:center;font-size:12px;color:rgba(100,116,139,0.7);">Cargando marcas…</div>
-                <button v-else v-for="b in filteredBrands" :key="b.id" @click="selectBrand(b.id)"
-                  :style="{ display:'block', width:'100%', padding:'8px 14px', fontSize:'12px', color:activeBrandId===b.id?'#38bdf8':'#CBD5E1', background:activeBrandId===b.id?'rgba(14,165,233,0.1)':'transparent', border:'none', cursor:'pointer', fontFamily:'inherit', textAlign:'left', fontWeight:activeBrandId===b.id?600:400 }"
-                  @mouseenter="e => { if(activeBrandId!==b.id)(e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.04)' }"
-                  @mouseleave="e => { if(activeBrandId!==b.id)(e.currentTarget as HTMLElement).style.background='transparent' }">
-                  {{ b.nombre }}
-                </button>
-              </div>
-            </div>
-          </Transition>
-          <div v-if="brandDropOpen" style="position:fixed;inset:0;z-index:40;" @click="brandDropOpen=false" />
+            </Transition>
+            <div v-if="brandDropOpen" style="position:fixed;inset:0;z-index:40;" @click="brandDropOpen=false" />
+          </div>
+        </div>
+
+        <!-- Active filter chips (aligned right) -->
+        <div class="active-chips">
+          <span v-if="dSearch" class="filter-chip">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            "{{ dSearch.length > 18 ? dSearch.slice(0,18) + '…' : dSearch }}"
+            <button @click="search=''" class="chip-x">×</button>
+          </span>
+          <span v-if="activeCategoryId" class="filter-chip">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            {{ categories.find(c=>c.id===activeCategoryId)?.nombre }}
+            <button @click="selectCategory(null)" class="chip-x">×</button>
+          </span>
+          <span v-if="activeBrandId" class="filter-chip">
+            <Tag :size="10" :stroke-width="1.8" />
+            {{ brands.find(b=>b.id===activeBrandId)?.nombre ?? activeBrandId }}
+            <button @click="clearBrand()" class="chip-x">×</button>
+          </span>
         </div>
       </div>
 
       <!-- Category tabs -->
-      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;" class="no-scrollbar">
-        <button @click="selectCategory(null)"
-          :style="{ flexShrink:0, height:'30px', padding:'0 12px', borderRadius:'6px', fontSize:'12px', fontWeight:!activeCategoryId?600:400, cursor:'pointer', border:'none', fontFamily:'inherit', background:!activeCategoryId?'rgba(14,165,233,0.15)':'rgba(255,255,255,0.04)', color:!activeCategoryId?'#38bdf8':'rgba(100,116,139,0.75)', outline:`1px solid ${!activeCategoryId?'rgba(14,165,233,0.35)':'rgba(255,255,255,0.07)'}`, display:'flex', alignItems:'center', gap:'6px' }">
-          <LayoutGrid :size="12" :stroke-width="!activeCategoryId?2.2:1.8" /> Todos
+      <div class="cat-tabs-wrap no-scrollbar">
+        <button @click="selectCategory(null)" class="cat-tab" :class="{ active: !activeCategoryId }">
+          <LayoutGrid :size="12" :stroke-width="!activeCategoryId?2.2:1.8" />
+          Todos
         </button>
         <template v-if="loadingCats">
-          <div v-for="i in 6" :key="i" class="shimmer-bg" style="flex-shrink:0;height:30px;width:100px;border-radius:6px;background:rgba(255,255,255,0.04);" />
+          <div v-for="i in 8" :key="i" class="cat-tab-skel shimmer-bg" />
         </template>
-        <button v-else v-for="cat in categories" :key="cat.id" @click="selectCategory(cat.id)"
-          :style="{ flexShrink:0, height:'30px', padding:'0 12px', borderRadius:'6px', fontSize:'12px', fontWeight:activeCategoryId===cat.id?600:400, cursor:'pointer', border:'none', fontFamily:'inherit', background:activeCategoryId===cat.id?'rgba(14,165,233,0.15)':'rgba(255,255,255,0.04)', color:activeCategoryId===cat.id?'#38bdf8':'rgba(100,116,139,0.75)', outline:`1px solid ${activeCategoryId===cat.id?'rgba(14,165,233,0.35)':'rgba(255,255,255,0.07)'}`, display:'flex', alignItems:'center', gap:'6px', whiteSpace:'nowrap' }">
-          <Package :size="12" :stroke-width="activeCategoryId===cat.id?2.2:1.8" /> {{ cat.nombre }}
+        <button v-else v-for="cat in categories" :key="cat.id"
+          @click="selectCategory(cat.id)" class="cat-tab" :class="{ active: activeCategoryId===cat.id }">
+          <Package :size="12" :stroke-width="activeCategoryId===cat.id?2.2:1.8" />
+          {{ cat.nombre }}
         </button>
       </div>
     </div>
 
-    <!-- Error -->
-    <div v-if="apiError" style="padding:12px 16px;border-radius:10px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);color:#fb7185;font-size:13px;display:flex;align-items:center;gap:10px;">
-      <AlertCircle :size="16" style="flex-shrink:0;" />
-      <span><strong>Error SYSCOM:</strong> {{ apiError }}</span>
+    <!-- ───── ERROR ───── -->
+    <div v-if="apiError" class="error-banner">
+      <AlertCircle :size="15" style="flex-shrink:0;" />
+      <span><strong>Error:</strong> {{ apiError }}</span>
     </div>
 
-    <!-- Connecting / initial load state -->
-    <div v-if="loadingCats || (loading && !products.length && !hasFilter)" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 0;border-radius:16px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);">
-      <div style="width:56px;height:56px;border-radius:16px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.18);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-        <Loader2 :size="24" color="#38bdf8" :stroke-width="1.8" class="spin" />
+    <!-- ───── INITIAL LOAD ───── -->
+    <div v-if="loadingCats || (loading && !products.length && !hasFilter)" class="empty-state">
+      <div class="empty-icon">
+        <Loader2 :size="22" color="#38bdf8" :stroke-width="1.8" class="spin" />
       </div>
-      <div style="font-size:16px;font-weight:700;color:#94a3b8;">Cargando inventario Sieeg…</div>
+      <div class="empty-title">Cargando inventario Sieeg…</div>
+      <div class="empty-sub">Conectando con el catálogo, un momento.</div>
     </div>
 
-    <!-- Skeletons (only for filtered searches) -->
-    <div v-else-if="loading && !products.length" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;">
-      <div v-for="i in 12" :key="i" style="border-radius:16px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
-        <div class="shimmer-bg" style="height:148px;background:rgba(255,255,255,0.03);" />
-        <div style="padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;">
-          <div class="shimmer-bg" style="height:10px;width:60px;border-radius:20px;background:rgba(255,255,255,0.06);" />
-          <div class="shimmer-bg" style="height:13px;width:90%;border-radius:6px;background:rgba(255,255,255,0.06);" />
-          <div class="shimmer-bg" style="height:13px;width:70%;border-radius:6px;background:rgba(255,255,255,0.04);" />
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div class="shimmer-bg" style="height:18px;width:80px;border-radius:6px;background:rgba(255,255,255,0.06);" />
-            <div class="shimmer-bg" style="height:32px;width:90px;border-radius:9px;background:rgba(14,165,233,0.07);" />
+    <!-- ───── SKELETON CARDS ───── -->
+    <div v-else-if="loading && !products.length" class="product-grid">
+      <div v-for="i in 12" :key="i" class="product-card">
+        <div class="shimmer-bg" style="height:160px;" />
+        <div class="card-body">
+          <div class="shimmer-bg" style="height:10px;width:60px;border-radius:20px;" />
+          <div class="shimmer-bg" style="height:14px;width:88%;border-radius:6px;margin-top:9px;" />
+          <div class="shimmer-bg" style="height:14px;width:68%;border-radius:6px;margin-top:5px;" />
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;">
+            <div class="shimmer-bg" style="height:20px;width:84px;border-radius:6px;" />
+            <div class="shimmer-bg" style="height:36px;width:88px;border-radius:9px;" />
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Product grid -->
+    <!-- ───── PRODUCT GRID ───── -->
     <div v-else-if="products.length">
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;">
+      <div class="product-grid">
         <div v-for="product in products" :key="product.id"
-          :style="{ borderRadius:'16px', background:'linear-gradient(160deg,#0D1B35,#091228)', border:`1px solid ${hoveredId===product.id?'rgba(14,165,233,0.22)':'rgba(255,255,255,0.07)'}`, overflow:'hidden', transition:'border-color 0.2s,box-shadow 0.2s,transform 0.2s', boxShadow:hoveredId===product.id?'0 12px 32px rgba(0,0,0,0.5),0 0 0 1px rgba(14,165,233,0.12)':'0 4px 16px rgba(0,0,0,0.35)', transform:hoveredId===product.id?'translateY(-4px)':'translateY(0)' }"
-          @mouseenter="hoveredId=product.id" @mouseleave="hoveredId=null">
+          class="product-card"
+          :class="{ hovered: hoveredId===product.id }"
+          @mouseenter="hoveredId=product.id"
+          @mouseleave="hoveredId=null">
+
           <!-- Image -->
-          <div style="position:relative;height:148px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-            <img v-if="product.images[0]" :src="product.images[0]" :alt="product.name" style="width:100%;height:100%;object-fit:contain;padding:10px;" @error="(e) => (e.currentTarget as HTMLImageElement).style.display='none'" />
-            <div v-else style="width:64px;height:64px;border-radius:16px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.18);display:flex;align-items:center;justify-content:center;">
-              <Package :size="26" color="#38bdf8" :stroke-width="1.8" />
+          <div class="card-img-wrap">
+            <img v-if="product.images[0]" :src="product.images[0]" :alt="product.name"
+              class="card-img"
+              @error="(e) => (e.currentTarget as HTMLImageElement).style.display='none'" />
+            <div v-else class="card-img-placeholder">
+              <Package :size="28" color="#38bdf8" :stroke-width="1.6" />
             </div>
-            <!-- Badges -->
-            <div style="position:absolute;top:10px;left:10px;display:flex;gap:5px;">
-              <span v-if="product.featured" style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:4px;background:linear-gradient(135deg,#0EA5E9,#22D3EE);color:white;">DESTACADO</span>
-              <span v-if="product.discount" style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:20px;background:#10B981;color:white;">-{{ product.discount }}%</span>
+            <!-- Hover overlay -->
+            <div class="card-img-overlay" />
+            <!-- Badges TL -->
+            <div class="card-badges">
+              <span v-if="product.featured" class="badge-feat">DESTACADO</span>
+              <span v-if="product.discount" class="badge-disc">-{{ product.discount }}%</span>
             </div>
-            <span :style="stockBadgeStyle(product)" style="position:absolute;top:10px;right:10px;font-size:9px;font-weight:600;padding:3px 7px;border-radius:20px;">{{ stockLabel(product) }}</span>
+            <!-- Stock badge -->
+            <span :style="stockBadgeStyle(product)" class="badge-stock">{{ stockLabel(product) }}</span>
           </div>
-          <!-- Content -->
-          <div style="padding:14px 16px 16px;">
-            <div style="font-size:10px;color:rgba(100,116,139,0.8);font-weight:500;margin-bottom:6px;">
-              <span style="background:rgba(255,255,255,0.04);padding:2px 7px;border-radius:20px;">{{ product.category }}</span>
+
+          <!-- Body -->
+          <div class="card-body">
+            <span class="card-cat">{{ product.category }}</span>
+            <div class="card-name" :class="{ bright: hoveredId===product.id }">{{ product.name }}</div>
+            <div v-if="product.sku" class="card-sku">{{ product.sku }}</div>
+            <div class="card-supplier">{{ product.supplier }}</div>
+            <div class="card-divider" />
+            <div class="card-price-row">
+              <template v-if="product.price > 0">
+                <span class="card-price">{{ fmtCurrency(product.price) }}</span>
+                <span v-if="product.discount" class="card-price-old">{{ fmtCurrency(Math.round(product.price / (1 - product.discount / 100))) }}</span>
+              </template>
+              <span v-else class="card-price-consult">Consultar precio</span>
             </div>
-            <div :style="{ fontSize:'13px', fontWeight:600, color:hoveredId===product.id?'#F1F5F9':'#CBD5E1', marginBottom:'5px', lineHeight:'1.35', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', minHeight:'36px', transition:'color 0.15s' }">{{ product.name }}</div>
-            <div v-if="product.sku" style="font-size:10px;color:rgba(100,116,139,0.6);margin-bottom:10px;font-family:monospace;">{{ product.sku }}</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-              <span style="font-size:11px;color:rgba(71,85,105,0.9);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;">{{ product.supplier }}</span>
-            </div>
-            <div style="height:1px;background:rgba(255,255,255,0.05);margin-bottom:14px;" />
-            <div style="margin-bottom:10px;">
-              <div v-if="product.price > 0" style="display:flex;align-items:baseline;gap:8px;">
-                <div style="font-size:16px;font-weight:800;color:#F1F5F9;letter-spacing:-0.3px;">{{ fmtCurrency(product.price) }}</div>
-                <div v-if="product.discount" style="font-size:10px;color:rgba(100,116,139,0.6);text-decoration:line-through;">{{ fmtCurrency(Math.round(product.price / (1 - product.discount / 100))) }}</div>
-              </div>
-              <div v-else style="font-size:12px;color:rgba(100,116,139,0.6);font-style:italic;">Consultar precio</div>
-            </div>
-            <div style="display:flex;gap:6px;">
-              <button @click="handleAdd(product)"
-                :disabled="product.stock===0"
-                :style="{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:'5px', height:'32px', borderRadius:'8px', fontSize:'12px', fontWeight:600, cursor:product.stock===0?'not-allowed':'pointer', border:'none', fontFamily:'inherit', transition:'all 0.2s', background:addedIds.has(product.id)?'rgba(16,185,129,0.15)':'rgba(14,165,233,0.12)', color:addedIds.has(product.id)?'#34d399':'#38bdf8', outline:`1px solid ${addedIds.has(product.id)?'rgba(52,211,153,0.25)':'rgba(14,165,233,0.22)'}`, opacity:product.stock===0?0.4:1 }">
-                {{ addedIds.has(product.id) ? '✓ Agregado' : '+ Agregar' }}
+            <div class="card-actions">
+              <button @click="handleAdd(product)" :disabled="product.stock===0"
+                class="btn-add" :class="{ added: addedIds.has(product.id), out: product.stock===0 }">
+                <span v-if="addedIds.has(product.id)" class="btn-inner">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                  Agregado
+                </span>
+                <span v-else class="btn-inner">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Agregar
+                </span>
               </button>
-              <button @click="openDetail(product)" title="Ver detalle"
-                style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(100,116,139,0.7);flex-shrink:0;">
-                <Eye :size="13" :stroke-width="1.8" />
+              <button @click="openDetail(product)" class="btn-detail" title="Ver detalle">
+                <Eye :size="14" :stroke-width="1.8" />
               </button>
             </div>
           </div>
@@ -164,24 +212,35 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="paginas > 1" style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:28px;">
-        <button @click="pagina=Math.max(1,pagina-1)" :disabled="pagina===1"
-          :style="{ height:'36px', padding:'0 16px', borderRadius:'9px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#CBD5E1', fontSize:'13px', cursor:pagina===1?'not-allowed':'pointer', opacity:pagina===1?0.4:1, fontFamily:'inherit' }">← Anterior</button>
-        <span style="font-size:13px;color:rgba(100,116,139,0.9);">Página <strong style="color:#E2E8F0;">{{ pagina }}</strong> de <strong style="color:#E2E8F0;">{{ paginas }}</strong></span>
-        <button @click="pagina=Math.min(paginas,pagina+1)" :disabled="pagina===paginas"
-          :style="{ height:'36px', padding:'0 16px', borderRadius:'9px', background:'rgba(14,165,233,0.1)', border:'1px solid rgba(14,165,233,0.2)', color:'#38bdf8', fontSize:'13px', cursor:pagina===paginas?'not-allowed':'pointer', opacity:pagina===paginas?0.4:1, fontFamily:'inherit' }">Siguiente →</button>
+      <div v-if="paginas > 1" class="pagination">
+        <button @click="pagina=Math.max(1,pagina-1)" :disabled="pagina===1" class="pag-btn pag-prev">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Anterior
+        </button>
+        <div class="pag-center">
+          <span class="pag-cur">{{ pagina }}</span>
+          <span class="pag-slash">/</span>
+          <span class="pag-total">{{ paginas }}</span>
+        </div>
+        <button @click="pagina=Math.min(paginas,pagina+1)" :disabled="pagina===paginas" class="pag-btn pag-next">
+          Siguiente
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
     </div>
 
-    <!-- No results -->
-    <div v-else-if="hasFilter && !loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 0;border-radius:16px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);">
-      <div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+    <!-- ───── NO RESULTS ───── -->
+    <div v-else-if="hasFilter && !loading" class="empty-state">
+      <div class="empty-icon">
         <Search :size="22" color="rgba(100,116,139,0.6)" />
       </div>
-      <div style="font-size:15px;font-weight:600;color:#94a3b8;margin-bottom:5px;">Sin resultados</div>
-      <div style="font-size:13px;color:rgba(71,85,105,0.9);">Prueba con otra búsqueda o categoría</div>
-      <button @click="clearAll()" style="margin-top:16px;padding:8px 18px;border-radius:9px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);color:#38bdf8;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Limpiar filtros</button>
+      <div class="empty-title">Sin resultados</div>
+      <div class="empty-sub">Prueba con otra búsqueda o categoría</div>
+      <button @click="clearAll()" class="clear-all-btn" style="margin-top:18px;">
+        Limpiar filtros
+      </button>
     </div>
+
   </div>
 
   <!-- Product detail modal -->
@@ -321,3 +380,156 @@ const fmtCurrency = (n: number) => new Intl.NumberFormat('es-MX', { style:'curre
 function stockLabel(p: Product) { return p.stock > 10 ? 'En stock' : p.stock > 0 ? `Solo ${p.stock}` : 'Agotado' }
 function stockBadgeStyle(p: Product) { return p.stock > 10 ? { background:'rgba(16,185,129,0.12)', color:'#34d399' } : p.stock > 0 ? { background:'rgba(245,158,11,0.12)', color:'#fbbf24' } : { background:'rgba(244,63,94,0.12)', color:'#fb7185' } }
 </script>
+
+<style scoped>
+/* ── Root ── */
+.catalog-root { font-family: 'Inter', system-ui, sans-serif; display: flex; flex-direction: column; gap: 20px; }
+
+/* ── Header ── */
+.catalog-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.catalog-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+.catalog-title { font-size: 22px; font-weight: 800; color: #F1F5F9; margin: 0; line-height: 1.2; }
+.catalog-subtitle { font-size: 13px; color: rgba(100,116,139,0.8); margin: 0; }
+
+.status-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.results-chip { background: rgba(14,165,233,0.1); border: 1px solid rgba(14,165,233,0.2); color: #38bdf8; }
+.loading-chip { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: rgba(148,163,184,0.7); }
+
+.clear-all-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 9px; background: rgba(244,63,94,0.07); border: 1px solid rgba(244,63,94,0.18); color: #fb7185; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s, border-color 0.2s; }
+.clear-all-btn:hover { background: rgba(244,63,94,0.13); border-color: rgba(244,63,94,0.28); }
+
+/* ── Filter panel ── */
+.filter-panel { border-radius: 16px; background: linear-gradient(160deg,#0D1B35,#091228); border: 1px solid rgba(255,255,255,0.07); padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+
+/* ── Search ── */
+.search-wrapper { position: relative; }
+.search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); pointer-events: none; color: rgba(100,116,139,0.65); transition: color 0.2s; }
+.search-icon.active { color: #0EA5E9; }
+.search-input { width: 100%; height: 48px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 13px; padding-left: 48px; padding-right: 48px; font-size: 14px; color: #E2E8F0; outline: none; font-family: inherit; box-sizing: border-box; transition: background 0.2s, border-color 0.2s, box-shadow 0.2s; }
+.search-input::placeholder { color: rgba(71,85,105,0.75); }
+.search-input.focused { background: rgba(14,165,233,0.06); border-color: rgba(14,165,233,0.45); box-shadow: 0 0 0 3px rgba(14,165,233,0.08); }
+.search-clear { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.08); border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: rgba(148,163,184,0.7); transition: background 0.15s, color 0.15s; }
+.search-clear:hover { background: rgba(255,255,255,0.15); color: #E2E8F0; }
+
+/* ── Controls row ── */
+.controls-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 38px; }
+.controls-left { display: flex; align-items: center; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+
+/* ── Sort select ── */
+.select-wrap { position: relative; display: flex; align-items: center; flex-shrink: 0; }
+.select-icon { position: absolute; left: 11px; pointer-events: none; color: rgba(100,116,139,0.7); }
+.styled-select { height: 38px; padding-left: 32px; padding-right: 30px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; font-size: 13px; color: #CBD5E1; outline: none; appearance: none; cursor: pointer; font-family: inherit; min-width: 158px; transition: background 0.15s, border-color 0.15s; }
+.styled-select:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.15); }
+.styled-select:focus { border-color: rgba(14,165,233,0.4); box-shadow: 0 0 0 2px rgba(14,165,233,0.08); }
+.select-arrow { position: absolute; right: 9px; pointer-events: none; color: rgba(100,116,139,0.75); }
+
+/* ── Brand button ── */
+.brand-btn { height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #CBD5E1; font-size: 13px; font-weight: 400; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 7px; min-width: 138px; justify-content: space-between; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+.brand-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.15); }
+.brand-btn.active { border-color: rgba(14,165,233,0.4); background: rgba(14,165,233,0.1); color: #38bdf8; font-weight: 600; }
+.brand-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 90px; flex: 1; text-align: left; }
+.brand-x { font-size: 14px; line-height: 1; flex-shrink: 0; }
+
+.brand-dropdown { position: absolute; top: 44px; left: 0; width: 240px; background: #0D1B35; border: 1px solid rgba(255,255,255,0.1); border-radius: 13px; overflow: hidden; z-index: 50; box-shadow: 0 16px 40px rgba(0,0,0,0.55); }
+.brand-search-input { width: 100%; height: 34px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0 10px; font-size: 12px; color: #E2E8F0; outline: none; font-family: inherit; box-sizing: border-box; }
+.brand-option { display: block; width: 100%; padding: 8px 14px; font-size: 12px; color: #CBD5E1; background: transparent; border: none; cursor: pointer; font-family: inherit; text-align: left; font-weight: 400; transition: background 0.12s; }
+.brand-option:hover { background: rgba(255,255,255,0.04); }
+.brand-option.active { color: #38bdf8; background: rgba(14,165,233,0.1); font-weight: 600; }
+
+/* ── Active filter chips ── */
+.active-chips { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+.filter-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; background: rgba(14,165,233,0.08); border: 1px solid rgba(14,165,233,0.2); font-size: 11px; font-weight: 500; color: #38bdf8; max-width: 180px; white-space: nowrap; }
+.chip-x { background: none; border: none; cursor: pointer; color: rgba(56,189,248,0.65); font-size: 14px; line-height: 1; padding: 0 0 0 3px; margin: 0; transition: color 0.15s; }
+.chip-x:hover { color: #fb7185; }
+
+/* ── Category tabs ── */
+.cat-tabs-wrap { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 2px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px; }
+.cat-tab { flex-shrink: 0; height: 32px; padding: 0 13px; border-radius: 8px; font-size: 12px; font-weight: 400; cursor: pointer; border: 1px solid rgba(255,255,255,0.07); font-family: inherit; background: rgba(255,255,255,0.03); color: rgba(100,116,139,0.8); display: flex; align-items: center; gap: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+.cat-tab:hover { background: rgba(255,255,255,0.07); color: #CBD5E1; border-color: rgba(255,255,255,0.13); }
+.cat-tab.active { background: rgba(14,165,233,0.13); color: #38bdf8; font-weight: 600; border-color: rgba(14,165,233,0.28); }
+.cat-tab-skel { flex-shrink: 0; height: 32px; width: 100px; border-radius: 8px; }
+
+/* ── Product grid ── */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(256px, 1fr)); gap: 16px; }
+
+/* ── Product card ── */
+.product-card { border-radius: 16px; background: linear-gradient(160deg,#0D1B35,#091228); border: 1px solid rgba(255,255,255,0.07); overflow: hidden; transition: border-color 0.2s, box-shadow 0.22s, transform 0.22s; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+.product-card.hovered { border-color: rgba(14,165,233,0.2); box-shadow: 0 14px 38px rgba(0,0,0,0.55), 0 0 0 1px rgba(14,165,233,0.1); transform: translateY(-4px); }
+
+/* ── Card image ── */
+.card-img-wrap { position: relative; height: 160px; background: rgba(255,255,255,0.02); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.card-img { width: 100%; height: 100%; object-fit: contain; padding: 12px; transition: transform 0.3s; }
+.product-card.hovered .card-img { transform: scale(1.04); }
+.card-img-placeholder { width: 60px; height: 60px; border-radius: 14px; background: rgba(14,165,233,0.08); border: 1px solid rgba(14,165,233,0.15); display: flex; align-items: center; justify-content: center; }
+.card-img-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(9,18,40,0.45) 0%, transparent 55%); pointer-events: none; opacity: 0; transition: opacity 0.22s; }
+.product-card.hovered .card-img-overlay { opacity: 1; }
+.card-badges { position: absolute; top: 9px; left: 9px; display: flex; gap: 5px; }
+.badge-feat { font-size: 9px; font-weight: 700; padding: 3px 7px; border-radius: 5px; background: linear-gradient(135deg,#0EA5E9,#22D3EE); color: white; letter-spacing: 0.3px; }
+.badge-disc { font-size: 9px; font-weight: 700; padding: 3px 7px; border-radius: 20px; background: #10B981; color: white; }
+.badge-stock { position: absolute; top: 9px; right: 9px; font-size: 9px; font-weight: 600; padding: 3px 8px; border-radius: 20px; }
+
+/* ── Card body ── */
+.card-body { padding: 13px 15px 15px; display: flex; flex-direction: column; }
+.card-cat { display: inline-block; font-size: 10px; color: rgba(100,116,139,0.78); font-weight: 500; margin-bottom: 7px; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 20px; align-self: flex-start; }
+.card-name { font-size: 13px; font-weight: 600; color: #CBD5E1; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 36px; margin-bottom: 5px; transition: color 0.15s; }
+.card-name.bright { color: #F1F5F9; }
+.card-sku { font-size: 10px; color: rgba(100,116,139,0.55); margin-bottom: 7px; font-family: ui-monospace, 'JetBrains Mono', monospace; letter-spacing: 0.4px; }
+.card-supplier { font-size: 11px; color: rgba(71,85,105,0.9); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 11px; }
+.card-divider { height: 1px; background: rgba(255,255,255,0.05); margin-bottom: 11px; }
+.card-price-row { margin-bottom: 12px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.card-price { font-size: 17px; font-weight: 800; color: #F1F5F9; letter-spacing: -0.4px; line-height: 1; }
+.card-price-old { font-size: 11px; color: rgba(100,116,139,0.5); text-decoration: line-through; }
+.card-price-consult { font-size: 12px; color: rgba(100,116,139,0.6); font-style: italic; }
+
+/* ── Card actions ── */
+.card-actions { display: flex; gap: 7px; }
+.btn-add { flex: 1; display: flex; align-items: center; justify-content: center; height: 36px; border-radius: 9px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid rgba(14,165,233,0.22); font-family: inherit; transition: background 0.18s, border-color 0.18s, box-shadow 0.18s; background: rgba(14,165,233,0.1); color: #38bdf8; }
+.btn-add:hover:not(.out) { background: rgba(14,165,233,0.18); box-shadow: 0 4px 14px rgba(14,165,233,0.18); }
+.btn-add.added { background: rgba(16,185,129,0.12); color: #34d399; border-color: rgba(52,211,153,0.22); }
+.btn-add.out { opacity: 0.33; cursor: not-allowed; }
+.btn-inner { display: flex; align-items: center; gap: 5px; }
+.btn-detail { width: 36px; height: 36px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; cursor: pointer; color: rgba(100,116,139,0.7); flex-shrink: 0; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+.btn-detail:hover { background: rgba(255,255,255,0.09); color: #CBD5E1; border-color: rgba(255,255,255,0.18); }
+
+/* ── Error ── */
+.error-banner { padding: 12px 16px; border-radius: 12px; background: rgba(244,63,94,0.08); border: 1px solid rgba(244,63,94,0.2); color: #fb7185; font-size: 13px; display: flex; align-items: center; gap: 10px; }
+
+/* ── Empty / loading state ── */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 72px 24px; border-radius: 16px; background: linear-gradient(160deg,#0D1B35,#091228); border: 1px solid rgba(255,255,255,0.07); text-align: center; }
+.empty-icon { width: 56px; height: 56px; border-radius: 16px; background: rgba(14,165,233,0.08); border: 1px solid rgba(14,165,233,0.14); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+.empty-title { font-size: 16px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; }
+.empty-sub { font-size: 13px; color: rgba(71,85,105,0.9); }
+
+/* ── Pagination ── */
+.pagination { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 32px; }
+.pag-btn { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 18px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: background 0.15s, border-color 0.15s, box-shadow 0.15s; }
+.pag-prev { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #CBD5E1; }
+.pag-prev:hover:not([disabled]) { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.18); }
+.pag-next { background: rgba(14,165,233,0.09); border: 1px solid rgba(14,165,233,0.22); color: #38bdf8; }
+.pag-next:hover:not([disabled]) { background: rgba(14,165,233,0.16); box-shadow: 0 4px 14px rgba(14,165,233,0.15); }
+.pag-btn:disabled { opacity: 0.33; cursor: not-allowed; }
+.pag-center { display: flex; align-items: baseline; gap: 4px; padding: 0 6px; }
+.pag-cur { font-size: 16px; font-weight: 800; color: #F1F5F9; }
+.pag-slash { font-size: 14px; color: rgba(100,116,139,0.45); }
+.pag-total { font-size: 13px; color: rgba(100,116,139,0.65); font-weight: 500; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .product-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .controls-row { flex-direction: column; align-items: stretch; }
+  .controls-left { flex-wrap: wrap; }
+  .active-chips { margin-left: 0; }
+  .styled-select { min-width: unset; width: 100%; }
+}
+@media (max-width: 480px) {
+  .product-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .catalog-title { font-size: 19px; }
+  .filter-panel { padding: 14px; }
+  .search-input { font-size: 13px; }
+}
+
+/* ── Dropdown transition ── */
+.dropdown-enter-active { transition: opacity 0.15s ease, transform 0.15s ease; }
+.dropdown-leave-active { transition: opacity 0.1s ease, transform 0.1s ease; }
+.dropdown-enter-from, .dropdown-leave-to { opacity: 0; transform: translateY(-4px); }
+</style>
