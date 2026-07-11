@@ -18,7 +18,7 @@
         Navegación
       </div>
 
-      <NuxtLink v-for="item in navItems" :key="item.href" :to="item.href" style="text-decoration:none;display:block;margin-bottom:1px;">
+      <a v-for="item in navItems" :key="item.href" :href="item.href" style="text-decoration:none;display:block;margin-bottom:1px;">
         <div :style="linkStyle(item.href)" :title="collapsed ? item.label : undefined"
           @mouseenter="e => onHover(e, item.href, true)"
           @mouseleave="e => onHover(e, item.href, false)">
@@ -43,7 +43,7 @@
             {{ cartCount }}
           </div>
         </div>
-      </NuxtLink>
+      </a>
     </nav>
 
     <!-- Botón colapsar -->
