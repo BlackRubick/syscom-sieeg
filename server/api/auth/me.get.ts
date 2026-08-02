@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
       fiscalCompleted:true, fiscalRfc:true, fiscalRazonSocial:true, fiscalCodpos:true, fiscalEmail:true,
       fiscalUsocfdi:true, fiscalRegimen:true, fiscalPais:true, fiscalCalle:true, fiscalNumExt:true,
       fiscalNumInt:true, fiscalColonia:true, fiscalCiudad:true, fiscalDelegacion:true, fiscalLocalidad:true,
-      fiscalEstado:true, fiscalNumregidtrib:true, fiscalNombre:true, fiscalApellidos:true, fiscalTelefono:true,
+      fiscalEstado:true, fiscalNumregidtrib:true, fiscalNombre:true, fiscalApellidos:true, fiscalTelefono:true, discountPct:true,
     },
   })
 

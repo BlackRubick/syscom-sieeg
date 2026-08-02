@@ -65,6 +65,7 @@ model User {
   fiscalApellidos    String? @map("fiscal_apellidos")
   fiscalTelefono     String? @map("fiscal_telefono")
   facturaUid         String? @map("factura_uid")
+  discountPct        Float   @default(0) @map("discount_pct")
 
   @@map("users")
 }

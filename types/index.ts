@@ -27,6 +27,7 @@ export interface User {
   fiscalNombre?: string
   fiscalApellidos?: string
   fiscalTelefono?: string
+  discountPct?: number
 }
 
 export interface Product {

@@ -97,6 +97,9 @@
             <span :style="{ width:'5px', height:'5px', borderRadius:'50%', background:statusCfg[user.status]?.dot, display:'inline-block' }" />
             {{ statusCfg[user.status]?.label }}
           </span>
+          <span v-if="user.discountPct && user.discountPct > 0" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.25);">
+            -{{ user.discountPct }}%
+          </span>
         </div>
 
         <!-- Detalles -->
@@ -145,6 +148,17 @@
                 <div v-if="modal==='create'" style="grid-column:1/-1;"><FormField label="Contraseña" type="password" v-model="form.password" placeholder="Mínimo 6 caracteres" :required="true" /></div>
                 <FormSelect label="Rol" v-model="form.role" :options="ROLES.map(r=>({value:r,label:roleCfg[r].label}))" />
                 <FormSelect label="Estado" v-model="form.status" :options="STATUSES.map(s=>({value:s,label:statusCfg[s].label}))" />
+                <div style="grid-column:1/-1;">
+                  <div style="font-size:11px;font-weight:600;color:rgba(100,116,139,0.9);margin-bottom:6px;letter-spacing:0.3px;">Descuento en catálogo (%)</div>
+                  <div style="position:relative;">
+                    <input v-model.number="form.discountPct" type="number" min="0" max="100" step="0.5" placeholder="0"
+                      style="width:100%;height:40px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0 40px 0 14px;font-size:13px;color:#E2E8F0;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.2s;"
+                      @focus="e=>(e.currentTarget as HTMLElement).style.borderColor='rgba(14,165,233,0.45)'"
+                      @blur="e=>(e.currentTarget as HTMLElement).style.borderColor='rgba(255,255,255,0.1)'" />
+                    <span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:13px;color:rgba(100,116,139,0.6);pointer-events:none;">%</span>
+                  </div>
+                  <div style="font-size:11px;color:rgba(100,116,139,0.5);margin-top:5px;">0 = precio normal · 10 = 10% de descuento sobre precios SYSCOM</div>
+                </div>
               </div>
 
               <Transition name="fade">
@@ -270,21 +284,21 @@ const avatarGrad = (name: string) => palette[name.charCodeAt(0) % palette.length
 const formatDate     = (d: string) => new Intl.DateTimeFormat('es-MX',{ day:'2-digit', month:'short', year:'numeric' }).format(new Date(d))
 
 /* ── modal crear / editar ── */
-interface Form { name:string; email:string; password:string; role:string; status:string }
+interface Form { name:string; email:string; password:string; role:string; status:string; discountPct:number }
 const modal      = ref<'create'|'edit'|null>(null)
 const editTarget = ref<User|null>(null)
-const form       = ref<Form>({ name:'', email:'', password:'', role:'buyer', status:'active' })
+const form       = ref<Form>({ name:'', email:'', password:'', role:'buyer', status:'active', discountPct:0 })
 const saving     = ref(false)
 const formError  = ref('')
 
 function openCreate() {
-  form.value = { name:'', email:'', password:'', role:'buyer', status:'active' }
+  form.value = { name:'', email:'', password:'', role:'buyer', status:'active', discountPct:0 }
   formError.value = ''
   modal.value = 'create'
 }
 function openEdit(u: User) {
   editTarget.value = u
-  form.value = { name:u.name, email:u.email, password:'', role:u.role, status:u.status }
+  form.value = { name:u.name, email:u.email, password:'', role:u.role, status:u.status, discountPct:u.discountPct ?? 0 }
   formError.value = ''
   openMenu.value = null
   modal.value = 'edit'
@@ -293,7 +307,7 @@ function openEdit(u: User) {
 async function handleSave() {
   saving.value = true; formError.value = ''
   try {
-    const body: Record<string,unknown> = { name:form.value.name, email:form.value.email, role:form.value.role, status:form.value.status }
+    const body: Record<string,unknown> = { name:form.value.name, email:form.value.email, role:form.value.role, status:form.value.status, discountPct:form.value.discountPct }
     if (modal.value === 'create') {
       if (!form.value.password) { formError.value = 'La contraseña es requerida'; saving.value=false; return }
       body.password = form.value.password

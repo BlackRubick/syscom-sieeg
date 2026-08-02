@@ -316,7 +316,7 @@
 
 <script setup lang="ts">
 import { Search, ChevronDown, Package, AlertCircle, Loader2, LayoutGrid, Eye, Tag } from '@lucide/vue'
-import { fetchCategorias, fetchProductos, fetchMarcas } from '~/composables/useSyscom'
+import { fetchCategorias, fetchProductos, fetchMarcas, fetchInitialCatalog } from '~/composables/useSyscom'
 import type { Product, SyscomCategoria } from '~/types'
 
 definePageMeta({ middleware: 'auth' })
@@ -373,18 +373,11 @@ onMounted(async () => {
 watch([dSearch, activeCategoryId, activeBrandId, pagina, sortBy], loadProducts)
 
 async function loadAllCategories(myId: number) {
-  const seen = new Set<string>()
-  for (const cat of categories.value) {
-    if (myId !== loadId) return
-    const r = await fetchProductos({ categoria: cat.id })
-    if (myId !== loadId) return
-    const fresh = r.products.filter(p => !seen.has(p.id))
-    fresh.forEach(p => seen.add(p.id))
-    products.value = [...products.value, ...fresh]
-    cantidad.value = products.value.length
-    if (loading.value && products.value.length > 0) loading.value = false
-  }
-  if (myId === loadId) loading.value = false
+  const r = await fetchInitialCatalog(categories.value)
+  if (myId !== loadId) return
+  products.value = r.products
+  cantidad.value = r.products.length
+  loading.value = false
 }
 
 async function loadProducts() {

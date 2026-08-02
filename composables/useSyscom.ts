@@ -60,18 +60,46 @@ export async function fetchProductos(opts: FetchProductosOpts): Promise<Producto
   if (opts.marca)     params.set('marca',     opts.marca)
   if (opts.pagina && opts.pagina > 1) params.set('pagina', String(opts.pagina))
   if (opts.orden && opts.orden !== 'relevancia') params.set('orden', opts.orden)
-  params.set('moneda', 'MXN')
-  const url = `/api/syscom/productos?${params}`
+  const url = `/api/catalog/products?${params}`
   const cached = get<ProductosResult>(url); if (cached) return cached
   try {
-    const data = await $fetch<{ productos?: SyscomProducto[]; cantidad?: number; pagina?: number; paginas?: number; error?: string }>(url)
-    const result: ProductosResult = {
-      products: (data.productos ?? []).map(adaptProduct),
-      cantidad: data.cantidad ?? 0, pagina: data.pagina ?? 1, paginas: data.paginas ?? 1,
-    }
+    const result = await $fetch<ProductosResult>(url)
     set(url, result, 5 * 60_000)
     return result
   } catch (e) { return empty(e instanceof Error ? e.message : 'Error de conexión') }
+}
+
+export async function fetchInitialCatalog(categories: SyscomCategoria[]): Promise<ProductosResult> {
+  const key = 'initial_catalog_v1'
+  const cached = get<ProductosResult>(key)
+  if (cached) return cached
+
+  const seen = new Set<string>()
+  const products: Product[] = []
+  const LIMIT = 50
+
+  for (const cat of categories) {
+    if (products.length >= LIMIT) break
+    try {
+      const r = await fetchProductos({ categoria: cat.id })
+      for (const p of r.products) {
+        if (!seen.has(p.id)) {
+          seen.add(p.id)
+          products.push(p)
+          if (products.length >= LIMIT) break
+        }
+      }
+    } catch { /* skip */ }
+  }
+
+  const result: ProductosResult = {
+    products: products.slice(0, LIMIT),
+    cantidad: products.length,
+    pagina: 1,
+    paginas: 1,
+  }
+  set(key, result, 10 * 60_000)
+  return result
 }
 
 export async function fetchMarcas(): Promise<Array<{ id: string; nombre: string }>> {

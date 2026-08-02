@@ -18,15 +18,16 @@ export default defineEventHandler(async (event) => {
   }
 
   const data: Record<string, unknown> = {}
-  if (body.name)   data.name   = body.name
-  if (body.email)  data.email  = (body.email as string).toLowerCase()
-  if (body.role)   data.role   = body.role as UserRole
-  if (body.status) data.status = body.status as UserStatus
+  if (body.name)                   data.name        = body.name
+  if (body.email)                  data.email       = (body.email as string).toLowerCase()
+  if (body.role)                   data.role        = body.role as UserRole
+  if (body.status)                 data.status      = body.status as UserStatus
+  if (body.discountPct !== undefined) data.discountPct = Math.max(0, Math.min(100, Number(body.discountPct)))
 
   const user = await prisma.user.update({
     where: { id },
     data,
-    select: { id:true, name:true, email:true, role:true, status:true, createdAt:true, lastLogin:true, avatar:true },
+    select: { id:true, name:true, email:true, role:true, status:true, createdAt:true, lastLogin:true, avatar:true, discountPct:true },
   })
 
   return { user }
