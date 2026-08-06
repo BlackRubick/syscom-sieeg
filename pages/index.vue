@@ -6,7 +6,6 @@
       <div style="width:100%;max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:20px;">
 
         <NuxtLink to="/" style="display:flex;align-items:center;gap:10px;flex-shrink:0;text-decoration:none;">
-          <img src="/logosieeg.jpg" alt="SIEEG" style="height:38px;width:38px;object-fit:contain;border-radius:8px;" />
           <span style="font-size:15px;font-weight:700;color:#F1F5F9;letter-spacing:-0.3px;">SIEEG <span style="color:#0EA5E9;">INTEGRADORES</span></span>
         </NuxtLink>
 
