@@ -2,7 +2,8 @@ import { createHmac } from 'crypto'
 import type { H3Event } from 'h3'
 
 export const SESSION_COOKIE = 'sieeg_sess'
-const TTL_MS = 8 * 60 * 60 * 1000
+export const TTL_MS        = 15 * 60 * 1000  // 15 min inactividad
+export const COOKIE_MAX_AGE = 15 * 60         // segundos
 
 export interface SessionPayload {
   userId: string

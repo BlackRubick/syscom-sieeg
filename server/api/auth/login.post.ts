@@ -1,7 +1,7 @@
 import { createHash } from 'crypto'
 import bcrypt from 'bcryptjs'
 import prisma from '~/server/utils/prisma'
-import { createToken, SESSION_COOKIE } from '~/server/utils/session'
+import { createToken, SESSION_COOKIE, COOKIE_MAX_AGE } from '~/server/utils/session'
 
 // #4 — Rate limiting en memoria (por IP)
 interface RateBucket { count: number; resetAt: number }
@@ -94,9 +94,9 @@ export default defineEventHandler(async (event) => {
 
   setCookie(event, SESSION_COOKIE, token, {
     httpOnly: true,
-    secure:   process.env.NODE_ENV === 'production',
+    secure:   false,
     sameSite: 'lax',
-    maxAge:   8 * 60 * 60,
+    maxAge:   COOKIE_MAX_AGE,
     path:     '/',
   })
 
