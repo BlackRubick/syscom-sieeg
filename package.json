@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "TMPDIR=/tmp nuxt dev",
-    "build": "nuxt build",
+    "build": "prisma generate && nuxt build",
     "preview": "nuxt preview",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
