@@ -18,7 +18,7 @@
         Navegación
       </div>
 
-      <a v-for="item in navItems" :key="item.href" :href="item.href" style="text-decoration:none;display:block;margin-bottom:1px;">
+      <NuxtLink v-for="item in navItems" :key="item.href" :to="item.href" style="text-decoration:none;display:block;margin-bottom:1px;">
         <div :style="linkStyle(item.href)" :title="collapsed ? item.label : undefined"
           @mouseenter="e => onHover(e, item.href, true)"
           @mouseleave="e => onHover(e, item.href, false)">
@@ -43,7 +43,7 @@
             {{ cartCount }}
           </div>
         </div>
-      </a>
+      </NuxtLink>
     </nav>
 
     <!-- Botón colapsar -->
@@ -87,6 +87,10 @@ const ALL_NAV = [
   {
     href: '/users', label: 'Usuarios', roles: ['admin'],
     svg: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  },
+  {
+    href: '/admin', label: 'Precios', roles: ['admin'],
+    svg: '<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
   },
   {
     href: '/fiscal', label: 'Datos Fiscales', roles: ['admin'],
