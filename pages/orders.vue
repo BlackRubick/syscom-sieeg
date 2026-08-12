@@ -75,6 +75,15 @@
                 <span style="font-size:12px;font-weight:700;color:#E2E8F0;font-family:monospace;">{{ order.id.slice(-8).toUpperCase() }}</span>
                 <span :style="{ fontSize:'10px', fontWeight:600, padding:'2px 8px', borderRadius:'20px', background:statusCfg[order.status].bg, color:statusCfg[order.status].color }">{{ statusCfg[order.status].label }}</span>
                 <span :style="{ fontSize:'10px', fontWeight:600, padding:'2px 8px', borderRadius:'20px', background:priCfg[order.priority]?.bg??priCfg.normal.bg, color:priCfg[order.priority]?.color??priCfg.normal.color }">{{ priCfg[order.priority]?.label??'Normal' }}</span>
+                <!-- Pago -->
+                <template v-if="order.paymentId">
+                  <span :style="{ fontSize:'10px', fontWeight:700, padding:'2px 8px', borderRadius:'20px', background: order.paymentStatus==='paid' ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.12)', color: order.paymentStatus==='paid' ? '#34d399' : '#fbbf24' }">
+                    {{ order.paymentStatus === 'paid' ? '✓ Pagado' : 'Pago pendiente' }}
+                  </span>
+                  <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(99,102,241,0.12);color:#a5b4fc;">
+                    {{ order.paymentMethod === 'spei' ? 'SPEI' : 'Tarjeta' }}
+                  </span>
+                </template>
               </div>
               <div style="display:flex;align-items:center;gap:6px;">
                 <Clock :size="11" color="rgba(100,116,139,0.6)" />
@@ -314,6 +323,53 @@
                   <!-- Error al consultar -->
                   <div v-if="trackingError && !tracking" style="padding:10px 16px;border-top:1px solid rgba(244,63,94,0.15);font-size:11px;color:#fb7185;">
                     {{ trackingError }}
+                  </div>
+                </div>
+
+                <!-- Pago OpenPay -->
+                <div v-if="detail.paymentId" style="border-radius:14px;overflow:hidden;"
+                  :style="{ background: detail.paymentMethod==='spei' ? 'rgba(16,185,129,0.05)' : 'rgba(14,165,233,0.05)', border: detail.paymentMethod==='spei' ? '1px solid rgba(16,185,129,0.2)' : '1px solid rgba(14,165,233,0.18)' }">
+                  <!-- Header pago -->
+                  <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" :stroke="detail.paymentMethod==='spei'?'#34d399':'#38bdf8'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
+                      <div>
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;"
+                          :style="{ color: detail.paymentMethod==='spei' ? 'rgba(52,211,153,0.7)' : 'rgba(56,189,248,0.7)' }">
+                          {{ detail.paymentMethod === 'spei' ? 'Transferencia SPEI · OpenPay' : 'Pago con tarjeta · OpenPay' }}
+                        </div>
+                        <div style="font-size:11px;font-family:monospace;color:rgba(100,116,139,0.65);">{{ detail.paymentId }}</div>
+                      </div>
+                    </div>
+                    <span :style="{
+                      fontSize:'11px', fontWeight:700, padding:'3px 10px', borderRadius:'20px',
+                      background: detail.paymentStatus==='paid' ? 'rgba(16,185,129,0.15)' : detail.paymentStatus==='pending_spei' ? 'rgba(245,158,11,0.12)' : 'rgba(245,158,11,0.12)',
+                      color:      detail.paymentStatus==='paid' ? '#34d399' : '#fbbf24'
+                    }">
+                      {{ detail.paymentStatus === 'paid' ? 'Pagado' : detail.paymentStatus === 'pending_spei' ? 'Esperando transferencia' : detail.paymentStatus ?? 'Pendiente' }}
+                    </span>
+                  </div>
+
+                  <!-- SPEI: datos bancarios -->
+                  <div v-if="detail.paymentMethod === 'spei' && detail.paymentData"
+                    style="border-top:1px solid rgba(16,185,129,0.12);padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                      <div>
+                        <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.5);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px;">CLABE</div>
+                        <div style="font-size:12px;font-weight:700;font-family:monospace;color:#6ee7b7;letter-spacing:1px;">{{ detail.paymentData.clabe }}</div>
+                      </div>
+                      <div>
+                        <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.5);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px;">Banco</div>
+                        <div style="font-size:12px;color:#94a3b8;">{{ detail.paymentData.bank }}</div>
+                      </div>
+                    </div>
+                    <div>
+                      <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.5);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px;">Convenio CIE</div>
+                      <div style="font-size:12px;font-weight:700;font-family:monospace;color:#34d399;">{{ detail.paymentData.agreement }}</div>
+                    </div>
+                    <div v-if="isManager" style="padding:8px 12px;border-radius:8px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.18);font-size:11px;color:rgba(251,191,36,0.85);line-height:1.5;">
+                      Verifica la recepción de la transferencia antes de aprobar el pedido.
+                    </div>
                   </div>
                 </div>
 
