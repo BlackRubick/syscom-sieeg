@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
     email:   email.toLowerCase().trim(),
     company: company?.trim() ?? '',
     phone:   phone?.trim()   ?? '',
-  }).catch(err => console.error('[email] Error enviando notificación:', err))
+  }).catch(() => {})
 
   return { success: true }
 })

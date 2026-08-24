@@ -60,7 +60,6 @@ export async function facturaFetch<T = unknown>(
   if (!res.ok) {
     const rawMsg = body?.message ?? `Factura.com error ${res.status}`
     const msg = typeof rawMsg === 'string' ? rawMsg : JSON.stringify(rawMsg)
-    console.error('[Factura.com HTTP error]', res.status, url, JSON.stringify(body))
     throw createError({ statusCode: res.status, message: msg })
   }
 
@@ -68,7 +67,6 @@ export async function facturaFetch<T = unknown>(
   if (body?.status === 'error' || body?.response === 'error') {
     const rawMsg = body?.message ?? body?.msg ?? 'Error en Factura.com'
     const msg = typeof rawMsg === 'string' ? rawMsg : JSON.stringify(rawMsg)
-    console.error('[Factura.com error]', url, JSON.stringify(body))
     throw createError({ statusCode: 422, message: msg })
   }
 
