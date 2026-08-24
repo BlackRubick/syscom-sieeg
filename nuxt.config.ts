@@ -11,6 +11,13 @@ export default defineNuxtConfig({
     smtpUser:    process.env.SMTP_USER     ?? '',
     smtpPass:    process.env.SMTP_PASS     ?? '',
     smtpAdminTo: process.env.SMTP_ADMIN_TO ?? '',
+    // OpenPay — server-only (private key)
+    openpayPrivateKey: process.env.OPENPAY_PRIVATE_KEY ?? '',
+    public: {
+      openpayMerchantId: process.env.OPENPAY_MERCHANT_ID ?? '',
+      openpayPublicKey:  process.env.OPENPAY_PUBLIC_KEY  ?? '',
+      openpayIsSandbox:  process.env.OPENPAY_IS_SANDBOX  ?? 'true',
+    },
   },
 
   css: ['~/assets/css/main.css'],
