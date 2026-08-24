@@ -520,6 +520,8 @@ function formatCardNumber(e: Event) {
 
 function formatExpiry(e: Event) {
   let v = (e.target as HTMLInputElement).value.replace(/\D/g, '').slice(0, 4)
+  // Si el primer dígito es > 1, agregar cero a la izquierda (ej. "6" → "06")
+  if (v.length === 1 && parseInt(v) > 1) v = '0' + v
   if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2)
   card.expiry = v
 }
@@ -587,6 +589,13 @@ async function handlePayCard() {
   if (rawNum.length < 15 || rawNum.length > 19) { payError.value = 'Número de tarjeta inválido'; return }
   const [expM, expY] = card.expiry.split('/')
   if (!expM || !expY || expM.length !== 2 || expY.length !== 2) { payError.value = 'Fecha de vencimiento inválida (MM/AA)'; return }
+  const mNum = parseInt(expM, 10)
+  if (mNum < 1 || mNum > 12) { payError.value = 'Mes de vencimiento inválido (01-12)'; return }
+  const now = new Date()
+  const curY = now.getFullYear() % 100
+  const curM = now.getMonth() + 1
+  const yNum = parseInt(expY, 10)
+  if (yNum < curY || (yNum === curY && mNum < curM)) { payError.value = 'La tarjeta ya venció, verifica la fecha'; return }
   if (!card.cvv || card.cvv.length < 3) { payError.value = 'CVV inválido'; return }
 
   paying.value = true
