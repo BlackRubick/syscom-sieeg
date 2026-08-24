@@ -12,17 +12,24 @@ function authHeader() {
 
 // ── Mensajes de error según requisitos de certificación OpenPay ──
 export function openpayErrorMessage(e: any): string {
-  const code: number | undefined = e?.data?.error_code
-  if (code === 3003) return 'Tu pago no pudo ser realizado. Intenta con otra tarjeta'
-  if (code === 3001 || code === 3004 || code === 3005 || code === 3009) {
-    return 'El pago no pudo ser realizado, intenta de nuevo.'
+  const code: number | undefined = e?.data?.error_code ?? e?.data?.data?.error_code
+  switch (code) {
+    case 3001: return 'El pago no pudo ser realizado, intenta de nuevo.'
+    case 3002: return 'Tu pago no pudo ser completado. Intenta con otra tarjeta o elige otra forma de pago.'
+    case 3003: return 'Tu pago no pudo ser realizado. Intenta con otra tarjeta.'
+    case 3004: return 'El pago no pudo ser realizado, intenta de nuevo.'
+    case 3005: return 'El pago no pudo ser realizado, intenta de nuevo.'
+    case 3006: return 'El pago no pudo ser realizado, intenta de nuevo o comunícate con tu banco.'
+    case 3007: return 'La tarjeta ha expirado. Intenta con otra tarjeta.'
+    case 3008: return 'La tarjeta no es compatible con compras. Intenta con otra tarjeta.'
+    case 3009: return 'Tu pago fue declinado. Comunícate con tu banco o intenta con otra tarjeta.'
+    case 3010: return 'Tu banco ha restringido el uso de la tarjeta. Comunícate con tu banco.'
+    case 3011: return 'Tu banco ha declinado el pago. Comunícate con tu banco y autoriza el pago.'
+    case 3012: return 'Se requiere autorización de tu banco para este pago. Comunícate con tu banco.'
+    case 2004: return 'El número de tarjeta es inválido.'
+    case 2005: return 'La tarjeta ha expirado.'
+    case 2009: return 'El código de seguridad (CVV) es inválido.'
   }
-  if (code && code >= 3000 && code < 4000) {
-    return 'Ocurrió un error, intenta de nuevo o comunícate con tu banco.'
-  }
-  if (code === 2004) return 'El número de tarjeta es inválido'
-  if (code === 2005) return 'La tarjeta ha expirado'
-  if (code === 2009) return 'El código de seguridad (CVV) es inválido'
   return e?.data?.description ?? e?.message ?? 'Ocurrió un error, intenta de nuevo o comunícate con tu banco.'
 }
 

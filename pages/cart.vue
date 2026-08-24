@@ -679,19 +679,24 @@ async function handlePayCard() {
       (error: any) => {
         done()
         const code = error?.data?.error_code
-        if (code === 3003) {
-          payError.value = 'El pago no pudo ser realizado, intenta con otra tarjeta.'
-        } else if (code === 3001 || code === 3004 || code === 3005 || code === 3009) {
-          payError.value = 'El pago no pudo ser realizado, intenta de nuevo.'
-        } else if (code === 2004) {
-          payError.value = 'El número de tarjeta es inválido.'
-        } else if (code === 2005) {
-          payError.value = 'La tarjeta ha expirado.'
-        } else if (code === 2009) {
-          payError.value = 'El código de seguridad (CVV) es inválido.'
-        } else {
-          payError.value = 'Ocurrió un error, intenta de nuevo o comunícate con tu banco.'
+        const msgs: Record<number, string> = {
+          3001: 'El pago no pudo ser realizado, intenta de nuevo.',
+          3002: 'Tu pago no pudo ser completado. Intenta con otra tarjeta o elige otra forma de pago.',
+          3003: 'Tu pago no pudo ser realizado. Intenta con otra tarjeta.',
+          3004: 'El pago no pudo ser realizado, intenta de nuevo.',
+          3005: 'El pago no pudo ser realizado, intenta de nuevo.',
+          3006: 'El pago no pudo ser realizado, intenta de nuevo o comunícate con tu banco.',
+          3007: 'La tarjeta ha expirado. Intenta con otra tarjeta.',
+          3008: 'La tarjeta no es compatible con compras. Intenta con otra tarjeta.',
+          3009: 'Tu pago fue declinado. Comunícate con tu banco o intenta con otra tarjeta.',
+          3010: 'Tu banco ha restringido el uso de la tarjeta. Comunícate con tu banco.',
+          3011: 'Tu banco ha declinado el pago. Comunícate con tu banco y autoriza el pago.',
+          3012: 'Se requiere autorización de tu banco para este pago. Comunícate con tu banco.',
+          2004: 'El número de tarjeta es inválido.',
+          2005: 'La tarjeta ha expirado.',
+          2009: 'El código de seguridad (CVV) es inválido.',
         }
+        payError.value = (code && msgs[code]) ?? 'Ocurrió un error, intenta de nuevo o comunícate con tu banco.'
         paying.value = false
       },
     )
