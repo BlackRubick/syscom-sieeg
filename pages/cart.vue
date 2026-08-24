@@ -696,7 +696,12 @@ async function handlePayCard() {
           2005: 'La tarjeta ha expirado.',
           2009: 'El código de seguridad (CVV) es inválido.',
         }
-        payError.value = (code && msgs[code]) ?? 'Ocurrió un error, intenta de nuevo o comunícate con tu banco.'
+        // Intentar también sin .data por si OpenPay.js cambia la estructura
+        const code2 = code ?? error?.error_code
+        payError.value = (code2 && msgs[code2])
+          ?? error?.data?.description
+          ?? error?.description
+          ?? 'Ocurrió un error, intenta de nuevo o comunícate con tu banco.'
         paying.value = false
       },
     )
