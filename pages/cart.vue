@@ -275,10 +275,9 @@
               <div>
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
                   <!-- Logo OpenPay -->
-                  <img src="https://openpay.s3.amazonaws.com/logo_openpay.png"
-                    alt="OpenPay" height="20"
-                    style="height:20px;object-fit:contain;"
-                    @error="(e:any) => { e.target.style.display='none' }" />
+                  <img src="/openpay-logo.svg"
+                    alt="Openpay" height="22"
+                    style="height:22px;object-fit:contain;" />
                   <span style="font-size:11px;color:rgba(100,116,139,0.5);">Pago seguro</span>
                 </div>
                 <!-- Logos de marcas de tarjeta -->
@@ -646,15 +645,21 @@ async function handlePayCard() {
               method:          'card',
               token:           response.data.id,
               deviceSessionId,
+              redirectUrl:     window.location.origin + '/payment/return',
               items:           cartItems(),
               priority:        priority.value,
               notes:           notes.value || undefined,
             },
           })
-          paymentAuth.value  = result.order?.authorization ?? result.order?.paymentId ?? ''
           cart.clearCart()
           showPayModal.value = false
-          submitted.value    = true
+          if (result.threeDSUrl) {
+            // Redirigir al banco para verificación 3D Secure
+            window.location.href = result.threeDSUrl
+          } else {
+            paymentAuth.value = result.order?.authorization ?? result.order?.paymentId ?? ''
+            submitted.value   = true
+          }
         } catch (e: any) {
           payError.value = e?.data?.message ?? 'Tu pago no pudo ser realizado, intenta de nuevo.'
         } finally {
