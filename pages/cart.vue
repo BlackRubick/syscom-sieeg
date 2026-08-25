@@ -273,27 +273,26 @@
           <div style="padding:22px 24px 0;">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
               <div>
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-                  <!-- Logo OpenPay -->
-                  <img src="/openpay-logo.svg"
-                    alt="Openpay" height="22"
-                    style="height:22px;object-fit:contain;" />
+                <!-- Logo OpenPay oficial -->
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                  <div style="background:white;border-radius:6px;padding:3px 10px;display:flex;align-items:center;">
+                    <img src="/openpay/openpay-logo.jpg" alt="Openpay by BBVA" style="height:18px;object-fit:contain;" />
+                  </div>
                   <span style="font-size:11px;color:rgba(100,116,139,0.5);">Pago seguro</span>
                 </div>
-                <!-- Logos de marcas de tarjeta -->
-                <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
-                  <!-- Visa -->
-                  <div style="height:20px;padding:0 7px;border-radius:4px;background:#1A1F71;display:flex;align-items:center;">
-                    <span style="font-size:11px;font-weight:800;color:white;letter-spacing:1px;font-family:Arial,sans-serif;">VISA</span>
+                <!-- Logos de marcas de tarjeta oficiales -->
+                <div style="display:flex;align-items:center;gap:5px;">
+                  <div style="height:22px;padding:2px 8px;border-radius:4px;background:white;display:flex;align-items:center;justify-content:center;">
+                    <img src="/openpay/visa.png" alt="Visa" style="height:13px;object-fit:contain;" />
                   </div>
-                  <!-- Mastercard -->
-                  <div style="height:20px;width:32px;border-radius:4px;background:#252525;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;">
-                    <div style="width:13px;height:13px;border-radius:50%;background:#EB001B;position:absolute;left:4px;"></div>
-                    <div style="width:13px;height:13px;border-radius:50%;background:#F79E1B;position:absolute;right:4px;opacity:0.9;"></div>
+                  <div style="height:22px;padding:2px 6px;border-radius:4px;background:white;display:flex;align-items:center;justify-content:center;">
+                    <img src="/openpay/mastercard.png" alt="Mastercard" style="height:18px;object-fit:contain;" />
                   </div>
-                  <!-- Amex -->
-                  <div style="height:20px;padding:0 6px;border-radius:4px;background:#2E77BC;display:flex;align-items:center;">
-                    <span style="font-size:9px;font-weight:800;color:white;letter-spacing:0.3px;font-family:Arial,sans-serif;">AMEX</span>
+                  <div style="height:22px;width:36px;border-radius:4px;overflow:hidden;flex-shrink:0;">
+                    <img src="/openpay/amex.png" alt="American Express" style="height:22px;width:36px;object-fit:cover;" />
+                  </div>
+                  <div style="height:22px;padding:2px 6px;border-radius:4px;background:white;display:flex;align-items:center;justify-content:center;">
+                    <img src="/openpay/carnet.png" alt="Carnet" style="height:16px;object-fit:contain;" />
                   </div>
                 </div>
               </div>
@@ -313,9 +312,9 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">
               <button @click="payTab = 'card'"
                 :style="{
-                  height:'42px', borderRadius:'10px', fontSize:'12px', fontWeight:600,
+                  height:'44px', borderRadius:'10px', fontSize:'12px', fontWeight:600,
                   cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center',
-                  justifyContent:'center', gap:'7px', transition:'all 0.15s', border:'none',
+                  justifyContent:'center', gap:'8px', transition:'all 0.15s', border:'none',
                   background: payTab==='card' ? 'rgba(14,165,233,0.15)' : 'rgba(255,255,255,0.03)',
                   color: payTab==='card' ? '#38bdf8' : 'rgba(100,116,139,0.7)',
                   outline: payTab==='card' ? '1.5px solid rgba(14,165,233,0.45)' : '1px solid rgba(255,255,255,0.08)',
@@ -324,15 +323,17 @@
               </button>
               <button @click="payTab = 'spei'"
                 :style="{
-                  height:'42px', borderRadius:'10px', fontSize:'12px', fontWeight:600,
+                  height:'44px', borderRadius:'10px', fontSize:'12px', fontWeight:600,
                   cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center',
-                  justifyContent:'center', gap:'7px', transition:'all 0.15s', border:'none',
+                  justifyContent:'center', gap:'8px', transition:'all 0.15s', border:'none',
                   background: payTab==='spei' ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.03)',
                   color: payTab==='spei' ? '#34d399' : 'rgba(100,116,139,0.7)',
                   outline: payTab==='spei' ? '1.5px solid rgba(16,185,129,0.35)' : '1px solid rgba(255,255,255,0.08)',
                 }">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
-                Transferencia SPEI
+                <div style="background:white;border-radius:3px;padding:1px 4px;display:flex;align-items:center;">
+                  <img src="/openpay/spei.png" alt="SPEI" style="height:14px;object-fit:contain;" />
+                </div>
+                Transferencia
               </button>
             </div>
           </div>
@@ -402,16 +403,24 @@
               </span>
             </button>
 
-            <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:7px;">
               <Lock :size="11" color="rgba(100,116,139,0.35)" />
-              <span style="font-size:10px;color:rgba(100,116,139,0.4);">Pago cifrado SSL · Procesado por OpenPay BBVA</span>
+              <span style="font-size:10px;color:rgba(100,116,139,0.4);">Pago cifrado SSL · Procesado por</span>
+              <div style="background:white;border-radius:4px;padding:1px 6px;display:inline-flex;align-items:center;">
+                <img src="/openpay/openpay-logo.jpg" alt="Openpay" style="height:11px;object-fit:contain;" />
+              </div>
             </div>
           </div>
 
           <!-- ── Tab: SPEI ── -->
           <div v-else style="padding:0 24px 24px;display:flex;flex-direction:column;gap:14px;">
-            <div style="padding:14px 16px;border-radius:12px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);display:flex;flex-direction:column;gap:8px;">
-              <div style="font-size:12px;font-weight:600;color:#34d399;">¿Cómo funciona?</div>
+            <div style="padding:14px 16px;border-radius:12px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="background:white;border-radius:5px;padding:4px 8px;display:flex;align-items:center;flex-shrink:0;">
+                  <img src="/openpay/spei.png" alt="SPEI" style="height:22px;object-fit:contain;" />
+                </div>
+                <div style="font-size:12px;font-weight:600;color:#34d399;">Transferencia SPEI</div>
+              </div>
               <div style="font-size:11px;color:rgba(100,116,139,0.75);line-height:1.6;">
                 Al confirmar, se generará una CLABE interbancaria. Realiza la transferencia desde tu banco con ese número. Tu pedido quedará pendiente hasta que el administrador confirme el pago.
               </div>
@@ -443,9 +452,12 @@
               <span v-else>Generar referencia SPEI</span>
             </button>
 
-            <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:7px;">
               <Lock :size="11" color="rgba(100,116,139,0.35)" />
-              <span style="font-size:10px;color:rgba(100,116,139,0.4);">Procesado por OpenPay BBVA</span>
+              <span style="font-size:10px;color:rgba(100,116,139,0.4);">Procesado por</span>
+              <div style="background:white;border-radius:4px;padding:1px 6px;display:inline-flex;align-items:center;">
+                <img src="/openpay/openpay-logo.jpg" alt="Openpay" style="height:11px;object-fit:contain;" />
+              </div>
             </div>
           </div>
 

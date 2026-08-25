@@ -344,7 +344,19 @@
           <img src="/logosieeg.jpg" alt="SIEEG" style="height:28px;width:28px;object-fit:contain;border-radius:6px;opacity:0.75;" />
           <span style="font-size:13px;font-weight:600;color:rgba(148,163,184,0.55);">SIEEG INTEGRADORES</span>
         </div>
-        <p style="font-size:12px;color:rgba(71,85,105,0.7);">© {{ new Date().getFullYear() }} SIEEG INTEGRADORES. Todos los derechos reservados.</p>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <NuxtLink to="/terminos" style="font-size:12px;color:rgba(71,85,105,0.75);text-decoration:none;transition:color 0.2s;"
+            @mouseenter="e => (e.currentTarget as HTMLElement).style.color='rgba(148,163,184,0.9)'"
+            @mouseleave="e => (e.currentTarget as HTMLElement).style.color='rgba(71,85,105,0.75)'">
+            Términos y Condiciones
+          </NuxtLink>
+          <NuxtLink to="/privacidad" style="font-size:12px;color:rgba(71,85,105,0.75);text-decoration:none;transition:color 0.2s;"
+            @mouseenter="e => (e.currentTarget as HTMLElement).style.color='rgba(148,163,184,0.9)'"
+            @mouseleave="e => (e.currentTarget as HTMLElement).style.color='rgba(71,85,105,0.75)'">
+            Políticas de Privacidad
+          </NuxtLink>
+          <p style="font-size:12px;color:rgba(71,85,105,0.7);margin:0;">© {{ new Date().getFullYear() }} SIEEG INTEGRADORES. Todos los derechos reservados.</p>
+        </div>
       </div>
     </footer>
 
