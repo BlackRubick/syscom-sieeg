@@ -219,120 +219,206 @@
       </div>
     </section>
 
-    <!-- ───────────── SOLICITAR ACCESO ───────────── -->
+    <!-- ───────────── CONTACTO ───────────── -->
     <section id="contacto" style="padding:80px 24px 100px;background:rgba(13,27,53,0.3);">
-      <div style="max-width:540px;margin:0 auto;">
-        <div style="text-align:center;margin-bottom:40px;">
-          <div style="font-size:12px;font-weight:600;color:#38bdf8;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Empieza hoy</div>
-          <h2 style="font-size:clamp(26px,3.5vw,36px);font-weight:800;color:#F1F5F9;letter-spacing:-0.5px;margin-bottom:12px;">¿Listo para comprar con nosotros?</h2>
-          <p style="font-size:14px;color:rgba(148,163,184,0.8);line-height:1.65;">
-            Déjanos tus datos y te contactamos para darte acceso a nuestro catálogo con precios exclusivos para tu empresa.
+      <div style="max-width:1100px;margin:0 auto;">
+
+        <!-- Encabezado centrado -->
+        <div style="text-align:center;margin-bottom:52px;">
+          <div style="font-size:12px;font-weight:600;color:#38bdf8;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Contáctanos</div>
+          <h2 style="font-size:clamp(26px,3.5vw,38px);font-weight:800;color:#F1F5F9;letter-spacing:-0.5px;margin-bottom:12px;">Estamos para atenderte</h2>
+          <p style="font-size:14px;color:rgba(148,163,184,0.8);line-height:1.65;max-width:480px;margin:0 auto;">
+            Visítanos, llámanos o escríbenos. También puedes dejarnos tus datos y te contactamos a la brevedad.
           </p>
         </div>
 
-        <div style="position:relative;">
-          <div style="position:absolute;inset:-1px;border-radius:22px;background:linear-gradient(135deg,rgba(14,165,233,0.35) 0%,rgba(124,58,237,0.2) 60%,rgba(14,165,233,0.1) 100%);z-index:0;" />
-          <div style="position:relative;z-index:1;border-radius:22px;background:linear-gradient(160deg,#0D1B35,#09122A);padding:36px 32px;box-shadow:0 24px 64px rgba(0,0,0,0.6);">
+        <!-- Grid dos columnas -->
+        <div class="contact-grid">
 
-            <Transition name="fade">
-              <div v-if="requestSent" style="text-align:center;padding:20px 0;">
-                <div style="width:64px;height:64px;border-radius:50%;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+          <!-- ── Columna izquierda: info de contacto ── -->
+          <div style="display:flex;flex-direction:column;gap:16px;">
+
+            <!-- Tarjeta: Visítanos -->
+            <div style="padding:24px;border-radius:18px;background:linear-gradient(145deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                <div style="width:38px;height:38px;border-radius:10px;background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
                   </svg>
                 </div>
-                <h3 style="font-size:20px;font-weight:700;color:#F1F5F9;margin-bottom:10px;">¡Mensaje recibido!</h3>
-                <p style="font-size:14px;color:rgba(148,163,184,0.85);line-height:1.65;margin-bottom:24px;">
-                  Gracias por tu interés. Nos pondremos en contacto contigo a la brevedad para hablar de cómo podemos ayudar a tu empresa.
-                </p>
-                <button @click="requestSent = false; resetForm()"
-                  style="padding:10px 24px;border-radius:9px;font-size:13px;font-weight:600;color:#0EA5E9;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.25);cursor:pointer;font-family:inherit;">
-                  Enviar otra solicitud
-                </button>
+                <div style="font-size:14px;font-weight:700;color:#F1F5F9;">Visítanos</div>
               </div>
-            </Transition>
+              <p style="font-size:13px;color:rgba(148,163,184,0.85);line-height:1.7;margin:0;">
+                Boulevard Belisario Domínguez #4213 L5<br/>
+                Tuxtla Gutiérrez, Chiapas
+              </p>
+            </div>
 
-            <Transition name="fade">
-              <form v-if="!requestSent" @submit.prevent="handleRequest" style="display:flex;flex-direction:column;gap:18px;">
-
-                <div>
-                  <label style="display:block;font-size:12px;font-weight:500;color:rgba(148,163,184,0.9);margin-bottom:7px;">Nombre completo *</label>
-                  <div :style="fieldWrap(nameFocus)">
-                    <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="nameFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                    </svg>
-                    <input v-model="form.name" type="text" placeholder="Juan García" required
-                      @focus="nameFocus=true" @blur="nameFocus=false"
-                      style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#F1F5F9;box-sizing:border-box;font-family:inherit;" />
-                  </div>
+            <!-- Tarjeta: Horario -->
+            <div style="padding:24px;border-radius:18px;background:linear-gradient(145deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                <div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                  </svg>
                 </div>
-
-                <div>
-                  <label style="display:block;font-size:12px;font-weight:500;color:rgba(148,163,184,0.9);margin-bottom:7px;">Correo electrónico *</label>
-                  <div :style="fieldWrap(emailFocus)">
-                    <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="emailFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/>
-                    </svg>
-                    <input v-model="form.email" type="email" placeholder="juan@miempresa.com" required
-                      @focus="emailFocus=true" @blur="emailFocus=false"
-                      style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#F1F5F9;box-sizing:border-box;font-family:inherit;" />
-                  </div>
+                <div style="font-size:14px;font-weight:700;color:#F1F5F9;">Horario comercial</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                  <span style="font-size:12px;color:rgba(100,116,139,0.8);">Lunes – Viernes</span>
+                  <span style="font-size:12px;font-weight:600;color:#fbbf24;">07:00 – 20:00 hrs</span>
                 </div>
-
-                <div>
-                  <label style="display:block;font-size:12px;font-weight:500;color:rgba(148,163,184,0.9);margin-bottom:7px;">Empresa</label>
-                  <div :style="fieldWrap(companyFocus)">
-                    <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="companyFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-                    </svg>
-                    <input v-model="form.company" type="text" placeholder="Mi Empresa S.A. de C.V."
-                      @focus="companyFocus=true" @blur="companyFocus=false"
-                      style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#F1F5F9;box-sizing:border-box;font-family:inherit;" />
-                  </div>
+                <div style="height:1px;background:rgba(255,255,255,0.05);" />
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                  <span style="font-size:12px;color:rgba(100,116,139,0.8);">Sábados</span>
+                  <span style="font-size:12px;font-weight:600;color:#fbbf24;">07:00 – 17:00 hrs</span>
                 </div>
+              </div>
+            </div>
 
-                <div>
-                  <label style="display:block;font-size:12px;font-weight:500;color:rgba(148,163,184,0.9);margin-bottom:7px;">Teléfono</label>
-                  <div :style="fieldWrap(phoneFocus)">
-                    <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="phoneFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-                    </svg>
-                    <input v-model="form.phone" type="tel" placeholder="+52 55 0000 0000"
-                      @focus="phoneFocus=true" @blur="phoneFocus=false"
-                      style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#F1F5F9;box-sizing:border-box;font-family:inherit;" />
-                  </div>
+            <!-- Tarjeta: Teléfono y correo -->
+            <div style="padding:24px;border-radius:18px;background:linear-gradient(145deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:16px;">
+              <!-- Teléfono -->
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:38px;height:38px;border-radius:10px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
                 </div>
+                <div>
+                  <div style="font-size:11px;color:rgba(100,116,139,0.7);font-weight:500;margin-bottom:2px;">Teléfono</div>
+                  <a href="tel:9611180157" style="font-size:15px;font-weight:700;color:#34d399;text-decoration:none;letter-spacing:0.3px;">961 118 0157</a>
+                </div>
+              </div>
+              <div style="height:1px;background:rgba(255,255,255,0.05);" />
+              <!-- Correo -->
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:38px;height:38px;border-radius:10px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:11px;color:rgba(100,116,139,0.7);font-weight:500;margin-bottom:2px;">Correo electrónico</div>
+                  <a href="mailto:contacto@sieeg.com.mx" style="font-size:13px;font-weight:600;color:#a78bfa;text-decoration:none;">contacto@sieeg.com.mx</a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ── Columna derecha: formulario ── -->
+          <div>
+            <div style="position:relative;">
+              <div style="position:absolute;inset:-1px;border-radius:22px;background:linear-gradient(135deg,rgba(14,165,233,0.35) 0%,rgba(124,58,237,0.2) 60%,rgba(14,165,233,0.1) 100%);z-index:0;" />
+              <div style="position:relative;z-index:1;border-radius:22px;background:linear-gradient(160deg,#0D1B35,#09122A);padding:36px 32px;box-shadow:0 24px 64px rgba(0,0,0,0.6);">
+
+                <div style="font-size:15px;font-weight:700;color:#F1F5F9;margin-bottom:6px;">¿Listo para comprar con nosotros?</div>
+                <p style="font-size:13px;color:rgba(148,163,184,0.7);margin-bottom:24px;line-height:1.6;">Déjanos tus datos y te contactamos para darte acceso con precios exclusivos.</p>
 
                 <Transition name="fade">
-                  <div v-if="reqError" style="padding:10px 14px;border-radius:10px;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.25);font-size:13px;color:#fb7185;">
-                    {{ reqError }}
+                  <div v-if="requestSent" style="text-align:center;padding:20px 0;">
+                    <div style="width:64px;height:64px;border-radius:50%;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                      </svg>
+                    </div>
+                    <h3 style="font-size:20px;font-weight:700;color:#F1F5F9;margin-bottom:10px;">¡Mensaje recibido!</h3>
+                    <p style="font-size:14px;color:rgba(148,163,184,0.85);line-height:1.65;margin-bottom:24px;">
+                      Gracias por tu interés. Nos pondremos en contacto contigo a la brevedad.
+                    </p>
+                    <button @click="requestSent = false; resetForm()"
+                      style="padding:10px 24px;border-radius:9px;font-size:13px;font-weight:600;color:#0EA5E9;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.25);cursor:pointer;font-family:inherit;">
+                      Enviar otra solicitud
+                    </button>
                   </div>
                 </Transition>
 
-                <button type="submit" :disabled="reqLoading"
-                  style="margin-top:4px;height:50px;border-radius:12px;border:none;background:linear-gradient(135deg,#0EA5E9,#0284C7);color:white;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;box-shadow:0 4px 20px rgba(14,165,233,0.35);transition:all 0.2s;"
-                  :style="{ opacity: reqLoading ? 0.8 : 1, cursor: reqLoading ? 'not-allowed' : 'pointer' }">
-                  <div v-if="reqLoading" style="display:flex;align-items:center;gap:10px;">
-                    <svg class="spin" style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24">
-                      <circle style="opacity:0.3" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
-                      <path style="opacity:0.9" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                    </svg>
-                    Enviando...
-                  </div>
-                  <div v-else style="display:flex;align-items:center;gap:8px;">
-                    Quiero ser cliente
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                    </svg>
-                  </div>
-                </button>
+                <Transition name="fade">
+                  <form v-if="!requestSent" @submit.prevent="handleRequest" style="display:flex;flex-direction:column;gap:16px;">
 
-                <p style="text-align:center;font-size:11px;color:rgba(71,85,105,0.85);margin-top:4px;">
-                  Nos pondremos en contacto contigo en menos de 24 horas.
-                </p>
-              </form>
-            </Transition>
+                    <div>
+                      <label style="display:block;font-size:12px;font-weight:500;color:rgba(148,163,184,0.9);margin-bottom:7px;">Nombre completo *</label>
+                      <div :style="fieldWrap(nameFocus)">
+                        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="nameFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <input v-model="form.name" type="text" placeholder="Juan García" required
+                          @focus="nameFocus=true" @blur="nameFocus=false"
+                          style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#F1F5F9;box-sizing:border-box;font-family:inherit;" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style="display:block;font-size:12px;font-weight:500;color:rgba(148,163,184,0.9);margin-bottom:7px;">Correo electrónico *</label>
+                      <div :style="fieldWrap(emailFocus)">
+                        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="emailFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/>
+                        </svg>
+                        <input v-model="form.email" type="email" placeholder="juan@miempresa.com" required
+                          @focus="emailFocus=true" @blur="emailFocus=false"
+                          style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#F1F5F9;box-sizing:border-box;font-family:inherit;" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style="display:block;font-size:12px;font-weight:500;color:rgba(148,163,184,0.9);margin-bottom:7px;">Empresa</label>
+                      <div :style="fieldWrap(companyFocus)">
+                        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="companyFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                        <input v-model="form.company" type="text" placeholder="Mi Empresa S.A. de C.V."
+                          @focus="companyFocus=true" @blur="companyFocus=false"
+                          style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#F1F5F9;box-sizing:border-box;font-family:inherit;" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style="display:block;font-size:12px;font-weight:500;color:rgba(148,163,184,0.9);margin-bottom:7px;">Teléfono</label>
+                      <div :style="fieldWrap(phoneFocus)">
+                        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="phoneFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                        </svg>
+                        <input v-model="form.phone" type="tel" placeholder="+52 55 0000 0000"
+                          @focus="phoneFocus=true" @blur="phoneFocus=false"
+                          style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#F1F5F9;box-sizing:border-box;font-family:inherit;" />
+                      </div>
+                    </div>
+
+                    <Transition name="fade">
+                      <div v-if="reqError" style="padding:10px 14px;border-radius:10px;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.25);font-size:13px;color:#fb7185;">
+                        {{ reqError }}
+                      </div>
+                    </Transition>
+
+                    <button type="submit" :disabled="reqLoading"
+                      style="margin-top:4px;height:50px;border-radius:12px;border:none;background:linear-gradient(135deg,#0EA5E9,#0284C7);color:white;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;box-shadow:0 4px 20px rgba(14,165,233,0.35);transition:all 0.2s;"
+                      :style="{ opacity: reqLoading ? 0.8 : 1, cursor: reqLoading ? 'not-allowed' : 'pointer' }">
+                      <div v-if="reqLoading" style="display:flex;align-items:center;gap:10px;">
+                        <svg class="spin" style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24">
+                          <circle style="opacity:0.3" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
+                          <path style="opacity:0.9" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        </svg>
+                        Enviando...
+                      </div>
+                      <div v-else style="display:flex;align-items:center;gap:8px;">
+                        Quiero ser cliente
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                      </div>
+                    </button>
+
+                    <p style="text-align:center;font-size:11px;color:rgba(71,85,105,0.85);margin-top:2px;">
+                      Nos pondremos en contacto contigo en menos de 24 horas.
+                    </p>
+                  </form>
+                </Transition>
+              </div>
+            </div>
           </div>
+
         </div>
       </div>
     </section>
@@ -550,11 +636,23 @@ async function handleRequest() {
 <style>
 /* ── Responsive ── */
 @media (max-width: 640px) {
-  .nav-links   { display: none !important; }
-  .hide-mobile { display: none !important; }
-  .hero-grid   { grid-template-columns: 1fr !important; }
-  .hero-visual { display: none !important; }
-  .hero-h1     { font-size: 38px !important; }
+  .nav-links    { display: none !important; }
+  .hide-mobile  { display: none !important; }
+  .hero-grid    { grid-template-columns: 1fr !important; }
+  .hero-visual  { display: none !important; }
+  .hero-h1      { font-size: 38px !important; }
+  .contact-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Grid de contacto ── */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .contact-grid { grid-template-columns: 1fr !important; }
 }
 
 /* ── Orbs animados ── */
