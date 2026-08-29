@@ -66,27 +66,39 @@ model User {
   fiscalTelefono     String? @map("fiscal_telefono")
   facturaUid         String? @map("factura_uid")
   discountPct        Float   @default(0) @map("discount_pct")
+  cartItems          Json?   @map("cart_items")
 
   @@map("users")
 }
 
 model Order {
-  id          String      @id @default(cuid())
-  userId      String      @map("user_id")
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status      OrderStatus @default(pending)
-  items       Json
-  total       Float
-  priority    String      @default("normal")
-  notes       String?
-  syscomFolio String?     @map("syscom_folio")
-  syscomData  Json?       @map("syscom_data")
-  cfdiUid     String?     @map("cfdi_uid")
-  auditLog    Json?       @map("audit_log")
-  createdAt   DateTime    @default(now()) @map("created_at")
-  updatedAt   DateTime    @updatedAt @map("updated_at")
+  id            String      @id @default(cuid())
+  userId        String      @map("user_id")
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status        OrderStatus @default(pending)
+  items         Json
+  total         Float
+  priority      String      @default("normal")
+  notes         String?
+  syscomFolio   String?     @map("syscom_folio")
+  syscomData    Json?       @map("syscom_data")
+  cfdiUid       String?     @map("cfdi_uid")
+  auditLog      Json?       @map("audit_log")
+  paymentId     String?     @map("payment_id")
+  paymentStatus String      @default("unpaid") @map("payment_status")
+  paymentMethod String?     @map("payment_method")
+  paymentData   Json?       @map("payment_data")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
 
   @@map("orders")
+}
+
+model SiteConfig {
+  id        Int   @id @default(1)
+  markupPct Float @default(0) @map("markup_pct")
+
+  @@map("site_config")
 }
 
 model Notification {
