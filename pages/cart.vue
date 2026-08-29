@@ -15,69 +15,163 @@
       </a>
     </div>
 
-    <!-- ── Éxito: SPEI — muestra referencia bancaria ── -->
-    <div v-else-if="speiResult" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;">
-      <div style="width:100%;max-width:460px;border-radius:20px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(14,165,233,0.25);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+    <!-- ── Éxito: SPEI — recibo de pago completo ── -->
+    <div v-else-if="speiResult" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;">
+      <div style="width:100%;max-width:680px;border-radius:20px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(14,165,233,0.2);overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.6);">
 
-        <!-- Header -->
-        <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:12px;">
-          <div style="width:40px;height:40px;border-radius:12px;background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
-          </div>
+        <!-- ── Encabezado del recibo ── -->
+        <div style="padding:22px 28px 18px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;">
           <div>
-            <div style="font-size:15px;font-weight:800;color:#F1F5F9;">Pedido creado — Pago pendiente</div>
-            <div style="font-size:12px;color:rgba(100,116,139,0.7);margin-top:1px;">Realiza la transferencia SPEI para confirmar tu compra</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <img src="/logosieeg.jpg" alt="SIEEG" style="height:26px;width:26px;object-fit:contain;border-radius:5px;" />
+              <span style="font-size:15px;font-weight:800;color:#F1F5F9;letter-spacing:-0.3px;">SIEEG INTEGRADORES</span>
+            </div>
+            <div style="font-size:11px;color:rgba(100,116,139,0.65);margin-bottom:12px;">Transferencia interbancaria (SPEI)</div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <div style="font-size:11px;color:rgba(100,116,139,0.6);">
+                <span style="font-weight:600;color:#94a3b8;">Fecha límite de pago:</span>
+                <span style="margin-left:6px;">{{ speiDueDate }}</span>
+              </div>
+              <div style="font-size:11px;color:rgba(100,116,139,0.6);">
+                <span style="font-weight:600;color:#94a3b8;">Beneficiario:</span>
+                <span style="margin-left:6px;">{{ speiResult.beneficiary || 'SIEEG INTEGRADORES' }}</span>
+              </div>
+            </div>
+          </div>
+          <!-- Monto a pagar -->
+          <div style="padding:16px 22px;border-radius:14px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.25);text-align:center;min-width:180px;">
+            <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.7);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Total a pagar / MXN</div>
+            <div style="font-size:26px;font-weight:800;background:linear-gradient(135deg,#0EA5E9,#22D3EE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-1px;">{{ fmt(speiResult.amount) }}</div>
           </div>
         </div>
 
-        <!-- Datos bancarios -->
-        <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;">
-
-          <!-- Monto -->
-          <div style="padding:14px 16px;border-radius:12px;background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.18);display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:12px;color:rgba(100,116,139,0.8);">Monto a transferir</span>
-            <span style="font-size:20px;font-weight:800;background:linear-gradient(135deg,#0EA5E9,#22D3EE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">{{ fmt(speiResult.amount) }} MXN</span>
-          </div>
-
-          <!-- CLABE -->
-          <div>
-            <div style="font-size:10px;font-weight:700;color:rgba(100,116,139,0.6);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">CLABE interbancaria</div>
-            <div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.09);">
-              <span style="font-size:16px;font-weight:700;font-family:monospace;color:#E2E8F0;letter-spacing:2px;flex:1;">{{ speiResult.clabe }}</span>
-              <button @click="copyClabe" style="height:30px;padding:0 10px;border-radius:7px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.25);color:#38bdf8;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;flex-shrink:0;">
-                {{ clabeCopied ? '✓ Copiado' : 'Copiar' }}
-              </button>
+        <!-- ── Detalles de la compra ── -->
+        <div style="padding:16px 28px;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="font-size:11px;font-weight:700;color:#38bdf8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Detalles de la compra</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+              <span style="font-size:12px;color:rgba(100,116,139,0.6);">Descripción</span>
+              <span style="font-size:12px;color:#CBD5E1;font-weight:500;">Pedido SIEEG Integradores</span>
             </div>
-          </div>
-
-          <!-- Banco y Convenio -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <div>
-              <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.55);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:5px;">Banco</div>
-              <div style="font-size:13px;font-weight:600;color:#CBD5E1;">{{ speiResult.bank }}</div>
+            <div style="display:flex;justify-content:space-between;gap:16px;padding:8px 0;">
+              <span style="font-size:12px;color:rgba(100,116,139,0.6);">Fecha y hora</span>
+              <span style="font-size:12px;color:#CBD5E1;">{{ speiCreatedDate }}</span>
             </div>
-            <div>
-              <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.55);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:5px;">Convenio CIE</div>
-              <div style="font-size:13px;font-weight:700;font-family:monospace;color:#38bdf8;">{{ speiResult.agreement }}</div>
-            </div>
-          </div>
-
-          <!-- Referencia -->
-          <div v-if="speiResult.beneficiary">
-            <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.55);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:5px;">Beneficiario / Referencia</div>
-            <div style="font-size:12px;font-family:monospace;color:#94a3b8;">{{ speiResult.beneficiary }}</div>
-          </div>
-
-          <!-- Aviso -->
-          <div style="padding:10px 13px;border-radius:9px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);font-size:11px;color:rgba(251,191,36,0.85);line-height:1.5;">
-            Tu pedido quedará en espera hasta que el administrador confirme la recepción del pago. Guarda el comprobante de transferencia.
           </div>
         </div>
 
-        <div style="padding:0 24px 20px;">
-          <a href="/orders" style="display:flex;align-items:center;justify-content:center;height:44px;border-radius:11px;background:linear-gradient(135deg,#0EA5E9,#0284C7);color:white;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(14,165,233,0.3);">
+        <!-- ── Instrucciones de pago ── -->
+        <div style="padding:16px 28px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="font-size:11px;font-weight:700;color:#38bdf8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:14px;">Pasos para realizar el pago</div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+            <!-- Bancomer -->
+            <div style="padding:14px 16px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);">
+              <div style="font-size:11px;font-weight:700;color:#F1F5F9;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+                <div style="width:6px;height:6px;border-radius:50%;background:#0EA5E9;flex-shrink:0;"></div>
+                Desde BBVA Bancomer
+              </div>
+              <div style="font-size:11px;color:rgba(148,163,184,0.75);line-height:1.65;margin-bottom:10px;">
+                1. Dentro del menú <strong style="color:#E2E8F0;">"Pagar"</strong> seleccione <strong style="color:#E2E8F0;">"De servicios"</strong> e ingrese el <strong style="color:#E2E8F0;">"Número de convenio CIE"</strong>.
+              </div>
+              <div style="font-size:11px;color:rgba(148,163,184,0.75);line-height:1.65;margin-bottom:10px;">
+                2. Ingrese los datos de registro para concluir con la operación:
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                  <span style="font-size:10px;color:rgba(100,116,139,0.6);">Núm. convenio CIE:</span>
+                  <span style="font-size:11px;font-weight:700;font-family:monospace;color:#38bdf8;">{{ speiResult.agreement }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                  <span style="font-size:10px;color:rgba(100,116,139,0.6);">Referencia:</span>
+                  <div style="display:flex;align-items:center;gap:4px;">
+                    <span style="font-size:10px;font-weight:600;font-family:monospace;color:#E2E8F0;">{{ speiResult.reference || speiResult.clabe }}</span>
+                    <button @click="copyRef" style="height:18px;padding:0 5px;border-radius:4px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);color:#38bdf8;font-size:9px;cursor:pointer;font-family:inherit;flex-shrink:0;">
+                      {{ refCopied ? '✓' : 'Copiar' }}
+                    </button>
+                  </div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                  <span style="font-size:10px;color:rgba(100,116,139,0.6);">Importe:</span>
+                  <span style="font-size:11px;font-weight:700;color:#E2E8F0;">{{ fmt(speiResult.amount) }} MXN</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                  <span style="font-size:10px;color:rgba(100,116,139,0.6);">Concepto:</span>
+                  <span style="font-size:10px;color:#94a3b8;">Pedido SIEEG</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Otros bancos -->
+            <div style="padding:14px 16px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);">
+              <div style="font-size:11px;font-weight:700;color:#F1F5F9;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+                <div style="width:6px;height:6px;border-radius:50%;background:#10B981;flex-shrink:0;"></div>
+                Desde cualquier otro banco
+              </div>
+              <div style="font-size:11px;color:rgba(148,163,184,0.75);line-height:1.65;margin-bottom:10px;">
+                Registra la cuenta beneficiaria del pago con los siguientes datos y realiza la transferencia:
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                  <span style="font-size:10px;color:rgba(100,116,139,0.6);">Beneficiario:</span>
+                  <span style="font-size:10px;font-weight:600;color:#E2E8F0;">{{ speiResult.beneficiary || 'SIEEG' }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                  <span style="font-size:10px;color:rgba(100,116,139,0.6);">Banco destino:</span>
+                  <span style="font-size:10px;font-weight:600;color:#E2E8F0;">{{ speiResult.bank }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                  <span style="font-size:10px;color:rgba(100,116,139,0.6);">CLABE:</span>
+                  <div style="display:flex;align-items:center;gap:4px;">
+                    <span style="font-size:10px;font-weight:600;font-family:monospace;color:#38bdf8;">{{ speiResult.clabe }}</span>
+                    <button @click="copyClabe" style="height:18px;padding:0 5px;border-radius:4px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);color:#38bdf8;font-size:9px;cursor:pointer;font-family:inherit;flex-shrink:0;">
+                      {{ clabeCopied ? '✓' : 'Copiar' }}
+                    </button>
+                  </div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                  <span style="font-size:10px;color:rgba(100,116,139,0.6);">Concepto de pago:</span>
+                  <span style="font-size:10px;font-weight:600;font-family:monospace;color:#E2E8F0;">{{ speiResult.reference || speiResult.clabe }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                  <span style="font-size:10px;color:rgba(100,116,139,0.6);">Referencia:</span>
+                  <span style="font-size:10px;font-weight:600;font-family:monospace;color:#38bdf8;">{{ speiResult.agreement }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                  <span style="font-size:10px;color:rgba(100,116,139,0.6);">Importe:</span>
+                  <span style="font-size:11px;font-weight:700;color:#E2E8F0;">{{ fmt(speiResult.amount) }} MXN</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aviso importante -->
+          <div style="margin-top:14px;padding:10px 13px;border-radius:9px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);font-size:11px;color:rgba(251,191,36,0.85);line-height:1.55;">
+            Tu pedido quedará en espera hasta que el administrador confirme la recepción del pago. Guarda el comprobante de transferencia. El recibo estará disponible mientras la transacción esté pendiente.
+          </div>
+        </div>
+
+        <!-- ── Acciones ── -->
+        <div style="padding:18px 28px;display:flex;gap:10px;flex-wrap:wrap;">
+          <a v-if="speiPdfUrl" :href="speiPdfUrl" target="_blank" rel="noopener"
+            style="flex:1;min-width:160px;height:42px;border-radius:10px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.3);color:#38bdf8;font-size:12px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:7px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Descargar recibo PDF
+          </a>
+          <a href="/orders"
+            style="flex:1;min-width:160px;height:42px;border-radius:10px;background:linear-gradient(135deg,#0EA5E9,#0284C7);color:white;font-size:12px;font-weight:700;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 14px rgba(14,165,233,0.28);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             Ver mis órdenes
           </a>
+        </div>
+
+        <!-- Powered by Openpay -->
+        <div style="padding:0 28px 18px;display:flex;align-items:center;justify-content:center;gap:8px;">
+          <span style="font-size:10px;color:rgba(71,85,105,0.5);">Procesado por</span>
+          <div style="background:white;border-radius:4px;padding:2px 8px;display:inline-flex;align-items:center;">
+            <img src="/openpay/openpay-logo.jpg" alt="Openpay" style="height:12px;object-fit:contain;" />
+          </div>
         </div>
       </div>
     </div>
@@ -485,8 +579,19 @@ const notesFocus = ref(false)
 // ── States de resultado ──
 const submitted  = ref(false)
 const paymentAuth = ref('')
-const speiResult  = ref<{ clabe: string; bank: string; agreement: string; beneficiary: string; amount: number } | null>(null)
+const speiResult  = ref<{
+  clabe: string
+  bank: string
+  agreement: string
+  beneficiary: string
+  amount: number
+  reference: string
+  dueDate: string
+  createdAt: string
+  transactionId: string
+} | null>(null)
 const clabeCopied = ref(false)
+const refCopied   = ref(false)
 
 // ── Modal ──
 const showPayModal = ref(false)
@@ -512,6 +617,25 @@ const priorityLabel = computed(() => ({ urgent:'Urgente — notificación inmedi
 const subtotal      = computed(() => cart.total)
 const iva           = computed(() => subtotal.value * 0.16)
 const totalUnits    = computed(() => cart.items.reduce((s, i) => s + i.quantity, 0))
+
+const speiPdfUrl = computed(() => {
+  if (!speiResult.value?.transactionId) return ''
+  const isSandbox = config.public.openpayIsSandbox !== 'false'
+  const dash = isSandbox ? 'https://sandbox-dashboard.openpay.mx' : 'https://dashboard.openpay.mx'
+  return `${dash}/spei-pdf/${config.public.openpayMerchantId}/${speiResult.value.transactionId}`
+})
+
+const speiDueDate = computed(() => {
+  const raw = speiResult.value?.dueDate
+  const d = raw ? new Date(raw) : (() => { const n = new Date(); n.setDate(n.getDate() + 30); return n })()
+  return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })
+})
+
+const speiCreatedDate = computed(() => {
+  const raw = speiResult.value?.createdAt
+  if (!raw) return new Date().toLocaleString('es-MX', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+  return new Date(raw).toLocaleString('es-MX', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+})
 
 const fmt = (n: number) => new Intl.NumberFormat('es-MX', { style:'currency', currency:'MXN' }).format(n)
 
@@ -744,11 +868,15 @@ async function handlePaySpei() {
     cart.clearCart()
     showPayModal.value = false
     speiResult.value   = {
-      clabe:       result.order?.spei?.clabe ?? '',
-      bank:        result.order?.spei?.bank  ?? '',
-      agreement:   result.order?.spei?.agreement ?? '',
-      beneficiary: result.order?.spei?.beneficiary ?? '',
-      amount:      result.order?.total ?? (subtotal.value + iva.value),
+      clabe:         result.order?.spei?.clabe       ?? '',
+      bank:          result.order?.spei?.bank         ?? 'BBVA Bancomer',
+      agreement:     result.order?.spei?.agreement    ?? '',
+      beneficiary:   result.order?.spei?.beneficiary  ?? 'SIEEG INTEGRADORES',
+      amount:        result.order?.total              ?? (subtotal.value + iva.value),
+      reference:     result.order?.spei?.reference    ?? '',
+      dueDate:       result.order?.spei?.dueDate      ?? '',
+      createdAt:     result.order?.spei?.createdAt    ?? '',
+      transactionId: result.order?.paymentId          ?? '',
     }
   } catch (e: any) {
     payError.value = e?.data?.message ?? 'Ocurrió un error, intenta de nuevo o comunícate con tu banco.'
@@ -763,6 +891,16 @@ async function copyClabe() {
     await navigator.clipboard.writeText(speiResult.value.clabe)
     clabeCopied.value = true
     setTimeout(() => { clabeCopied.value = false }, 2000)
+  } catch {}
+}
+
+async function copyRef() {
+  const val = speiResult.value?.reference || speiResult.value?.clabe
+  if (!val) return
+  try {
+    await navigator.clipboard.writeText(val)
+    refCopied.value = true
+    setTimeout(() => { refCopied.value = false }, 2000)
   } catch {}
 }
 </script>

@@ -94,6 +94,9 @@ export default defineEventHandler(async (event) => {
         bank:        charge.payment_method.bank,
         agreement:   charge.payment_method.agreement,
         beneficiary: charge.payment_method.name,
+        reference:   charge.payment_method.reference ?? '',
+        dueDate:     charge.due_date ?? '',
+        createdAt:   charge.creation_date,
       }
     } catch (e: any) {
       throw createError({ statusCode: 402, message: openpayErrorMessage(e) })

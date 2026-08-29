@@ -57,12 +57,14 @@ export interface OpenPaySpeiCharge {
   currency: string
   description: string
   creation_date: string
+  due_date?: string
   payment_method: {
-    type:      string
-    agreement: string
-    bank:      string
-    clabe:     string
-    name:      string
+    type:       string
+    agreement:  string
+    bank:       string
+    clabe:      string
+    name:       string
+    reference?: string
   }
 }
 
