@@ -10,9 +10,6 @@ export default defineEventHandler(async (event) => {
     transaction?:       { id: string; status: string }
   }>(event)
 
-  // Log full body temporarily to find verification code
-  console.log('[WEBHOOK BODY]', JSON.stringify(body))
-
   // OpenPay sends this when you first register the webhook URL
   if (body?.type === 'verification') {
     return { verification_code: body.verification_code }
