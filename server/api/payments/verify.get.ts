@@ -1,6 +1,7 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { getCharge } from '~/server/utils/openpay'
+import { approveOrder } from '~/server/utils/approveOrder'
 
 export default defineEventHandler(async (event) => {
   const session  = requireSession(event)
@@ -19,6 +20,13 @@ export default defineEventHandler(async (event) => {
   if (charge.status === 'completed' && order.paymentStatus !== 'paid') {
     paymentStatus = 'paid'
     await prisma.order.update({ where: { id: order.id }, data: { paymentStatus: 'paid' } })
+    if (order.status !== 'approved') {
+      try {
+        await approveOrder(order.id)
+      } catch {
+        // Payment confirmed; approval error is non-fatal
+      }
+    }
   } else if (charge.status === 'failed' && order.paymentStatus !== 'failed') {
     paymentStatus = 'failed'
     await prisma.order.update({ where: { id: order.id }, data: { paymentStatus: 'failed' } })

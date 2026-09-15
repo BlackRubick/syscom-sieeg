@@ -1,6 +1,7 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { createCardCharge, createSpeiCharge, openpayErrorMessage } from '~/server/utils/openpay'
+import { approveOrder } from '~/server/utils/approveOrder'
 import type { OrderItem } from '~/types'
 
 export default defineEventHandler(async (event) => {
@@ -40,8 +41,8 @@ export default defineEventHandler(async (event) => {
     '127.0.0.1'
 
   const user        = await prisma.user.findUniqueOrThrow({ where: { id: session.userId } })
-  const serverTotal = body.items.reduce((s, i) => s + i.price * i.quantity, 0)
-  const total       = Math.round(serverTotal * 100) / 100
+  const serverSubtotal = body.items.reduce((s, i) => s + i.price * i.quantity, 0)
+  const total          = Math.round(serverSubtotal * 1.16 * 100) / 100
 
   const nameParts = user.name.trim().split(' ')
   const firstName = user.fiscalNombre ?? nameParts[0]
@@ -118,17 +119,28 @@ export default defineEventHandler(async (event) => {
     include: { user: { select: { id: true, name: true, email: true } } },
   })
 
+  // Auto-approve when card payment is immediately confirmed
+  if (paymentStatus === 'paid') {
+    try {
+      await approveOrder(order.id)
+    } catch {
+      // Payment went through; approval failure is logged in audit log — don't block the response
+    }
+  }
+
   const admins = await prisma.user.findMany({
     where:  { role: 'admin', status: 'active' },
     select: { id: true },
   })
   if (admins.length) {
     const titleMap = {
-      card: 'Nuevo pedido (pagado con tarjeta)',
+      card: paymentStatus === 'paid' ? 'Nuevo pedido aprobado (tarjeta)' : 'Nuevo pedido (3DS pendiente)',
       spei: 'Nuevo pedido (SPEI pendiente)',
     }
     const msgMap = {
-      card: `${order.user.name} pagó ${total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} con tarjeta — cargo ${paymentId}`,
+      card: paymentStatus === 'paid'
+        ? `${order.user.name} pagó ${total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} con tarjeta — aprobado automáticamente`
+        : `${order.user.name} inició pago con 3DS — cargo ${paymentId}`,
       spei: `${order.user.name} generó un pedido por ${total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} vía SPEI — pendiente de recibir transferencia`,
     }
     await prisma.notification.createMany({
