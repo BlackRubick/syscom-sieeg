@@ -4,10 +4,16 @@ import { approveOrder } from '~/server/utils/approveOrder'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
-    type:          string
-    event_date?:   string
-    transaction?:  { id: string; status: string }
+    type:               string
+    verification_code?: string
+    event_date?:        string
+    transaction?:       { id: string; status: string }
   }>(event)
+
+  // OpenPay sends this when you first register the webhook URL
+  if (body?.type === 'verification') {
+    return { verification_code: body.verification_code }
+  }
 
   const transactionId = body?.transaction?.id
   if (!transactionId) return { ok: true }
