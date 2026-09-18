@@ -171,18 +171,28 @@
       <span><strong>Error:</strong> {{ apiError }}</span>
     </div>
 
-    <!-- ══════════ CARGANDO INICIAL ══════════ -->
-    <div v-if="loadingCats || (loading && !products.length && !hasFilter)"
+    <!-- ══════════ CARGANDO CATEGORÍAS ══════════ -->
+    <div v-if="loadingCats"
       style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 0;border-radius:16px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);">
       <div style="width:60px;height:60px;border-radius:18px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
         <Loader2 :size="24" color="#38bdf8" :stroke-width="1.8" class="spin" />
       </div>
-      <div style="font-size:16px;font-weight:700;color:#94a3b8;margin-bottom:6px;">Cargando inventario…</div>
+      <div style="font-size:16px;font-weight:700;color:#94a3b8;margin-bottom:6px;">Cargando catálogo…</div>
       <div style="font-size:13px;color:rgba(71,85,105,0.9);">Conectando con el catálogo SIEEG</div>
     </div>
 
+    <!-- ══════════ ESTADO INICIAL (sin filtro) ══════════ -->
+    <div v-else-if="!hasFilter && !loading"
+      style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;border-radius:16px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);text-align:center;">
+      <div style="width:64px;height:64px;border-radius:18px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.18);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+        <Search :size="24" color="#38bdf8" :stroke-width="1.6" />
+      </div>
+      <div style="font-size:17px;font-weight:700;color:#94a3b8;margin-bottom:8px;">Busca o elige una categoría</div>
+      <div style="font-size:13px;color:rgba(71,85,105,0.9);max-width:320px;line-height:1.6;">Escribe en el buscador o selecciona una categoría arriba para ver los productos disponibles.</div>
+    </div>
+
     <!-- ══════════ SKELETONS ══════════ -->
-    <div v-else-if="loading && !products.length" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:16px;">
+    <div v-else-if="loading && !products.length && hasFilter" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:16px;">
       <div v-for="i in 12" :key="i" style="border-radius:16px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
         <div class="shimmer-bg" style="height:164px;" />
         <div style="padding:14px 16px;display:flex;flex-direction:column;gap:8px;">
@@ -316,7 +326,7 @@
 
 <script setup lang="ts">
 import { Search, ChevronDown, Package, AlertCircle, Loader2, LayoutGrid, Eye, Tag } from '@lucide/vue'
-import { fetchCategorias, fetchProductos, fetchMarcas, fetchInitialCatalog } from '~/composables/useSyscom'
+import { fetchCategorias, fetchProductos, fetchMarcas } from '~/composables/useSyscom'
 import type { Product, SyscomCategoria } from '~/types'
 
 definePageMeta({ middleware: 'auth' })
@@ -358,7 +368,7 @@ const filteredBrands = computed(() => brands.value.filter(b => !brandSearch.valu
 let debounceTimer: ReturnType<typeof setTimeout>
 watch(search, (v) => {
   clearTimeout(debounceTimer)
-  debounceTimer = setTimeout(() => { dSearch.value = v; pagina.value = 1 }, 250)
+  debounceTimer = setTimeout(() => { dSearch.value = v; pagina.value = 1 }, 400)
 })
 
 let loadId = 0
@@ -367,31 +377,24 @@ onMounted(async () => {
   const cats = await fetchCategorias()
   categories.value = cats
   loadingCats.value = false
-  loadProducts()
 })
 
 watch([dSearch, activeCategoryId, activeBrandId, pagina, sortBy], loadProducts)
 
-async function loadAllCategories(myId: number) {
-  const r = await fetchInitialCatalog(categories.value)
-  if (myId !== loadId) return
-  products.value = r.products
-  cantidad.value = r.products.length
-  loading.value = false
-}
-
 async function loadProducts() {
+  if (!hasFilter.value) {
+    products.value = []
+    cantidad.value = 0
+    paginas.value  = 1
+    loading.value  = false
+    return
+  }
+
   const myId = ++loadId
   loading.value = true
   apiError.value = null
   products.value = []
   cantidad.value = 0
-
-  if (!hasFilter.value) {
-    paginas.value = 1
-    loadAllCategories(myId)
-    return
-  }
 
   const r = await fetchProductos({
     busqueda:  dSearch.value || undefined,
