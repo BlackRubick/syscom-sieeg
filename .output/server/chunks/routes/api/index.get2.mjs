@@ -1,5 +1,4 @@
-import { d as defineEventHandler } from '../../nitro/nitro.mjs';
-import { r as requireSession } from '../../_/session.mjs';
+import { d as defineEventHandler, r as requireSession, h as getQuery } from '../../nitro/nitro.mjs';
 import { p as prisma } from '../../_/prisma.mjs';
 import 'node:http';
 import 'node:https';
@@ -13,12 +12,21 @@ import 'crypto';
 import '@prisma/client';
 
 const index_get = defineEventHandler(async (event) => {
-  requireSession(event);
-  const users = await prisma.user.findMany({
-    orderBy: { createdAt: "asc" },
-    select: { id: true, name: true, email: true, role: true, status: true, createdAt: true, lastLogin: true, avatar: true }
+  const session = requireSession(event);
+  const q = getQuery(event);
+  const onlyUnread = q.unread === "true";
+  const notifications = await prisma.notification.findMany({
+    where: {
+      userId: session.userId,
+      ...onlyUnread ? { read: false } : {}
+    },
+    orderBy: { createdAt: "desc" },
+    take: 50
   });
-  return { users };
+  const unreadCount = await prisma.notification.count({
+    where: { userId: session.userId, read: false }
+  });
+  return { notifications, unreadCount };
 });
 
 export { index_get as default };

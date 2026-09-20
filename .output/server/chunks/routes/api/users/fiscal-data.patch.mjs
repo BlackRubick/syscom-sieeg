@@ -1,5 +1,4 @@
-import { d as defineEventHandler, r as readBody, c as createError } from '../../../nitro/nitro.mjs';
-import { r as requireSession } from '../../../_/session.mjs';
+import { d as defineEventHandler, r as requireSession, a as readBody, c as createError } from '../../../nitro/nitro.mjs';
 import { p as prisma } from '../../../_/prisma.mjs';
 import { h as actualizarCliente, o as obtenerCliente, d as crearCliente } from '../../../_/factura.mjs';
 import 'node:http';
@@ -19,6 +18,11 @@ const fiscalData_patch = defineEventHandler(async (event) => {
   const { rfc, razonSocial, codpos, email, regimen, pais } = body;
   if (!rfc || !razonSocial || !codpos || !email || !regimen || !pais) {
     throw createError({ statusCode: 400, message: "Faltan campos requeridos: RFC, Raz\xF3n Social, C\xF3digo Postal, Email, R\xE9gimen Fiscal y Pa\xEDs" });
+  }
+  const rfcClean = rfc.trim().toUpperCase();
+  const RFC_RE = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
+  if (!RFC_RE.test(rfcClean)) {
+    throw createError({ statusCode: 400, message: `RFC inv\xE1lido: "${rfcClean}". Debe tener el formato SAT (ej: XAXX010101000 o GOME820101H25).` });
   }
   const user = await prisma.user.update({
     where: { id: session.userId },

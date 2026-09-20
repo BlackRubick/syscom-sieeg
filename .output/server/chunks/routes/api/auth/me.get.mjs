@@ -1,5 +1,4 @@
-import { d as defineEventHandler, c as createError } from '../../../nitro/nitro.mjs';
-import { g as getSession } from '../../../_/session.mjs';
+import { d as defineEventHandler, f as getSession, c as createError } from '../../../nitro/nitro.mjs';
 import { p as prisma } from '../../../_/prisma.mjs';
 import 'node:http';
 import 'node:https';
@@ -45,7 +44,8 @@ const me_get = defineEventHandler(async (event) => {
       fiscalNumregidtrib: true,
       fiscalNombre: true,
       fiscalApellidos: true,
-      fiscalTelefono: true
+      fiscalTelefono: true,
+      discountPct: true
     }
   });
   if (!user) throw createError({ statusCode: 401, message: "No autorizado" });

@@ -1,6 +1,5 @@
-import { d as defineEventHandler, g as getRouterParam, c as createError, h as getMethod, f as getQuery, r as readBody, i as setResponseStatus } from '../../../nitro/nitro.mjs';
+import { d as defineEventHandler, r as requireSession, i as getRouterParam, c as createError, m as getMethod, h as getQuery, a as readBody, n as setResponseStatus } from '../../../nitro/nitro.mjs';
 import { a as getSyscomToken } from '../../../_/syscom.mjs';
-import { r as requireSession } from '../../../_/session.mjs';
 import 'node:http';
 import 'node:https';
 import 'node:events';

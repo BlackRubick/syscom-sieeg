@@ -620,7 +620,7 @@ const totalUnits    = computed(() => cart.items.reduce((s, i) => s + i.quantity,
 
 const speiPdfUrl = computed(() => {
   if (!speiResult.value?.transactionId) return ''
-  const isSandbox = config.public.openpayIsSandbox !== 'false'
+  const isSandbox = config.public.openpayIsSandbox === true || config.public.openpayIsSandbox === 'true'
   const dash = isSandbox ? 'https://sandbox-dashboard.openpay.mx' : 'https://dashboard.openpay.mx'
   return `${dash}/spei-pdf/${config.public.openpayMerchantId}/${speiResult.value.transactionId}`
 })
@@ -699,7 +699,7 @@ async function loadOpenPay(): Promise<void> {
   }
   w.OpenPay.setId(merchantId)
   w.OpenPay.setApiKey(publicKey)
-  w.OpenPay.setSandboxMode(config.public.openpayIsSandbox !== 'false')
+  w.OpenPay.setSandboxMode(config.public.openpayIsSandbox === true || config.public.openpayIsSandbox === 'true')
   openpayLoaded = true
 }
 

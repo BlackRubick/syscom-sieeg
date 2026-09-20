@@ -3,6 +3,10 @@ import type { Serialize, Simplify } from "nitropack/types";
 declare module "nitropack/types" {
   type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T
   interface InternalApi {
+    '/api/admin/config': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/config.get').default>>>>
+      'patch': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/config.patch').default>>>>
+    }
     '/api/auth/change-password': {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/change-password.post').default>>>>
     }
@@ -14,6 +18,13 @@ declare module "nitropack/types" {
     }
     '/api/auth/me': {
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/me.get').default>>>>
+    }
+    '/api/cart': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/cart/index.get').default>>>>
+      'patch': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/cart/index.patch').default>>>>
+    }
+    '/api/catalog/products': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/catalog/products.get').default>>>>
     }
     '/api/contact/request': {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/contact/request.post').default>>>>
@@ -63,6 +74,16 @@ declare module "nitropack/types" {
     '/api/orders': {
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/index.get').default>>>>
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/index.post').default>>>>
+    }
+    '/api/payments/create': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/payments/create.post').default>>>>
+    }
+    '/api/payments/verify': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/payments/verify.get').default>>>>
+    }
+    '/api/payments/webhook': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/payments/webhook.get').default>>>>
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/payments/webhook.post').default>>>>
     }
     '/api/syscom/**:path': {
       'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/syscom/[...path]').default>>>>

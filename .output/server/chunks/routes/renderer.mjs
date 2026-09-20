@@ -1,5 +1,5 @@
 import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'vue-bundle-renderer/runtime';
-import { k as joinRelativeURL, u as useRuntimeConfig, l as encodePath, m as defineRenderHandler, f as getQuery, c as createError, n as getRouteRules, o as getResponseStatusText, p as getResponseStatus, q as useNitroApp } from '../nitro/nitro.mjs';
+import { o as joinRelativeURL, u as useRuntimeConfig, p as encodePath, q as defineRenderHandler, h as getQuery, c as createError, t as getRouteRules, v as getResponseStatusText, w as getResponseStatus, x as useNitroApp } from '../nitro/nitro.mjs';
 import { renderToString } from 'vue/server-renderer';
 import { createHead as createHead$1, propsToString, renderSSRHead } from 'unhead/server';
 import { stringify, uneval } from 'devalue';
@@ -76,7 +76,7 @@ function createHead(options = {}) {
 
 const NUXT_RUNTIME_PAYLOAD_EXTRACTION = false;
 
-const appHead = {"meta":[{"name":"viewport","content":"width=device-width, initial-scale=1"},{"charset":"utf-8"}],"link":[{"rel":"preconnect","href":"https://fonts.googleapis.com"},{"rel":"preconnect","href":"https://fonts.gstatic.com","crossorigin":""},{"rel":"stylesheet","href":"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"}],"style":[],"script":[],"noscript":[],"title":"SIEEG SYSCOM"};
+const appHead = {"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"}],"link":[{"rel":"icon","type":"image/jpeg","href":"/logosieeg.jpg"},{"rel":"preconnect","href":"https://fonts.googleapis.com"},{"rel":"preconnect","href":"https://fonts.gstatic.com","crossorigin":""},{"rel":"stylesheet","href":"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"}],"style":[],"script":[],"noscript":[],"title":"SIEEG INTEGRADORES"};
 
 const appRootTag = "div";
 
@@ -457,5 +457,5 @@ const renderer = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   default: handler
 }, Symbol.toStringTag, { value: 'Module' }));
 
-export { baseURL as b, headSymbol as h, renderer as r, useHead as u };
+export { baseURL as b, headSymbol as h, publicAssetsURL as p, renderer as r, useHead as u };
 //# sourceMappingURL=renderer.mjs.map

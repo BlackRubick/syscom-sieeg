@@ -1,7 +1,9 @@
 declare global {
+  const COOKIE_MAX_AGE: typeof import('../../server/utils/session').COOKIE_MAX_AGE
   const H3Error: typeof import('../../node_modules/h3').H3Error
   const H3Event: typeof import('../../node_modules/h3').H3Event
   const SESSION_COOKIE: typeof import('../../server/utils/session').SESSION_COOKIE
+  const TTL_MS: typeof import('../../server/utils/session').TTL_MS
   const __buildAssetsURL: typeof import('../../node_modules/@nuxt/nitro-server/dist/runtime/utils/paths').buildAssetsURL
   const __publicAssetsURL: typeof import('../../node_modules/@nuxt/nitro-server/dist/runtime/utils/paths').publicAssetsURL
   const actualizarCliente: typeof import('../../server/utils/factura').actualizarCliente
@@ -11,6 +13,7 @@ declare global {
   const appendHeaders: typeof import('../../node_modules/h3').appendHeaders
   const appendResponseHeader: typeof import('../../node_modules/h3').appendResponseHeader
   const appendResponseHeaders: typeof import('../../node_modules/h3').appendResponseHeaders
+  const approveOrder: typeof import('../../server/utils/approveOrder').approveOrder
   const assertMethod: typeof import('../../node_modules/h3').assertMethod
   const buildCfdiConcepto: typeof import('../../server/utils/factura').buildCfdiConcepto
   const cachedEventHandler: typeof import('../../node_modules/nitropack/dist/runtime/internal/cache').cachedEventHandler
@@ -22,10 +25,12 @@ declare global {
   const crearCliente: typeof import('../../server/utils/factura').crearCliente
   const createApp: typeof import('../../node_modules/h3').createApp
   const createAppEventHandler: typeof import('../../node_modules/h3').createAppEventHandler
+  const createCardCharge: typeof import('../../server/utils/openpay').createCardCharge
   const createError: typeof import('../../node_modules/h3').createError
   const createEvent: typeof import('../../node_modules/h3').createEvent
   const createEventStream: typeof import('../../node_modules/h3').createEventStream
   const createRouter: typeof import('../../node_modules/h3').createRouter
+  const createSpeiCharge: typeof import('../../server/utils/openpay').createSpeiCharge
   const createToken: typeof import('../../server/utils/session').createToken
   const defaultContentType: typeof import('../../node_modules/h3').defaultContentType
   const defineAppConfig: typeof import('../../node_modules/@nuxt/nitro-server/dist/runtime/utils/config').defineAppConfig
@@ -54,6 +59,7 @@ declare global {
   const fromPlainHandler: typeof import('../../node_modules/h3').fromPlainHandler
   const fromWebHandler: typeof import('../../node_modules/h3').fromWebHandler
   const generateSyscomOrder: typeof import('../../server/utils/syscom').generateSyscomOrder
+  const getCharge: typeof import('../../server/utils/openpay').getCharge
   const getCookie: typeof import('../../node_modules/h3').getCookie
   const getFacturaEnv: typeof import('../../server/utils/factura').getFacturaEnv
   const getFacturaHeaders: typeof import('../../server/utils/factura').getFacturaHeaders
@@ -99,6 +105,7 @@ declare global {
   const listarClientes: typeof import('../../server/utils/factura').listarClientes
   const nitroPlugin: typeof import('../../node_modules/nitropack/dist/runtime/internal/plugin').nitroPlugin
   const obtenerCliente: typeof import('../../server/utils/factura').obtenerCliente
+  const openpayErrorMessage: typeof import('../../server/utils/openpay').openpayErrorMessage
   const parseCookies: typeof import('../../node_modules/h3').parseCookies
   const prisma: typeof import('../../server/utils/prisma').default
   const promisifyNodeListener: typeof import('../../node_modules/h3').promisifyNodeListener
@@ -158,6 +165,9 @@ declare global {
   export type { FacturaCliente, FacturaClientePayload, CfdiConcepto, CfdiPayload, CfdiResult, ConceptoInput, CfdiListItem, CfdiListResponse } from '../../server/utils/factura'
   import('../../server/utils/factura')
   // @ts-ignore
+  export type { OpenPayCharge, OpenPaySpeiCharge } from '../../server/utils/openpay'
+  import('../../server/utils/openpay')
+  // @ts-ignore
   export type { SessionPayload } from '../../server/utils/session'
   import('../../server/utils/session')
   // @ts-ignore
@@ -178,9 +188,11 @@ export { defineTask, runTask } from 'nitropack/runtime/internal/task';
 export { defineNitroErrorHandler } from 'nitropack/runtime/internal/error/utils';
 export { buildAssetsURL as __buildAssetsURL, publicAssetsURL as __publicAssetsURL } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/@nuxt/nitro-server/dist/runtime/utils/paths';
 export { defineAppConfig } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/@nuxt/nitro-server/dist/runtime/utils/config';
+export { approveOrder } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/approveOrder';
 export { getPool, query } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/db';
 export { sendAccessRequestEmail } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/email';
 export { getFacturaEnv, getFacturaHost, getFacturaHeaders, facturaFetch, listarClientes, obtenerCliente, crearCliente, actualizarCliente, eliminarCliente, buildCfdiConcepto, crearCFDI, listarCFDIs } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/factura';
+export { openpayErrorMessage, createCardCharge, createSpeiCharge, getCharge } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/openpay';
 export { default as prisma } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/prisma';
-export { SESSION_COOKIE, createToken, verifyToken, getSession, requireSession } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/session';
+export { SESSION_COOKIE, TTL_MS, COOKIE_MAX_AGE, createToken, verifyToken, getSession, requireSession } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/session';
 export { getSyscomToken, generateSyscomOrder } from '/Users/blackrubick/Desktop/sieeg-syscom-nuxt/server/utils/syscom';

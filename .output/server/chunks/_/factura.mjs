@@ -50,13 +50,11 @@ async function facturaFetch(version, endpoint, options = {}) {
   if (!res.ok) {
     const rawMsg = (_b = body == null ? void 0 : body.message) != null ? _b : `Factura.com error ${res.status}`;
     const msg = typeof rawMsg === "string" ? rawMsg : JSON.stringify(rawMsg);
-    console.error("[Factura.com HTTP error]", res.status, url, JSON.stringify(body));
     throw createError({ statusCode: res.status, message: msg });
   }
   if ((body == null ? void 0 : body.status) === "error" || (body == null ? void 0 : body.response) === "error") {
     const rawMsg = (_d = (_c = body == null ? void 0 : body.message) != null ? _c : body == null ? void 0 : body.msg) != null ? _d : "Error en Factura.com";
     const msg = typeof rawMsg === "string" ? rawMsg : JSON.stringify(rawMsg);
-    console.error("[Factura.com error]", url, JSON.stringify(body));
     throw createError({ statusCode: 422, message: msg });
   }
   return data;

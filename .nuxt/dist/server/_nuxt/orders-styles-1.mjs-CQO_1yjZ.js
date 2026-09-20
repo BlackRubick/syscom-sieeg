@@ -1,0 +1,5 @@
+const orders_vue_vue_type_style_index_0_scoped_a210e10d_lang = ".spin[data-v-a210e10d]{animation:spin-a210e10d .8s linear infinite}@keyframes spin-a210e10d{0%{transform:rotate(0)}to{transform:rotate(1turn)}}.shimmer-bg[data-v-a210e10d]{animation:shimmer-a210e10d 1.5s ease-in-out infinite}@keyframes shimmer-a210e10d{0%,to{opacity:.4}50%{opacity:.8}}.fade-enter-active[data-v-a210e10d],.fade-leave-active[data-v-a210e10d]{transition:opacity .2s}.fade-enter-from[data-v-a210e10d],.fade-leave-to[data-v-a210e10d]{opacity:0}.modal-enter-active[data-v-a210e10d],.modal-leave-active[data-v-a210e10d]{transition:opacity .22s,transform .22s}.modal-enter-from[data-v-a210e10d],.modal-leave-to[data-v-a210e10d]{opacity:0;transform:scale(.97) translateY(-6px)}.slide-down-enter-active[data-v-a210e10d],.slide-down-leave-active[data-v-a210e10d]{max-height:400px;overflow:hidden;transition:opacity .25s,max-height .3s ease}.slide-down-enter-from[data-v-a210e10d],.slide-down-leave-to[data-v-a210e10d]{max-height:0;opacity:0}";
+export {
+  orders_vue_vue_type_style_index_0_scoped_a210e10d_lang as default
+};
+//# sourceMappingURL=orders-styles-1.mjs-CQO_1yjZ.js.map

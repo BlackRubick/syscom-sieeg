@@ -7,7 +7,7 @@ import { sanitizeStatusCode, createError as createError$1 } from "/Users/blackru
 import { shouldHydrate, createPinia, setActivePinia } from "pinia";
 import { defu } from "/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/defu/dist/defu.mjs";
 import { START_LOCATION, createMemoryHistory, createRouter, useRoute as useRoute$1, RouterView } from "vue-router";
-import { hasProtocol, joinURL, parseURL, encodePath, decodePath, withQuery, isScriptProtocol } from "/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/ufo/dist/index.mjs";
+import { hasProtocol, joinURL, withQuery, parseURL, encodePath, decodePath, isScriptProtocol } from "/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/ufo/dist/index.mjs";
 import "/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/klona/dist/index.mjs";
 import { ssrRenderComponent, ssrRenderSuspense, ssrRenderVNode } from "vue/server-renderer";
 if (!globalThis.$fetch) {
@@ -436,67 +436,94 @@ const unhead_k2P3m_ZDyjlr2mMYnoDPwavjsDN8hBlk9cFai0bbopU = /* @__PURE__ */ defin
 function toArray$1(value) {
   return Array.isArray(value) ? value : [value];
 }
-const __nuxt_page_meta = { layout: "auth" };
+const __nuxt_page_meta$3 = { layout: "landing" };
+const __nuxt_page_meta$2 = { layout: "auth" };
+const __nuxt_page_meta$1 = { layout: "landing" };
+const __nuxt_page_meta = { layout: "landing" };
 const _routes = [
   {
     name: "cart",
     path: "/cart",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/cart-Da9gRRem.js")
+    component: () => import("./_nuxt/cart-BSj7pOB4.js")
+  },
+  {
+    name: "admin",
+    path: "/admin",
+    meta: { "middleware": "auth" },
+    component: () => import("./_nuxt/admin-DLF8xl2L.js")
   },
   {
     name: "index",
     path: "/",
-    meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/index-DvDd1RKe.js")
+    meta: { ...__nuxt_page_meta$3 || {}, ...{ "middleware": "redirect-authenticated" } },
+    component: () => import("./_nuxt/index-xYVvs2Kl.js")
   },
   {
     name: "login",
     path: "/login",
-    meta: __nuxt_page_meta || {},
-    component: () => import("./_nuxt/login-BxDaUn0c.js")
+    meta: __nuxt_page_meta$2 || {},
+    component: () => import("./_nuxt/login-AUa5jrVi.js")
   },
   {
     name: "users",
     path: "/users",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/users-jC-YVF3m.js")
+    component: () => import("./_nuxt/users-Ks2wHeue.js")
   },
   {
     name: "fiscal",
     path: "/fiscal",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/fiscal-B0dkwVlm.js")
+    component: () => import("./_nuxt/fiscal-CZJ29ACw.js")
   },
   {
     name: "orders",
     path: "/orders",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/orders-CBsdMqRV.js")
+    component: () => import("./_nuxt/orders-CJabfC-i.js")
   },
   {
     name: "perfil",
     path: "/perfil",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/perfil-Btu3Nk4q.js")
+    component: () => import("./_nuxt/perfil-CFnrnzh_.js")
   },
   {
     name: "catalog",
     path: "/catalog",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/catalog-10kkpaaB.js")
+    component: () => import("./_nuxt/catalog-Drn24WE-.js")
   },
   {
     name: "facturas",
     path: "/facturas",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/facturas-CE__FxlB.js")
+    component: () => import("./_nuxt/facturas-Dg4QOd0u.js")
+  },
+  {
+    name: "terminos",
+    path: "/terminos",
+    meta: __nuxt_page_meta$1 || {},
+    component: () => import("./_nuxt/terminos-CRGkHxOu.js")
   },
   {
     name: "dashboard",
     path: "/dashboard",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/dashboard-CxNsGVxz.js")
+    component: () => import("./_nuxt/dashboard-BJ7RosMC.js")
+  },
+  {
+    name: "privacidad",
+    path: "/privacidad",
+    meta: __nuxt_page_meta || {},
+    component: () => import("./_nuxt/privacidad-BuSSe7QB.js")
+  },
+  {
+    name: "payment-return",
+    path: "/payment/return",
+    meta: { "middleware": "auth" },
+    component: () => import("./_nuxt/return-BGL7NeX_.js")
   }
 ];
 const _wrapInTransition = (props, children) => {
@@ -641,7 +668,8 @@ const globalMiddleware = [
   manifest_45route_45rule
 ];
 const namedMiddleware = {
-  auth: () => import("./_nuxt/auth-DvAgt1fG.js")
+  auth: () => import("./_nuxt/auth-D2ygV-9l.js"),
+  "redirect-authenticated": () => import("./_nuxt/redirect-authenticated-Des8s9e3.js")
 };
 Object.assign(/* @__PURE__ */ Object.create(null), {});
 const pageIslandRoutes = Object.assign(/* @__PURE__ */ Object.create(null), {});
@@ -946,7 +974,8 @@ const plugins = [
 ];
 const layouts = {
   auth: defineAsyncComponent(() => import("./_nuxt/auth-2bov0ybJ.js").then((m) => m.default || m)),
-  default: defineAsyncComponent(() => import("./_nuxt/default-DY7gQPvn.js").then((m) => m.default || m))
+  default: defineAsyncComponent(() => import("./_nuxt/default-CRKbKPNz.js").then((m) => m.default || m)),
+  landing: defineAsyncComponent(() => import("./_nuxt/landing-Cf2XonZo.js").then((m) => m.default || m))
 };
 const routeRulesMatcher = _routeRulesMatcher;
 const LayoutLoader = defineComponent({
@@ -1228,7 +1257,7 @@ const _sfc_main$1 = {
     const statusText = _error.statusMessage ?? (is404 ? "Page Not Found" : "Internal Server Error");
     const description = _error.message || _error.toString();
     const stack = void 0;
-    const _Error404 = defineAsyncComponent(() => import("./_nuxt/error-404-CznJ3Dnb.js"));
+    const _Error404 = defineAsyncComponent(() => import("./_nuxt/error-404-CGX_8KKO.js"));
     const _Error = defineAsyncComponent(() => import("./_nuxt/error-500-qL_ddNmu.js"));
     const ErrorTemplate = is404 ? _Error404 : _Error;
     return (_ctx, _push, _parent, _attrs) => {
@@ -1322,9 +1351,9 @@ let entry;
 const entry_default = ((ssrContext) => entry(ssrContext));
 export {
   _export_sfc as _,
-  useNuxtApp as a,
+  useRouter as a,
   useRoute as b,
-  useRuntimeConfig as c,
+  useNuxtApp as c,
   defineNuxtRouteMiddleware as d,
   entry_default as default,
   encodeRoutePath as e,
@@ -1332,6 +1361,6 @@ export {
   navigateTo as n,
   resolveRouteObject as r,
   tryUseNuxtApp as t,
-  useRouter as u
+  useRuntimeConfig as u
 };
 //# sourceMappingURL=server.mjs.map

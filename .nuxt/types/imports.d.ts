@@ -3,7 +3,7 @@ export {}
 declare global {
   const abortNavigation: typeof import('../../node_modules/nuxt/dist/app/composables/router').abortNavigation
   const acceptHMRUpdate: typeof import('../../node_modules/@pinia/nuxt/dist/runtime/composables').acceptHMRUpdate
-  const actions: typeof import('../../stores/auth').actions
+  const actions: typeof import('../../stores/cart').actions
   const adaptProduct: typeof import('../../composables/useSyscom').adaptProduct
   const addRouteMiddleware: typeof import('../../node_modules/nuxt/dist/app/composables/router').addRouteMiddleware
   const callOnce: typeof import('../../node_modules/nuxt/dist/app/composables/once').callOnce
@@ -111,6 +111,7 @@ declare global {
   const useAsyncData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData').useAsyncData
   const useAttrs: typeof import('vue').useAttrs
   const useAuthStore: typeof import('../../stores/auth').useAuthStore
+  const useBreakpoint: typeof import('../../composables/useBreakpoint').useBreakpoint
   const useCartStore: typeof import('../../stores/cart').useCartStore
   const useCookie: typeof import('../../node_modules/nuxt/dist/app/composables/cookie').useCookie
   const useCssModule: typeof import('vue').useCssModule
@@ -219,7 +220,7 @@ declare module 'vue' {
   interface ComponentCustomProperties {
     readonly abortNavigation: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/router')['abortNavigation']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('../../node_modules/@pinia/nuxt/dist/runtime/composables')['acceptHMRUpdate']>
-    readonly actions: UnwrapRef<typeof import('../../stores/auth')['actions']>
+    readonly actions: UnwrapRef<typeof import('../../stores/cart')['actions']>
     readonly adaptProduct: UnwrapRef<typeof import('../../composables/useSyscom')['adaptProduct']>
     readonly addRouteMiddleware: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/router')['addRouteMiddleware']>
     readonly callOnce: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/once')['callOnce']>
@@ -327,6 +328,7 @@ declare module 'vue' {
     readonly useAsyncData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useAsyncData']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
     readonly useAuthStore: UnwrapRef<typeof import('../../stores/auth')['useAuthStore']>
+    readonly useBreakpoint: UnwrapRef<typeof import('../../composables/useBreakpoint')['useBreakpoint']>
     readonly useCartStore: UnwrapRef<typeof import('../../stores/cart')['useCartStore']>
     readonly useCookie: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/cookie')['useCookie']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>

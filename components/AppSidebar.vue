@@ -6,20 +6,28 @@
       <div style="width:30px;height:30px;border-radius:8px;overflow:hidden;flex-shrink:0;box-shadow:0 0 14px rgba(14,165,233,0.35);">
         <img src="/logosieeg.jpg" alt="SIEEG" style="width:100%;height:100%;object-fit:cover;" />
       </div>
-      <div v-if="!collapsed" style="overflow:hidden;white-space:nowrap;transition:opacity 0.2s;" >
+      <div v-if="!collapsed || isMobile" style="overflow:hidden;white-space:nowrap;transition:opacity 0.2s;flex:1;">
         <div style="font-size:13px;font-weight:800;color:#F1F5F9;line-height:1;letter-spacing:-0.3px;">SIEEG</div>
         <div style="font-size:9px;color:rgba(100,116,139,0.7);font-weight:500;letter-spacing:0.8px;margin-top:2px;">INTEGRADORES</div>
       </div>
+      <!-- Close button on mobile -->
+      <button v-if="isMobile" @click="ui.closeMobileSidebar()"
+        style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:auto;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
     </div>
 
     <!-- Nav -->
     <nav style="flex:1;padding:8px 6px;overflow-y:auto;overflow-x:hidden;" class="no-scrollbar">
-      <div v-if="!collapsed" style="font-size:9px;font-weight:600;color:rgba(71,85,105,0.8);text-transform:uppercase;letter-spacing:1.2px;padding:4px 10px 8px;user-select:none;">
+      <div v-if="!collapsed || isMobile" style="font-size:9px;font-weight:600;color:rgba(71,85,105,0.8);text-transform:uppercase;letter-spacing:1.2px;padding:4px 10px 8px;user-select:none;">
         Navegación
       </div>
 
-      <NuxtLink v-for="item in navItems" :key="item.href" :to="item.href" style="text-decoration:none;display:block;margin-bottom:1px;">
-        <div :style="linkStyle(item.href)" :title="collapsed ? item.label : undefined"
+      <NuxtLink v-for="item in navItems" :key="item.href" :to="item.href" style="text-decoration:none;display:block;margin-bottom:1px;"
+        @click="isMobile && ui.closeMobileSidebar()">
+        <div :style="linkStyle(item.href)" :title="collapsed && !isMobile ? item.label : undefined"
           @mouseenter="e => onHover(e, item.href, true)"
           @mouseleave="e => onHover(e, item.href, false)">
 
@@ -34,7 +42,7 @@
             style="flex-shrink:0;" v-html="item.svg" />
 
           <!-- Label -->
-          <span v-if="!collapsed" :style="{ fontSize:'12.5px', fontWeight:isActive(item.href)?600:500, color:isActive(item.href)?'#E2E8F0':'rgba(100,116,139,0.8)', whiteSpace:'nowrap', flex:1, overflow:'hidden', textOverflow:'ellipsis', transition:'opacity 0.15s' }">
+          <span v-if="!collapsed || isMobile" :style="{ fontSize:'12.5px', fontWeight:isActive(item.href)?600:500, color:isActive(item.href)?'#E2E8F0':'rgba(100,116,139,0.8)', whiteSpace:'nowrap', flex:1, overflow:'hidden', textOverflow:'ellipsis', transition:'opacity 0.15s' }">
             {{ item.label }}
           </span>
 
@@ -46,10 +54,9 @@
       </NuxtLink>
     </nav>
 
-    <!-- Botón colapsar -->
-    <button @click="ui.toggleSidebar()"
+    <!-- Botón colapsar (solo desktop) -->
+    <button v-if="!isMobile" @click="ui.toggleSidebar()"
       style="position:absolute;right:-11px;top:72px;width:22px;height:22px;border-radius:50%;background:#0D1B35;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:30;box-shadow:0 2px 8px rgba(0,0,0,0.4);padding:0;">
-      <!-- ChevronLeft / ChevronRight -->
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path v-if="!collapsed" d="m15 18-6-6 6-6"/>
         <path v-else            d="m9 18 6-6-6-6"/>
@@ -63,6 +70,7 @@ const route = useRoute()
 const ui    = useUIStore()
 const cart  = useCartStore()
 const auth  = useAuthStore()
+const { isMobile } = useBreakpoint()
 
 const collapsed  = computed(() => ui.sidebarCollapsed)
 const cartCount  = computed(() => cart.count)
@@ -111,19 +119,38 @@ const navItems = computed(() => {
   return ALL_NAV.filter(item => !item.roles || item.roles.includes(role))
 })
 
-const sidebarStyle = computed(() => ({
-  width: collapsed.value ? '64px' : '220px',
-  transition: 'width 0.28s cubic-bezier(0.4,0,0.2,1)',
-  flexShrink: 0,
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  background: 'rgba(6,12,26,0.98)',
-  borderRight: '1px solid rgba(255,255,255,0.07)',
-  position: 'relative',
-  zIndex: 20,
-  overflow: 'visible',
-}))
+const sidebarStyle = computed(() => {
+  if (isMobile.value) {
+    return {
+      position:   'fixed',
+      top:        '0',
+      left:       '0',
+      height:     '100%',
+      width:      '260px',
+      display:    'flex',
+      flexDirection: 'column',
+      background: 'rgba(6,12,26,0.99)',
+      borderRight: '1px solid rgba(255,255,255,0.07)',
+      zIndex:     '200',
+      overflow:   'visible',
+      transform:  ui.mobileSidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+      transition: 'transform 0.28s cubic-bezier(0.4,0,0.2,1)',
+    }
+  }
+  return {
+    width:       collapsed.value ? '64px' : '220px',
+    transition:  'width 0.28s cubic-bezier(0.4,0,0.2,1)',
+    flexShrink:  '0',
+    height:      '100%',
+    display:     'flex',
+    flexDirection: 'column',
+    background:  'rgba(6,12,26,0.98)',
+    borderRight: '1px solid rgba(255,255,255,0.07)',
+    position:    'relative',
+    zIndex:      '20',
+    overflow:    'visible',
+  }
+})
 
 function isActive(href: string) {
   return href === '/dashboard' ? route.path === href : route.path.startsWith(href)
@@ -131,13 +158,14 @@ function isActive(href: string) {
 
 function linkStyle(href: string) {
   const active = isActive(href)
+  const expand = !collapsed.value || isMobile.value
   return {
     display: 'flex',
     alignItems: 'center',
     gap: '9px',
     height: '36px',
-    padding: collapsed.value ? '0' : '0 10px',
-    justifyContent: collapsed.value ? 'center' : 'flex-start',
+    padding: expand ? '0 10px' : '0',
+    justifyContent: expand ? 'flex-start' : 'center',
     borderRadius: '9px',
     position: 'relative',
     cursor: 'pointer',
@@ -155,10 +183,10 @@ function onHover(e: MouseEvent, href: string, entering: boolean) {
 }
 
 const badgeStyle = computed(() => ({
-  position: collapsed.value ? 'absolute' : 'static',
-  top:   collapsed.value ? '3px'  : undefined,
-  right: collapsed.value ? '3px'  : undefined,
-  minWidth: '17px', height: '17px', borderRadius: '9px',
+  position:   (!collapsed.value || isMobile.value) ? 'static' : 'absolute',
+  top:        (!collapsed.value || isMobile.value) ? undefined : '3px',
+  right:      (!collapsed.value || isMobile.value) ? undefined : '3px',
+  minWidth:   '17px', height: '17px', borderRadius: '9px',
   background: '#0EA5E9', display: 'flex', alignItems: 'center',
   justifyContent: 'center', fontSize: '9px', fontWeight: 700,
   color: 'white', padding: '0 4px', flexShrink: 0,

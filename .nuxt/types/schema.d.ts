@@ -27,12 +27,18 @@ import { NuxtModule, ModuleDependencyMeta } from '@nuxt/schema'
 
    smtpAdminTo: string,
 
+   openpayPrivateKey: string,
+
    nitro: {
       envPrefix: string,
    },
   }
   interface SharedPublicRuntimeConfig {
+   openpayMerchantId: string,
 
+   openpayPublicKey: string,
+
+   openpayIsSandbox: string,
   }
 declare module '@nuxt/schema' {
   interface ModuleDependencies {

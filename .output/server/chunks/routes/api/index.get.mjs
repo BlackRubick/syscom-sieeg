@@ -1,5 +1,4 @@
-import { d as defineEventHandler } from '../../nitro/nitro.mjs';
-import { r as requireSession } from '../../_/session.mjs';
+import { d as defineEventHandler, r as requireSession } from '../../nitro/nitro.mjs';
 import { p as prisma } from '../../_/prisma.mjs';
 import 'node:http';
 import 'node:https';
@@ -13,29 +12,14 @@ import 'crypto';
 import '@prisma/client';
 
 const index_get = defineEventHandler(async (event) => {
+  var _a;
   const session = requireSession(event);
-  const isManager = session.role === "admin" || session.role === "approver";
-  const orders = await prisma.order.findMany({
-    where: isManager ? {} : { userId: session.userId },
-    orderBy: { createdAt: "desc" },
-    include: { user: { select: { id: true, name: true, email: true } } }
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { cartItems: true }
   });
-  return {
-    orders: orders.map((o) => ({
-      id: o.id,
-      userId: o.userId,
-      userName: o.user.name,
-      userEmail: o.user.email,
-      status: o.status,
-      items: o.items,
-      total: o.total,
-      priority: o.priority,
-      notes: o.notes,
-      syscomFolio: o.syscomFolio,
-      createdAt: o.createdAt.toISOString(),
-      updatedAt: o.updatedAt.toISOString()
-    }))
-  };
+  const raw = (_a = user == null ? void 0 : user.cartItems) != null ? _a : [];
+  return { items: JSON.parse(JSON.stringify(raw)) };
 });
 
 export { index_get as default };

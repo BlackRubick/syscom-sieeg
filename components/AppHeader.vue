@@ -1,15 +1,15 @@
 <template>
-  <header style="height:60px;display:flex;align-items:center;padding:0 24px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(8,16,32,0.9);backdrop-filter:blur(12px);flex-shrink:0;gap:16px;position:sticky;top:0;z-index:10;font-family:'Inter',system-ui,sans-serif;">
+  <header :style="{ height:'60px', display:'flex', alignItems:'center', padding: isMobile ? '0 16px' : '0 24px', borderBottom:'1px solid rgba(255,255,255,0.06)', background:'rgba(8,16,32,0.9)', backdropFilter:'blur(12px)', flexShrink:0, gap:'12px', position:'sticky', top:0, zIndex:10, fontFamily:`'Inter',system-ui,sans-serif` }">
 
-    <!-- Buscador -->
-    <div style="flex:1;max-width:400px;position:relative;">
-      <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;" :width="14" :height="14" viewBox="0 0 24 24" fill="none" :stroke="searchFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    <!-- Hamburger (solo mobile) -->
+    <button v-if="isMobile" @click="ui.openMobileSidebar()"
+      style="width:36px;height:36px;border-radius:10px;background:transparent;border:1px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;"
+      @mouseenter="e => (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.06)'"
+      @mouseleave="e => (e.currentTarget as HTMLElement).style.background='transparent'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
-      <input v-model="search" placeholder="Buscar productos, órdenes..."
-        @focus="searchFocus=true" @blur="searchFocus=false"
-        :style="{ width:'100%', height:'36px', background:searchFocus?'rgba(14,165,233,0.06)':'rgba(255,255,255,0.04)', border:`1px solid ${searchFocus?'rgba(14,165,233,0.4)':'rgba(255,255,255,0.08)'}`, borderRadius:'10px', paddingLeft:'36px', paddingRight:'12px', fontSize:'13px', color:'#E2E8F0', outline:'none', transition:'all 0.2s', fontFamily:'inherit', boxSizing:'border-box' }" />
-    </div>
+    </button>
 
     <div style="margin-left:auto;display:flex;align-items:center;gap:4px;">
 
@@ -19,7 +19,6 @@
           :style="{ width:'36px', height:'36px', borderRadius:'10px', background:notifOpen?'rgba(255,255,255,0.08)':'transparent', border:'1px solid transparent', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', position:'relative' }"
           @mouseenter="e => (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.06)'"
           @mouseleave="e => { if(!notifOpen)(e.currentTarget as HTMLElement).style.background='transparent' }">
-          <!-- Bell icon -->
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.9)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
           </svg>
@@ -29,7 +28,7 @@
         </button>
 
         <Transition name="dropdown">
-          <div v-if="notifOpen" style="position:absolute;right:0;top:44px;width:300px;background:#0D1B35;border:1px solid rgba(255,255,255,0.1);border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,0.6);overflow:hidden;z-index:50;">
+          <div v-if="notifOpen" :style="{ position:'absolute', right:0, top:'44px', width: isMobile ? 'calc(100vw - 32px)' : '300px', maxWidth:'300px', background:'#0D1B35', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'14px', boxShadow:'0 16px 48px rgba(0,0,0,0.6)', overflow:'hidden', zIndex:50 }">
             <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
               <span style="font-size:13px;font-weight:600;color:#E2E8F0;">Notificaciones</span>
               <button v-if="ui.unreadCount > 0" @click="ui.markAllRead()" style="font-size:11px;color:#38bdf8;background:none;border:none;cursor:pointer;font-weight:500;">Marcar leídas</button>
@@ -64,12 +63,11 @@
           <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#0EA5E9,#22D3EE);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;">
             {{ initials }}
           </div>
-          <div style="text-align:left;">
+          <div v-if="!isMobile" style="text-align:left;">
             <div style="font-size:12px;font-weight:600;color:#E2E8F0;line-height:1;">{{ firstName }}</div>
             <div style="font-size:10px;color:rgba(100,116,139,0.8);margin-top:2px;">{{ roleLabel }}</div>
           </div>
-          <!-- ChevronDown -->
-          <svg :width="12" :height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(100,116,139,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" :style="{ transition:'transform 0.2s', transform:userOpen?'rotate(180deg)':'rotate(0deg)', marginLeft:'2px' }">
+          <svg v-if="!isMobile" :width="12" :height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(100,116,139,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" :style="{ transition:'transform 0.2s', transform:userOpen?'rotate(180deg)':'rotate(0deg)', marginLeft:'2px' }">
             <path d="m6 9 6 6 6-6"/>
           </svg>
         </button>
@@ -85,7 +83,6 @@
                 style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px;color:#fb7185;background:none;border:none;cursor:pointer;text-align:left;font-family:inherit;"
                 @mouseenter="e => (e.currentTarget as HTMLElement).style.background='rgba(244,63,94,0.06)'"
                 @mouseleave="e => (e.currentTarget as HTMLElement).style.background='transparent'">
-                <!-- LogOut icon -->
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>
                 </svg>
@@ -105,11 +102,10 @@
 const auth   = useAuthStore()
 const ui     = useUIStore()
 const router = useRouter()
+const { isMobile } = useBreakpoint()
 
-const search      = ref('')
-const searchFocus = ref(false)
-const notifOpen   = ref(false)
-const userOpen    = ref(false)
+const notifOpen = ref(false)
+const userOpen  = ref(false)
 
 const roleLabels: Record<string, string> = { admin:'Administrador', buyer:'Comprador', approver:'Aprobador', viewer:'Visor' }
 

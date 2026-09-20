@@ -1,0 +1,683 @@
+import { defineComponent, ref, unref, useSSRContext, computed, watch } from "vue";
+import { ssrRenderAttrs, ssrRenderStyle, ssrInterpolate, ssrRenderList, ssrRenderAttr, ssrIncludeBooleanAttr, ssrRenderComponent, ssrRenderClass, ssrLooseContain, ssrLooseEqual } from "vue/server-renderer";
+import { u as useCartStore } from "./cart-DSVjrl-J.js";
+import { a as adaptProduct, f as fetchProductos } from "./useSyscom-BdSrtAOh.js";
+import { Loader2, ChevronDown, Tag, LayoutGrid, Search, AlertCircle, Package, Eye } from "@lucide/vue";
+import "/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/hookable/dist/index.mjs";
+import { u as useBreakpoint } from "./useBreakpoint-DbQtNGMm.js";
+import { _ as _export_sfc } from "../server.mjs";
+import "pinia";
+import "/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/ofetch/dist/node.mjs";
+import "#internal/nuxt/paths";
+import "/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/unctx/dist/index.mjs";
+import "/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/h3/dist/index.mjs";
+import "/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/defu/dist/defu.mjs";
+import "vue-router";
+import "/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/ufo/dist/index.mjs";
+import "/Users/blackrubick/Desktop/sieeg-syscom-nuxt/node_modules/klona/dist/index.mjs";
+const _sfc_main$2 = /* @__PURE__ */ defineComponent({
+  __name: "MiniProductGrid",
+  __ssrInlineRender: true,
+  props: {
+    title: {},
+    products: {}
+  },
+  setup(__props) {
+    useCartStore();
+    const addedId = ref(null);
+    const fmtCurrency = (n) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n);
+    return (_ctx, _push, _parent, _attrs) => {
+      _push(`<div${ssrRenderAttrs(_attrs)}><div style="${ssrRenderStyle({ "font-size": "11px", "font-weight": "600", "color": "rgba(100,116,139,0.7)", "text-transform": "uppercase", "letter-spacing": "0.8px", "margin-bottom": "10px" })}">${ssrInterpolate(__props.title)}</div><div style="${ssrRenderStyle({ "display": "grid", "grid-template-columns": "repeat(auto-fill,minmax(150px,1fr))", "gap": "10px" })}"><!--[-->`);
+      ssrRenderList(__props.products, (p) => {
+        _push(`<div style="${ssrRenderStyle({ "border-radius": "12px", "background": "rgba(255,255,255,0.03)", "border": "1px solid rgba(255,255,255,0.07)", "padding": "10px", "display": "flex", "flex-direction": "column", "gap": "7px" })}">`);
+        if (p.images[0]) {
+          _push(`<img${ssrRenderAttr("src", p.images[0])}${ssrRenderAttr("alt", p.name)} style="${ssrRenderStyle({ "width": "100%", "height": "70px", "object-fit": "contain", "border-radius": "7px" })}">`);
+        } else {
+          _push(`<div style="${ssrRenderStyle({ "height": "70px", "display": "flex", "align-items": "center", "justify-content": "center", "font-size": "24px" })}">📦</div>`);
+        }
+        _push(`<div style="${ssrRenderStyle({ "font-size": "11px", "font-weight": "600", "color": "#CBD5E1", "line-height": "1.3", "display": "-webkit-box", "-webkit-line-clamp": "2", "-webkit-box-orient": "vertical", "overflow": "hidden" })}">${ssrInterpolate(p.name)}</div>`);
+        if (p.price > 0) {
+          _push(`<div style="${ssrRenderStyle({ "font-size": "12px", "font-weight": "700", "color": "#38bdf8" })}">${ssrInterpolate(fmtCurrency(p.price))}</div>`);
+        } else {
+          _push(`<!---->`);
+        }
+        _push(`<button${ssrIncludeBooleanAttr(p.stock === 0) ? " disabled" : ""} style="${ssrRenderStyle({ height: "28px", borderRadius: "7px", border: "none", background: unref(addedId) === p.id ? "rgba(16,185,129,0.15)" : "rgba(14,165,233,0.12)", color: unref(addedId) === p.id ? "#34d399" : "#38bdf8", fontSize: "10px", fontWeight: 600, cursor: p.stock === 0 ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: p.stock === 0 ? 0.4 : 1 })}">${ssrInterpolate(unref(addedId) === p.id ? "✓ Agregado" : "+ Agregar")}</button></div>`);
+      });
+      _push(`<!--]--></div></div>`);
+    };
+  }
+});
+const _sfc_setup$2 = _sfc_main$2.setup;
+_sfc_main$2.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/MiniProductGrid.vue");
+  return _sfc_setup$2 ? _sfc_setup$2(props, ctx) : void 0;
+};
+const _sfc_main$1 = /* @__PURE__ */ defineComponent({
+  __name: "ProductModal",
+  __ssrInlineRender: true,
+  props: {
+    product: {},
+    show: { type: Boolean }
+  },
+  emits: ["close"],
+  setup(__props, { emit: __emit }) {
+    const props = __props;
+    useCartStore();
+    const loading = ref(true);
+    const error = ref(null);
+    const detail = ref(null);
+    const related = ref([]);
+    const accesorios = ref([]);
+    const imgIdx = ref(0);
+    const added = ref(false);
+    const displayProduct = computed(() => {
+      if (!detail.value) return props.product;
+      try {
+        return adaptProduct(detail.value);
+      } catch {
+        return props.product;
+      }
+    });
+    const images = computed(() => {
+      const imgs = [];
+      const raw = detail.value?.imagenes;
+      if (raw?.length) {
+        [...raw].sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0)).forEach((i) => {
+          if (i.url) imgs.push(i.url);
+        });
+      }
+      if (!imgs.length && props.product.images[0]) imgs.push(props.product.images[0]);
+      return imgs;
+    });
+    const stockTotal = computed(() => detail.value ? Number(detail.value.total_existencia) : props.product.stock);
+    const description = computed(() => detail.value?.descripcion ?? "");
+    const caracteristicas = computed(() => detail.value?.caracteristicas ?? []);
+    const recursos = computed(() => detail.value?.recursos ?? []);
+    const existencia = computed(() => detail.value?.existencia);
+    function extractQty(v) {
+      if (typeof v === "number") return v;
+      if (typeof v === "string") return parseInt(v, 10) || 0;
+      if (v && typeof v === "object") {
+        const o = v;
+        const n = o.cantidad ?? o.total ?? o.existencia ?? o.stock;
+        return typeof n === "number" ? n : parseInt(String(n ?? "0"), 10) || 0;
+      }
+      return 0;
+    }
+    function toDisplayString(v) {
+      if (typeof v === "string") return v;
+      if (typeof v === "number" || typeof v === "boolean") return String(v);
+      if (v && typeof v === "object") {
+        const o = v;
+        return String(o.descripcion ?? o.nombre ?? o.valor ?? o.text ?? JSON.stringify(v));
+      }
+      return String(v ?? "");
+    }
+    function isHTML(v) {
+      return typeof v === "string" && /<[a-z][\s\S]*>/i.test(v);
+    }
+    const fmtCurrency = (n) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n);
+    async function loadDetail() {
+      loading.value = true;
+      error.value = null;
+      detail.value = null;
+      related.value = [];
+      accesorios.value = [];
+      imgIdx.value = 0;
+      const id = props.product.id;
+      const [det, rel, acc] = await Promise.all([
+        $fetch(`/api/syscom/productos/${id}?moneda=MXN`).catch(() => null),
+        $fetch(`/api/syscom/productos/${id}/relacionados?moneda=MXN`).catch(() => []),
+        $fetch(`/api/syscom/productos/${id}/accesorios?moneda=MXN`).catch(() => [])
+      ]);
+      if (!det || det.error) {
+        error.value = String(det?.error ?? "No se pudo cargar el producto");
+      } else {
+        detail.value = det;
+      }
+      const toProducts = (arr) => arr.slice(0, 6).map((p) => {
+        try {
+          return adaptProduct(p);
+        } catch {
+          return null;
+        }
+      }).filter(Boolean);
+      related.value = Array.isArray(rel) ? toProducts(rel) : [];
+      accesorios.value = Array.isArray(acc) ? toProducts(acc) : [];
+      loading.value = false;
+    }
+    watch(() => props.show, (open) => {
+      if (open) loadDetail();
+    });
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_MiniProductGrid = _sfc_main$2;
+      _push(`<!--[-->`);
+      if (__props.show) {
+        _push(`<div style="${ssrRenderStyle({ "position": "fixed", "inset": "0", "background": "rgba(0,0,0,0.75)", "backdrop-filter": "blur(4px)", "z-index": "200" })}"></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      if (__props.show) {
+        _push(`<div style="${ssrRenderStyle({ "position": "fixed", "inset": "5%", "max-width": "900px", "margin": "0 auto", "background": "linear-gradient(160deg,#0D1B35,#091228)", "border": "1px solid rgba(255,255,255,0.1)", "border-radius": "20px", "box-shadow": "0 32px 80px rgba(0,0,0,0.7)", "overflow-y": "auto", "z-index": "201", "font-family": "'Inter',system-ui,sans-serif" })}"><button style="${ssrRenderStyle({ "position": "absolute", "top": "16px", "right": "16px", "width": "34px", "height": "34px", "border-radius": "9px", "background": "rgba(255,255,255,0.06)", "border": "1px solid rgba(255,255,255,0.1)", "display": "flex", "align-items": "center", "justify-content": "center", "cursor": "pointer", "z-index": "10", "color": "rgba(148,163,184,0.8)" })}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>`);
+        if (unref(loading)) {
+          _push(`<div style="${ssrRenderStyle({ "padding": "28px", "display": "grid", "grid-template-columns": "1fr 1fr", "gap": "28px" })}"><div class="shimmer-bg" style="${ssrRenderStyle({ "aspect-ratio": "1", "border-radius": "14px" })}"></div><div style="${ssrRenderStyle({ "display": "flex", "flex-direction": "column", "gap": "14px", "padding-top": "8px" })}"><div class="shimmer-bg" style="${ssrRenderStyle({ "width": "60%", "height": "11px", "border-radius": "8px" })}"></div><div class="shimmer-bg" style="${ssrRenderStyle({ "width": "90%", "height": "22px", "border-radius": "8px" })}"></div><div class="shimmer-bg" style="${ssrRenderStyle({ "width": "50%", "height": "14px", "border-radius": "8px" })}"></div><div class="shimmer-bg" style="${ssrRenderStyle({ "width": "40%", "height": "28px", "border-radius": "8px" })}"></div><div class="shimmer-bg" style="${ssrRenderStyle({ "width": "100%", "height": "60px", "border-radius": "10px" })}"></div></div></div>`);
+        } else if (unref(error)) {
+          _push(`<div style="${ssrRenderStyle({ "padding": "40px", "display": "flex", "flex-direction": "column", "align-items": "center", "gap": "12px", "color": "#fb7185" })}"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg><div style="${ssrRenderStyle({ "font-size": "14px", "font-weight": "600" })}">No se pudo cargar el producto</div><div style="${ssrRenderStyle({ "font-size": "12px", "color": "rgba(100,116,139,0.8)" })}">${ssrInterpolate(unref(error))}</div></div>`);
+        } else if (unref(displayProduct)) {
+          _push(`<div><div style="${ssrRenderStyle({ "display": "grid", "grid-template-columns": "1fr 1fr", "gap": "28px", "padding": "28px 28px 20px" })}"><div><div style="${ssrRenderStyle({ "position": "relative", "border-radius": "14px", "background": "rgba(255,255,255,0.03)", "border": "1px solid rgba(255,255,255,0.07)", "overflow": "hidden", "aspect-ratio": "1", "display": "flex", "align-items": "center", "justify-content": "center", "margin-bottom": "10px" })}">`);
+          if (unref(images).length) {
+            _push(`<img${ssrRenderAttr("src", unref(images)[unref(imgIdx)])}${ssrRenderAttr("alt", unref(displayProduct).name)} style="${ssrRenderStyle({ "width": "90%", "height": "90%", "object-fit": "contain", "transition": "opacity 0.2s" })}">`);
+          } else {
+            _push(`<div style="${ssrRenderStyle({ "width": "72px", "height": "72px", "border-radius": "18px", "background": "rgba(14,165,233,0.1)", "border": "1px solid rgba(14,165,233,0.18)", "display": "flex", "align-items": "center", "justify-content": "center" })}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"></path><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>`);
+          }
+          if (unref(images).length > 1) {
+            _push(`<!--[--><button style="${ssrRenderStyle({ "position": "absolute", "left": "8px", "top": "50%", "transform": "translateY(-50%)", "width": "32px", "height": "32px", "border-radius": "8px", "background": "rgba(0,0,0,0.5)", "border": "none", "display": "flex", "align-items": "center", "justify-content": "center", "cursor": "pointer", "color": "#CBD5E1" })}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button><button style="${ssrRenderStyle({ "position": "absolute", "right": "8px", "top": "50%", "transform": "translateY(-50%)", "width": "32px", "height": "32px", "border-radius": "8px", "background": "rgba(0,0,0,0.5)", "border": "none", "display": "flex", "align-items": "center", "justify-content": "center", "cursor": "pointer", "color": "#CBD5E1" })}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></button><!--]-->`);
+          } else {
+            _push(`<!---->`);
+          }
+          _push(`</div>`);
+          if (unref(images).length > 1) {
+            _push(`<div style="${ssrRenderStyle({ "display": "flex", "gap": "6px", "justify-content": "center" })}"><!--[-->`);
+            ssrRenderList(unref(images).slice(0, 6), (url, i) => {
+              _push(`<button style="${ssrRenderStyle({ width: "48px", height: "48px", borderRadius: "8px", overflow: "hidden", border: `2px solid ${unref(imgIdx) === i ? "#0EA5E9" : "rgba(255,255,255,0.07)"}`, padding: 0, cursor: "pointer", background: "rgba(255,255,255,0.03)" })}"><img${ssrRenderAttr("src", url)} style="${ssrRenderStyle({ "width": "100%", "height": "100%", "object-fit": "contain" })}"></button>`);
+            });
+            _push(`<!--]--></div>`);
+          } else {
+            _push(`<!---->`);
+          }
+          _push(`</div><div style="${ssrRenderStyle({ "display": "flex", "flex-direction": "column", "gap": "12px" })}"><div style="${ssrRenderStyle({ "display": "flex", "gap": "6px", "flex-wrap": "wrap" })}"><span style="${ssrRenderStyle({ "font-size": "11px", "padding": "3px 9px", "border-radius": "5px", "background": "rgba(255,255,255,0.05)", "color": "rgba(100,116,139,0.8)", "font-weight": "500" })}">${ssrInterpolate(unref(displayProduct).category)}</span><span style="${ssrRenderStyle({ "font-size": "11px", "padding": "3px 9px", "border-radius": "5px", "background": "rgba(14,165,233,0.1)", "color": "#38bdf8", "font-weight": "600" })}">${ssrInterpolate(unref(displayProduct).supplier)}</span></div><h2 style="${ssrRenderStyle({ "font-size": "18px", "font-weight": "800", "color": "#F1F5F9", "margin": "0", "line-height": "1.3" })}">${ssrInterpolate(unref(displayProduct).name)}</h2><div style="${ssrRenderStyle({ "display": "flex", "align-items": "center", "gap": "6px" })}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(100,116,139,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"></path><path d="M7 7h.01"></path></svg><span style="${ssrRenderStyle({ "font-size": "12px", "font-family": "monospace", "color": "rgba(100,116,139,0.8)" })}">${ssrInterpolate(unref(displayProduct).sku)}</span></div><div><div style="${ssrRenderStyle({ "font-size": "28px", "font-weight": "800", "color": "#F1F5F9", "letter-spacing": "-0.5px", "line-height": "1" })}">${ssrInterpolate(unref(displayProduct).price > 0 ? fmtCurrency(unref(displayProduct).price) : "Consultar precio")}</div>`);
+          if (unref(displayProduct).discount) {
+            _push(`<div style="${ssrRenderStyle({ "display": "flex", "align-items": "center", "gap": "8px", "margin-top": "4px" })}"><span style="${ssrRenderStyle({ "font-size": "13px", "color": "rgba(100,116,139,0.6)", "text-decoration": "line-through" })}">${ssrInterpolate(fmtCurrency(Math.round(unref(displayProduct).price / (1 - unref(displayProduct).discount / 100))))}</span><span style="${ssrRenderStyle({ "font-size": "11px", "font-weight": "700", "color": "#34d399", "background": "rgba(52,211,153,0.1)", "padding": "2px 7px", "border-radius": "4px" })}">-${ssrInterpolate(unref(displayProduct).discount)}%</span></div>`);
+          } else {
+            _push(`<!---->`);
+          }
+          _push(`</div><div style="${ssrRenderStyle({ "display": "flex", "align-items": "center", "gap": "8px" })}"><span style="${ssrRenderStyle({ fontSize: "13px", fontWeight: 600, color: unref(stockTotal) > 10 ? "#34d399" : unref(stockTotal) > 0 ? "#fbbf24" : "#fb7185" })}">${ssrInterpolate(unref(stockTotal) > 10 ? `${unref(stockTotal)} en stock` : unref(stockTotal) > 0 ? `Solo ${unref(stockTotal)} disponibles` : "Agotado")}</span></div>`);
+          if (unref(existencia) && Object.keys(unref(existencia)).length) {
+            _push(`<div style="${ssrRenderStyle({ "background": "rgba(255,255,255,0.03)", "border-radius": "10px", "padding": "10px 12px" })}"><div style="${ssrRenderStyle({ "font-size": "10px", "font-weight": "600", "color": "rgba(100,116,139,0.7)", "text-transform": "uppercase", "letter-spacing": "0.8px", "margin-bottom": "8px" })}">Stock por sucursal</div><div style="${ssrRenderStyle({ "display": "flex", "flex-direction": "column", "gap": "5px" })}"><!--[-->`);
+            ssrRenderList(Object.entries(unref(existencia)).slice(0, 6), ([suc, raw]) => {
+              _push(`<div style="${ssrRenderStyle({ "display": "flex", "justify-content": "space-between", "font-size": "12px" })}"><span style="${ssrRenderStyle({ "color": "rgba(100,116,139,0.8)", "text-transform": "capitalize" })}">${ssrInterpolate(suc.replace(/_/g, " "))}</span><span style="${ssrRenderStyle({ fontWeight: 600, color: extractQty(raw) > 0 ? "#E2E8F0" : "rgba(100,116,139,0.4)" })}">${ssrInterpolate(extractQty(raw))}</span></div>`);
+            });
+            _push(`<!--]--></div></div>`);
+          } else {
+            _push(`<!---->`);
+          }
+          _push(`<div style="${ssrRenderStyle({ "display": "flex", "flex-direction": "column", "gap": "8px", "margin-top": "auto" })}"><button${ssrIncludeBooleanAttr(unref(stockTotal) === 0) ? " disabled" : ""} style="${ssrRenderStyle({ height: "44px", borderRadius: "11px", border: "none", cursor: unref(stockTotal) === 0 ? "not-allowed" : "pointer", background: unref(added) ? "rgba(16,185,129,0.15)" : "linear-gradient(135deg,#0EA5E9,#0284C7)", color: unref(added) ? "#34d399" : "white", fontSize: "13px", fontWeight: 700, fontFamily: "inherit", opacity: unref(stockTotal) === 0 ? 0.4 : 1, boxShadow: unref(added) ? "none" : "0 4px 16px rgba(14,165,233,0.3)", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px" })}">`);
+          if (!unref(added)) {
+            _push(`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>`);
+          } else {
+            _push(`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`);
+          }
+          _push(` ${ssrInterpolate(unref(added) ? "Agregado al carrito" : "Agregar al carrito")}</button></div></div></div><div style="${ssrRenderStyle({ "padding": "0 28px 28px", "display": "flex", "flex-direction": "column", "gap": "20px" })}">`);
+          if (unref(description)) {
+            _push(`<div><div style="${ssrRenderStyle({ "font-size": "11px", "font-weight": "600", "color": "rgba(100,116,139,0.7)", "text-transform": "uppercase", "letter-spacing": "0.8px", "margin-bottom": "12px" })}">Descripción</div>`);
+            if (isHTML(unref(description))) {
+              _push(`<div style="${ssrRenderStyle({ "font-size": "13px", "color": "#94a3b8", "line-height": "1.7" })}">${unref(description) ?? ""}</div>`);
+            } else {
+              _push(`<p style="${ssrRenderStyle({ "font-size": "13px", "color": "#94a3b8", "line-height": "1.7", "margin": "0" })}">${ssrInterpolate(unref(description))}</p>`);
+            }
+            _push(`</div>`);
+          } else {
+            _push(`<!---->`);
+          }
+          if (unref(caracteristicas).length) {
+            _push(`<div><div style="${ssrRenderStyle({ "font-size": "11px", "font-weight": "600", "color": "rgba(100,116,139,0.7)", "text-transform": "uppercase", "letter-spacing": "0.8px", "margin-bottom": "10px" })}">Características</div><ul style="${ssrRenderStyle({ "margin": "0", "padding": "0", "list-style": "none", "display": "flex", "flex-direction": "column", "gap": "6px" })}"><!--[-->`);
+            ssrRenderList(unref(caracteristicas), (c, i) => {
+              _push(`<li style="${ssrRenderStyle({ "display": "flex", "gap": "8px", "font-size": "13px", "color": "#94a3b8" })}"><span style="${ssrRenderStyle({ "color": "#0EA5E9", "flex-shrink": "0", "margin-top": "2px" })}">—</span>${ssrInterpolate(toDisplayString(c))}</li>`);
+            });
+            _push(`<!--]--></ul></div>`);
+          } else {
+            _push(`<!---->`);
+          }
+          if (unref(recursos).length) {
+            _push(`<div><div style="${ssrRenderStyle({ "font-size": "11px", "font-weight": "600", "color": "rgba(100,116,139,0.7)", "text-transform": "uppercase", "letter-spacing": "0.8px", "margin-bottom": "10px" })}">Recursos y manuales</div><div style="${ssrRenderStyle({ "display": "flex", "flex-wrap": "wrap", "gap": "8px" })}"><!--[-->`);
+            ssrRenderList(unref(recursos).filter((r) => r.path), (r, i) => {
+              _push(`<a${ssrRenderAttr("href", r.path)} target="_blank" rel="noopener noreferrer" style="${ssrRenderStyle({ "display": "flex", "align-items": "center", "gap": "5px", "padding": "6px 12px", "border-radius": "7px", "background": "rgba(255,255,255,0.04)", "border": "1px solid rgba(255,255,255,0.08)", "font-size": "12px", "color": "#38bdf8", "text-decoration": "none" })}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg> ${ssrInterpolate(r.recurso ?? "Recurso")}</a>`);
+            });
+            _push(`<!--]--></div></div>`);
+          } else {
+            _push(`<!---->`);
+          }
+          if (unref(related).length) {
+            _push(ssrRenderComponent(_component_MiniProductGrid, {
+              title: "Productos relacionados",
+              products: unref(related)
+            }, null, _parent));
+          } else {
+            _push(`<!---->`);
+          }
+          if (unref(accesorios).length) {
+            _push(ssrRenderComponent(_component_MiniProductGrid, {
+              title: "Accesorios",
+              products: unref(accesorios)
+            }, null, _parent));
+          } else {
+            _push(`<!---->`);
+          }
+          _push(`</div></div>`);
+        } else {
+          _push(`<!---->`);
+        }
+        _push(`</div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`<!--]-->`);
+    };
+  }
+});
+const _sfc_setup$1 = _sfc_main$1.setup;
+_sfc_main$1.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/ProductModal.vue");
+  return _sfc_setup$1 ? _sfc_setup$1(props, ctx) : void 0;
+};
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "catalog",
+  __ssrInlineRender: true,
+  setup(__props) {
+    useCartStore();
+    const { isMobile } = useBreakpoint();
+    const search = ref("");
+    const dSearch = ref("");
+    const searchFocused = ref(false);
+    const sortBy = ref("relevancia");
+    const pagina = ref(1);
+    const categories = ref([]);
+    const activeCategoryId = ref(null);
+    const brands = ref([]);
+    const activeBrandId = ref(null);
+    const brandSearch = ref("");
+    const brandDropOpen = ref(false);
+    const loadingBrands = ref(false);
+    const catPanelOpen = ref(false);
+    const catSearch = ref("");
+    const products = ref([]);
+    const cantidad = ref(0);
+    const paginas = ref(1);
+    const loading = ref(false);
+    const loadingCats = ref(true);
+    const apiError = ref(null);
+    const hoveredId = ref(null);
+    const addedIds = ref(/* @__PURE__ */ new Set());
+    const detailProduct = ref(null);
+    const SORT_OPTIONS = [
+      { value: "relevancia", label: "Relevancia" },
+      { value: "precio:asc", label: "Precio: menor" },
+      { value: "precio:desc", label: "Precio: mayor" },
+      { value: "topseller", label: "Más vendidos" }
+    ];
+    const hasFilter = computed(() => !!dSearch.value || !!activeCategoryId.value || !!activeBrandId.value);
+    const filteredBrands = computed(
+      () => brands.value.filter((b) => !brandSearch.value || b.nombre.toLowerCase().includes(brandSearch.value.toLowerCase())).slice(0, 40)
+    );
+    const filteredCats = computed(
+      () => catSearch.value ? categories.value.filter((c) => c.nombre.toLowerCase().includes(catSearch.value.toLowerCase())) : categories.value
+    );
+    let debounceTimer;
+    watch(search, (v) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        dSearch.value = v;
+        pagina.value = 1;
+      }, 400);
+    });
+    let loadId = 0;
+    watch([dSearch, activeCategoryId, activeBrandId, pagina, sortBy], loadProducts);
+    async function loadProducts() {
+      if (!hasFilter.value) {
+        products.value = [];
+        cantidad.value = 0;
+        paginas.value = 1;
+        loading.value = false;
+        return;
+      }
+      const myId = ++loadId;
+      loading.value = true;
+      apiError.value = null;
+      products.value = [];
+      cantidad.value = 0;
+      const r = await fetchProductos({
+        busqueda: dSearch.value || void 0,
+        categoria: activeCategoryId.value ?? void 0,
+        marca: activeBrandId.value ?? void 0,
+        pagina: pagina.value,
+        orden: sortBy.value
+      });
+      if (myId !== loadId) return;
+      products.value = r.products;
+      cantidad.value = r.cantidad;
+      paginas.value = r.paginas;
+      if (r.error) apiError.value = r.error;
+      loading.value = false;
+    }
+    const fmtCurrency = (n) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n);
+    function stockLabel(p) {
+      return p.stock > 10 ? "En stock" : p.stock > 0 ? `Solo ${p.stock}` : "Agotado";
+    }
+    function stockClass(p) {
+      return p.stock > 10 ? "stock-ok" : p.stock > 0 ? "stock-low" : "stock-out";
+    }
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_ProductModal = _sfc_main$1;
+      _push(`<!--[--><div class="cat-wrap" data-v-ab4baa58><div class="cat-header" data-v-ab4baa58><div class="cat-header-left" data-v-ab4baa58><div data-v-ab4baa58><div style="${ssrRenderStyle({ "display": "flex", "align-items": "center", "gap": "10px" })}" data-v-ab4baa58><h1 class="cat-title" data-v-ab4baa58>Catálogo</h1><span class="cat-badge" data-v-ab4baa58>SIEEG</span></div><p class="cat-subtitle" data-v-ab4baa58>${ssrInterpolate(unref(categories).length > 0 ? `${unref(categories).length} categorías disponibles` : "Cargando catálogo…")}</p></div>`);
+      if (unref(hasFilter)) {
+        _push(`<div class="cat-results-chip" data-v-ab4baa58>`);
+        if (unref(loading)) {
+          _push(ssrRenderComponent(unref(Loader2), {
+            size: 11,
+            color: "#38bdf8",
+            class: "spin"
+          }, null, _parent));
+        } else {
+          _push(`<div class="cat-results-dot" data-v-ab4baa58></div>`);
+        }
+        _push(`<span data-v-ab4baa58>${ssrInterpolate(unref(loading) ? "Buscando…" : `${unref(cantidad).toLocaleString("es-MX")} resultados`)}</span></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div>`);
+      if (unref(hasFilter)) {
+        _push(`<button class="btn-clear" data-v-ab4baa58><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" data-v-ab4baa58><line x1="18" y1="6" x2="6" y2="18" data-v-ab4baa58></line><line x1="6" y1="6" x2="18" y2="18" data-v-ab4baa58></line></svg> Limpiar todo </button>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div><div class="filter-panel" data-v-ab4baa58><div class="filter-accent-bar" data-v-ab4baa58></div><div class="filter-body" data-v-ab4baa58><div style="${ssrRenderStyle({ "position": "relative" })}" data-v-ab4baa58><svg class="search-icon" style="${ssrRenderStyle({ color: unref(searchFocused) ? "#0EA5E9" : "rgba(100,116,139,0.55)" })}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-v-ab4baa58><circle cx="11" cy="11" r="8" data-v-ab4baa58></circle><path d="m21 21-4.35-4.35" data-v-ab4baa58></path></svg><input${ssrRenderAttr("value", unref(search))} placeholder="Buscar por nombre, modelo, marca o SKU…" class="${ssrRenderClass([{ focused: unref(searchFocused) }, "search-input"])}" data-v-ab4baa58>`);
+      if (unref(search)) {
+        _push(`<button class="search-clear" data-v-ab4baa58>×</button>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div><div class="filter-controls" data-v-ab4baa58><div style="${ssrRenderStyle({ "position": "relative", "display": "flex", "align-items": "center", "flex-shrink": "0" })}" data-v-ab4baa58><svg style="${ssrRenderStyle({ "position": "absolute", "left": "11px", "pointer-events": "none", "color": "rgba(100,116,139,0.6)" })}" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-v-ab4baa58><line x1="3" y1="6" x2="21" y2="6" data-v-ab4baa58></line><line x1="3" y1="12" x2="15" y2="12" data-v-ab4baa58></line><line x1="3" y1="18" x2="9" y2="18" data-v-ab4baa58></line></svg><select class="filter-select" data-v-ab4baa58><!--[-->`);
+      ssrRenderList(SORT_OPTIONS, (o) => {
+        _push(`<option${ssrRenderAttr("value", o.value)} style="${ssrRenderStyle({ "background": "#0D1B35" })}" data-v-ab4baa58${ssrIncludeBooleanAttr(Array.isArray(unref(sortBy)) ? ssrLooseContain(unref(sortBy), o.value) : ssrLooseEqual(unref(sortBy), o.value)) ? " selected" : ""}>${ssrInterpolate(o.label)}</option>`);
+      });
+      _push(`<!--]--></select>`);
+      _push(ssrRenderComponent(unref(ChevronDown), {
+        size: 12,
+        color: "rgba(100,116,139,0.65)",
+        style: { "position": "absolute", "right": "9px", "pointer-events": "none" }
+      }, null, _parent));
+      _push(`</div><div style="${ssrRenderStyle({ "position": "relative", "flex-shrink": "0" })}" data-v-ab4baa58><button class="${ssrRenderClass([{ active: unref(activeBrandId) }, "filter-btn"])}" data-v-ab4baa58><div style="${ssrRenderStyle({ "display": "flex", "align-items": "center", "gap": "6px", "overflow": "hidden" })}" data-v-ab4baa58>`);
+      _push(ssrRenderComponent(unref(Tag), {
+        size: 13,
+        "stroke-width": 1.8
+      }, null, _parent));
+      _push(`<span style="${ssrRenderStyle({ "overflow": "hidden", "text-overflow": "ellipsis", "white-space": "nowrap", "max-width": "85px" })}" data-v-ab4baa58>${ssrInterpolate(unref(activeBrandId) ? unref(brands).find((b) => b.id === unref(activeBrandId))?.nombre ?? unref(activeBrandId) : "Marca")}</span></div>`);
+      if (unref(activeBrandId)) {
+        _push(`<span class="filter-btn-x" data-v-ab4baa58>×</span>`);
+      } else {
+        _push(ssrRenderComponent(unref(ChevronDown), {
+          size: 12,
+          color: "rgba(100,116,139,0.65)"
+        }, null, _parent));
+      }
+      _push(`</button>`);
+      if (unref(brandDropOpen)) {
+        _push(`<div class="brand-dropdown" data-v-ab4baa58><div style="${ssrRenderStyle({ "padding": "9px 9px 4px" })}" data-v-ab4baa58><input${ssrRenderAttr("value", unref(brandSearch))} autofocus placeholder="Buscar marca…" class="brand-search" data-v-ab4baa58></div><div style="${ssrRenderStyle({ "max-height": "220px", "overflow-y": "auto", "padding-bottom": "6px" })}" data-v-ab4baa58>`);
+        if (unref(loadingBrands)) {
+          _push(`<div style="${ssrRenderStyle({ "padding": "16px", "text-align": "center", "font-size": "12px", "color": "rgba(100,116,139,0.7)" })}" data-v-ab4baa58>Cargando marcas…</div>`);
+        } else {
+          _push(`<!--[-->`);
+          ssrRenderList(unref(filteredBrands), (b) => {
+            _push(`<button class="${ssrRenderClass([{ selected: unref(activeBrandId) === b.id }, "brand-option"])}" data-v-ab4baa58>${ssrInterpolate(b.nombre)}</button>`);
+          });
+          _push(`<!--]-->`);
+        }
+        _push(`</div></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      if (unref(brandDropOpen)) {
+        _push(`<div style="${ssrRenderStyle({ "position": "fixed", "inset": "0", "z-index": "40" })}" data-v-ab4baa58></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div><div style="${ssrRenderStyle({ "position": "relative", "flex-shrink": "0" })}" data-v-ab4baa58><button class="${ssrRenderClass([{ active: unref(activeCategoryId) }, "filter-btn cat-btn"])}" data-v-ab4baa58><div style="${ssrRenderStyle({ "display": "flex", "align-items": "center", "gap": "7px", "overflow": "hidden" })}" data-v-ab4baa58>`);
+      _push(ssrRenderComponent(unref(LayoutGrid), {
+        size: 13,
+        "stroke-width": 1.8
+      }, null, _parent));
+      _push(`<span style="${ssrRenderStyle({ "overflow": "hidden", "text-overflow": "ellipsis", "white-space": "nowrap", "max-width": "110px" })}" data-v-ab4baa58>${ssrInterpolate(unref(activeCategoryId) ? unref(categories).find((c) => c.id === unref(activeCategoryId))?.nombre ?? "Categoría" : "Categorías")}</span></div>`);
+      if (unref(activeCategoryId)) {
+        _push(`<span class="filter-btn-x" data-v-ab4baa58>×</span>`);
+      } else {
+        _push(ssrRenderComponent(unref(ChevronDown), {
+          size: 12,
+          color: "rgba(100,116,139,0.65)",
+          style: { transition: "transform 0.2s", transform: unref(catPanelOpen) ? "rotate(180deg)" : "rotate(0)" }
+        }, null, _parent));
+      }
+      _push(`</button>`);
+      if (unref(catPanelOpen) && !unref(isMobile)) {
+        _push(`<div class="cat-dropdown" data-v-ab4baa58><div class="cat-drop-head" data-v-ab4baa58><span class="cat-drop-title" data-v-ab4baa58>Categorías</span><span class="cat-drop-count" data-v-ab4baa58>${ssrInterpolate(unref(categories).length)}</span></div><div style="${ssrRenderStyle({ "padding": "0 12px 10px" })}" data-v-ab4baa58><div style="${ssrRenderStyle({ "position": "relative" })}" data-v-ab4baa58><svg style="${ssrRenderStyle({ "position": "absolute", "left": "10px", "top": "50%", "transform": "translateY(-50%)", "pointer-events": "none", "color": "rgba(100,116,139,0.5)" })}" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-v-ab4baa58><circle cx="11" cy="11" r="8" data-v-ab4baa58></circle><path d="m21 21-4.35-4.35" data-v-ab4baa58></path></svg><input${ssrRenderAttr("value", unref(catSearch))} placeholder="Buscar categoría…" class="cat-drop-search" data-v-ab4baa58></div></div><div style="${ssrRenderStyle({ "padding": "0 12px 8px" })}" data-v-ab4baa58><button class="${ssrRenderClass([{ active: !unref(activeCategoryId) }, "cat-drop-all"])}" data-v-ab4baa58>`);
+        _push(ssrRenderComponent(unref(LayoutGrid), {
+          size: 13,
+          "stroke-width": !unref(activeCategoryId) ? 2.2 : 1.7
+        }, null, _parent));
+        _push(` Todos los productos `);
+        if (!unref(activeCategoryId)) {
+          _push(`<span class="cat-drop-check" data-v-ab4baa58>✓</span>`);
+        } else {
+          _push(`<!---->`);
+        }
+        _push(`</button></div><div class="cat-drop-divider" data-v-ab4baa58></div><div class="cat-drop-grid no-scrollbar" data-v-ab4baa58>`);
+        if (unref(loadingCats)) {
+          _push(`<!--[-->`);
+          ssrRenderList(12, (i) => {
+            _push(`<div class="shimmer-bg" style="${ssrRenderStyle({ "height": "36px", "border-radius": "9px" })}" data-v-ab4baa58></div>`);
+          });
+          _push(`<!--]-->`);
+        } else {
+          _push(`<!--[-->`);
+          ssrRenderList(unref(filteredCats), (cat) => {
+            _push(`<button class="${ssrRenderClass([{ active: unref(activeCategoryId) === cat.id }, "cat-drop-item"])}" data-v-ab4baa58><span class="${ssrRenderClass([{ active: unref(activeCategoryId) === cat.id }, "cat-drop-item-dot"])}" data-v-ab4baa58></span><span data-v-ab4baa58>${ssrInterpolate(cat.nombre)}</span>`);
+            if (unref(activeCategoryId) === cat.id) {
+              _push(`<span class="cat-drop-check" data-v-ab4baa58>✓</span>`);
+            } else {
+              _push(`<!---->`);
+            }
+            _push(`</button>`);
+          });
+          _push(`<!--]-->`);
+        }
+        if (!unref(loadingCats) && unref(filteredCats).length === 0) {
+          _push(`<div style="${ssrRenderStyle({ "grid-column": "1/-1", "padding": "20px", "text-align": "center", "font-size": "12px", "color": "rgba(100,116,139,0.6)" })}" data-v-ab4baa58> Sin resultados </div>`);
+        } else {
+          _push(`<!---->`);
+        }
+        _push(`</div></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      if (unref(catPanelOpen) && !unref(isMobile)) {
+        _push(`<div style="${ssrRenderStyle({ "position": "fixed", "inset": "0", "z-index": "48" })}" data-v-ab4baa58></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div><div class="active-chips" data-v-ab4baa58>`);
+      if (unref(dSearch)) {
+        _push(`<div class="chip" data-v-ab4baa58>`);
+        _push(ssrRenderComponent(unref(Search), { size: 10 }, null, _parent));
+        _push(`<span style="${ssrRenderStyle({ "overflow": "hidden", "text-overflow": "ellipsis", "white-space": "nowrap" })}" data-v-ab4baa58>&quot;${ssrInterpolate(unref(dSearch).length > 18 ? unref(dSearch).slice(0, 18) + "…" : unref(dSearch))}&quot;</span><button class="chip-x" data-v-ab4baa58>×</button></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div></div></div></div>`);
+      if (unref(catPanelOpen) && unref(isMobile)) {
+        _push(`<div style="${ssrRenderStyle({ "position": "fixed", "inset": "0", "background": "rgba(0,0,0,0.55)", "z-index": "200", "backdrop-filter": "blur(3px)" })}" data-v-ab4baa58></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      if (unref(catPanelOpen) && unref(isMobile)) {
+        _push(`<div class="cat-sheet" data-v-ab4baa58><div style="${ssrRenderStyle({ "display": "flex", "justify-content": "center", "padding": "10px 0 4px" })}" data-v-ab4baa58><div style="${ssrRenderStyle({ "width": "36px", "height": "4px", "border-radius": "99px", "background": "rgba(255,255,255,0.15)" })}" data-v-ab4baa58></div></div><div class="cat-drop-head" style="${ssrRenderStyle({ "padding": "8px 18px 12px" })}" data-v-ab4baa58><span class="cat-drop-title" data-v-ab4baa58>Categorías</span><span class="cat-drop-count" data-v-ab4baa58>${ssrInterpolate(unref(categories).length)}</span><button style="${ssrRenderStyle({ "margin-left": "auto", "width": "28px", "height": "28px", "border-radius": "8px", "background": "rgba(255,255,255,0.06)", "border": "none", "display": "flex", "align-items": "center", "justify-content": "center", "cursor": "pointer" })}" data-v-ab4baa58><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" data-v-ab4baa58><line x1="18" y1="6" x2="6" y2="18" data-v-ab4baa58></line><line x1="6" y1="6" x2="18" y2="18" data-v-ab4baa58></line></svg></button></div><div style="${ssrRenderStyle({ "padding": "0 16px 12px" })}" data-v-ab4baa58><div style="${ssrRenderStyle({ "position": "relative" })}" data-v-ab4baa58><svg style="${ssrRenderStyle({ "position": "absolute", "left": "12px", "top": "50%", "transform": "translateY(-50%)", "pointer-events": "none", "color": "rgba(100,116,139,0.5)" })}" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-v-ab4baa58><circle cx="11" cy="11" r="8" data-v-ab4baa58></circle><path d="m21 21-4.35-4.35" data-v-ab4baa58></path></svg><input${ssrRenderAttr("value", unref(catSearch))} placeholder="Buscar categoría…" class="cat-drop-search" style="${ssrRenderStyle({ "height": "40px", "font-size": "13px" })}" data-v-ab4baa58></div></div><div style="${ssrRenderStyle({ "padding": "0 16px 8px" })}" data-v-ab4baa58><button class="${ssrRenderClass([{ active: !unref(activeCategoryId) }, "cat-drop-all"])}" data-v-ab4baa58>`);
+        _push(ssrRenderComponent(unref(LayoutGrid), {
+          size: 14,
+          "stroke-width": !unref(activeCategoryId) ? 2.2 : 1.7
+        }, null, _parent));
+        _push(` Todos los productos `);
+        if (!unref(activeCategoryId)) {
+          _push(`<span class="cat-drop-check" data-v-ab4baa58>✓</span>`);
+        } else {
+          _push(`<!---->`);
+        }
+        _push(`</button></div><div class="cat-drop-divider" data-v-ab4baa58></div><div class="cat-sheet-list no-scrollbar" data-v-ab4baa58>`);
+        if (unref(loadingCats)) {
+          _push(`<!--[-->`);
+          ssrRenderList(8, (i) => {
+            _push(`<div class="shimmer-bg" style="${ssrRenderStyle({ "height": "44px", "border-radius": "10px", "margin-bottom": "4px" })}" data-v-ab4baa58></div>`);
+          });
+          _push(`<!--]-->`);
+        } else {
+          _push(`<!--[-->`);
+          ssrRenderList(unref(filteredCats), (cat) => {
+            _push(`<button class="${ssrRenderClass([{ active: unref(activeCategoryId) === cat.id }, "cat-sheet-item"])}" data-v-ab4baa58><span class="${ssrRenderClass([{ active: unref(activeCategoryId) === cat.id }, "cat-drop-item-dot"])}" data-v-ab4baa58></span><span style="${ssrRenderStyle({ "flex": "1", "text-align": "left" })}" data-v-ab4baa58>${ssrInterpolate(cat.nombre)}</span>`);
+            if (unref(activeCategoryId) === cat.id) {
+              _push(`<span style="${ssrRenderStyle({ "font-size": "13px", "color": "#38bdf8" })}" data-v-ab4baa58>✓</span>`);
+            } else {
+              _push(`<!---->`);
+            }
+            _push(`</button>`);
+          });
+          _push(`<!--]-->`);
+        }
+        if (!unref(loadingCats) && unref(filteredCats).length === 0) {
+          _push(`<div style="${ssrRenderStyle({ "padding": "24px", "text-align": "center", "font-size": "13px", "color": "rgba(100,116,139,0.6)" })}" data-v-ab4baa58> Sin resultados </div>`);
+        } else {
+          _push(`<!---->`);
+        }
+        _push(`</div></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      if (unref(apiError)) {
+        _push(`<div class="error-bar" data-v-ab4baa58>`);
+        _push(ssrRenderComponent(unref(AlertCircle), {
+          size: 15,
+          style: { "flex-shrink": "0" }
+        }, null, _parent));
+        _push(`<span data-v-ab4baa58><strong data-v-ab4baa58>Error:</strong> ${ssrInterpolate(unref(apiError))}</span></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      if (unref(loadingCats)) {
+        _push(`<div class="state-box" data-v-ab4baa58><div class="state-icon" data-v-ab4baa58>`);
+        _push(ssrRenderComponent(unref(Loader2), {
+          size: 24,
+          color: "#38bdf8",
+          "stroke-width": 1.8,
+          class: "spin"
+        }, null, _parent));
+        _push(`</div><div class="state-title" data-v-ab4baa58>Cargando catálogo…</div><div class="state-sub" data-v-ab4baa58>Conectando con el catálogo SIEEG</div></div>`);
+      } else if (!unref(hasFilter) && !unref(loading)) {
+        _push(`<div class="state-box" data-v-ab4baa58><div class="state-icon" data-v-ab4baa58>`);
+        _push(ssrRenderComponent(unref(Search), {
+          size: 26,
+          color: "#38bdf8",
+          "stroke-width": 1.6
+        }, null, _parent));
+        _push(`</div><div class="state-title" data-v-ab4baa58>Busca o elige una categoría</div><div class="state-sub" data-v-ab4baa58>Escribe en el buscador o selecciona una categoría para ver los productos disponibles.</div></div>`);
+      } else if (unref(loading) && !unref(products).length && unref(hasFilter)) {
+        _push(`<div class="products-grid" data-v-ab4baa58><!--[-->`);
+        ssrRenderList(12, (i) => {
+          _push(`<div class="product-card-skeleton" data-v-ab4baa58><div class="shimmer-bg" style="${ssrRenderStyle({ "height": "180px", "border-radius": "0" })}" data-v-ab4baa58></div><div style="${ssrRenderStyle({ "padding": "14px 16px", "display": "flex", "flex-direction": "column", "gap": "9px" })}" data-v-ab4baa58><div class="shimmer-bg" style="${ssrRenderStyle({ "height": "10px", "width": "52px", "border-radius": "20px" })}" data-v-ab4baa58></div><div class="shimmer-bg" style="${ssrRenderStyle({ "height": "13px", "width": "88%", "border-radius": "6px" })}" data-v-ab4baa58></div><div class="shimmer-bg" style="${ssrRenderStyle({ "height": "13px", "width": "64%", "border-radius": "6px" })}" data-v-ab4baa58></div><div style="${ssrRenderStyle({ "display": "flex", "justify-content": "space-between", "align-items": "center", "margin-top": "8px" })}" data-v-ab4baa58><div class="shimmer-bg" style="${ssrRenderStyle({ "height": "22px", "width": "84px", "border-radius": "6px" })}" data-v-ab4baa58></div><div class="shimmer-bg" style="${ssrRenderStyle({ "height": "36px", "width": "90px", "border-radius": "10px" })}" data-v-ab4baa58></div></div></div></div>`);
+        });
+        _push(`<!--]--></div>`);
+      } else if (unref(products).length) {
+        _push(`<div data-v-ab4baa58><div class="products-grid" data-v-ab4baa58><!--[-->`);
+        ssrRenderList(unref(products), (product) => {
+          _push(`<div class="product-card" data-v-ab4baa58><div class="product-img-wrap" data-v-ab4baa58>`);
+          if (product.images[0]) {
+            _push(`<img${ssrRenderAttr("src", product.images[0])}${ssrRenderAttr("alt", product.name)} class="${ssrRenderClass([{ zoomed: unref(hoveredId) === product.id }, "product-img"])}" data-v-ab4baa58>`);
+          } else {
+            _push(`<div class="product-img-placeholder" data-v-ab4baa58>`);
+            _push(ssrRenderComponent(unref(Package), {
+              size: 28,
+              color: "#38bdf8",
+              "stroke-width": 1.6
+            }, null, _parent));
+            _push(`</div>`);
+          }
+          _push(`<div class="${ssrRenderClass([{ visible: unref(hoveredId) === product.id }, "product-hover-overlay"])}" data-v-ab4baa58><div class="product-detail-hint" data-v-ab4baa58>`);
+          _push(ssrRenderComponent(unref(Eye), {
+            size: 14,
+            "stroke-width": 2
+          }, null, _parent));
+          _push(` Ver detalles </div></div><div style="${ssrRenderStyle({ "position": "absolute", "top": "10px", "left": "10px", "display": "flex", "gap": "5px", "z-index": "2" })}" data-v-ab4baa58>`);
+          if (product.featured) {
+            _push(`<span class="badge-featured" data-v-ab4baa58>DEST.</span>`);
+          } else {
+            _push(`<!---->`);
+          }
+          if (product.discount) {
+            _push(`<span class="badge-discount" data-v-ab4baa58>-${ssrInterpolate(product.discount)}%</span>`);
+          } else {
+            _push(`<!---->`);
+          }
+          _push(`</div><span class="${ssrRenderClass([stockClass(product), "badge-stock"])}" data-v-ab4baa58>${ssrInterpolate(stockLabel(product))}</span></div><div class="product-info" data-v-ab4baa58><span class="product-cat-label" data-v-ab4baa58>${ssrInterpolate(product.category)}</span><div class="${ssrRenderClass([{ highlighted: unref(hoveredId) === product.id }, "product-name"])}" data-v-ab4baa58>${ssrInterpolate(product.name)}</div>`);
+          if (product.sku) {
+            _push(`<div class="product-sku" data-v-ab4baa58>${ssrInterpolate(product.sku)}</div>`);
+          } else {
+            _push(`<!---->`);
+          }
+          _push(`<div class="product-brand" data-v-ab4baa58>${ssrInterpolate(product.supplier)}</div><div class="product-divider" data-v-ab4baa58></div><div class="product-price-row" data-v-ab4baa58><div data-v-ab4baa58>`);
+          if (product.price > 0) {
+            _push(`<div class="product-price" data-v-ab4baa58>${ssrInterpolate(fmtCurrency(product.price))}</div>`);
+          } else {
+            _push(`<div class="product-no-price" data-v-ab4baa58>Consultar precio</div>`);
+          }
+          if (product.discount) {
+            _push(`<div class="product-old-price" data-v-ab4baa58>${ssrInterpolate(fmtCurrency(Math.round(product.price / (1 - product.discount / 100))))}</div>`);
+          } else {
+            _push(`<!---->`);
+          }
+          _push(`</div><button${ssrIncludeBooleanAttr(product.stock === 0) ? " disabled" : ""} class="${ssrRenderClass([{ added: unref(addedIds).has(product.id), disabled: product.stock === 0 }, "btn-add"])}" data-v-ab4baa58>`);
+          if (unref(addedIds).has(product.id)) {
+            _push(`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" data-v-ab4baa58><path d="M20 6L9 17l-5-5" data-v-ab4baa58></path></svg>`);
+          } else {
+            _push(`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" data-v-ab4baa58><line x1="12" y1="5" x2="12" y2="19" data-v-ab4baa58></line><line x1="5" y1="12" x2="19" y2="12" data-v-ab4baa58></line></svg>`);
+          }
+          _push(` ${ssrInterpolate(unref(addedIds).has(product.id) ? "Agregado" : "Agregar")}</button></div></div></div>`);
+        });
+        _push(`<!--]--></div>`);
+        if (unref(paginas) > 1) {
+          _push(`<div class="pagination" data-v-ab4baa58><button${ssrIncludeBooleanAttr(unref(pagina) === 1) ? " disabled" : ""} class="${ssrRenderClass([{ disabled: unref(pagina) === 1 }, "page-btn prev"])}" data-v-ab4baa58><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-v-ab4baa58><polyline points="15 18 9 12 15 6" data-v-ab4baa58></polyline></svg> Anterior </button><div class="page-info" data-v-ab4baa58><span class="page-current" data-v-ab4baa58>${ssrInterpolate(unref(pagina))}</span><span class="page-sep" data-v-ab4baa58>/</span><span class="page-total" data-v-ab4baa58>${ssrInterpolate(unref(paginas))}</span></div><button${ssrIncludeBooleanAttr(unref(pagina) === unref(paginas)) ? " disabled" : ""} class="${ssrRenderClass([{ disabled: unref(pagina) === unref(paginas) }, "page-btn next"])}" data-v-ab4baa58> Siguiente <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-v-ab4baa58><polyline points="9 18 15 12 9 6" data-v-ab4baa58></polyline></svg></button></div>`);
+        } else {
+          _push(`<!---->`);
+        }
+        _push(`</div>`);
+      } else if (unref(hasFilter) && !unref(loading)) {
+        _push(`<div class="state-box" data-v-ab4baa58><div class="state-icon" style="${ssrRenderStyle({ "background": "rgba(100,116,139,0.06)", "border-color": "rgba(100,116,139,0.15)" })}" data-v-ab4baa58>`);
+        _push(ssrRenderComponent(unref(Search), {
+          size: 22,
+          color: "rgba(100,116,139,0.45)"
+        }, null, _parent));
+        _push(`</div><div class="state-title" data-v-ab4baa58>Sin resultados</div><div class="state-sub" style="${ssrRenderStyle({ "margin-bottom": "20px" })}" data-v-ab4baa58>Prueba con otra búsqueda o categoría</div><button class="btn-clear" data-v-ab4baa58>Limpiar filtros</button></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div>`);
+      if (unref(detailProduct)) {
+        _push(ssrRenderComponent(_component_ProductModal, {
+          product: unref(detailProduct),
+          show: !!unref(detailProduct),
+          onClose: ($event) => detailProduct.value = null
+        }, null, _parent));
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`<!--]-->`);
+    };
+  }
+});
+const _sfc_setup = _sfc_main.setup;
+_sfc_main.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("pages/catalog.vue");
+  return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
+};
+const catalog = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-ab4baa58"]]);
+export {
+  catalog as default
+};
+//# sourceMappingURL=catalog-Drn24WE-.js.map

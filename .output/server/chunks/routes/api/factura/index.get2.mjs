@@ -1,5 +1,4 @@
-import { d as defineEventHandler, c as createError, f as getQuery } from '../../../nitro/nitro.mjs';
-import { r as requireSession } from '../../../_/session.mjs';
+import { d as defineEventHandler, r as requireSession, c as createError, h as getQuery } from '../../../nitro/nitro.mjs';
 import { f as listarClientes } from '../../../_/factura.mjs';
 import 'node:http';
 import 'node:https';

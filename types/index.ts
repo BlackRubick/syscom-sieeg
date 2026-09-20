@@ -82,6 +82,10 @@ export interface Order {
   syscomFolio?: string | null
   cfdiUid?: string | null
   auditLog?: { status: string; by: string; byName: string; at: string }[] | null
+  paymentId?: string | null
+  paymentStatus?: string | null
+  paymentMethod?: string | null
+  paymentData?: { clabe?: string; bank?: string; agreement?: string; beneficiary?: string } | null
   createdAt: string
   updatedAt: string
 }

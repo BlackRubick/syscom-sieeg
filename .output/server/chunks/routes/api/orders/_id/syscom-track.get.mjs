@@ -1,5 +1,4 @@
-import { d as defineEventHandler, g as getRouterParam, c as createError } from '../../../../nitro/nitro.mjs';
-import { r as requireSession } from '../../../../_/session.mjs';
+import { d as defineEventHandler, r as requireSession, i as getRouterParam, c as createError } from '../../../../nitro/nitro.mjs';
 import { p as prisma } from '../../../../_/prisma.mjs';
 import { a as getSyscomToken } from '../../../../_/syscom.mjs';
 import 'node:http';

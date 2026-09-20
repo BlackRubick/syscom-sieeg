@@ -1,5 +1,4 @@
-import { d as defineEventHandler, a as deleteCookie } from '../../../nitro/nitro.mjs';
-import { S as SESSION_COOKIE } from '../../../_/session.mjs';
+import { d as defineEventHandler, e as deleteCookie, S as SESSION_COOKIE } from '../../../nitro/nitro.mjs';
 import 'node:http';
 import 'node:https';
 import 'node:events';

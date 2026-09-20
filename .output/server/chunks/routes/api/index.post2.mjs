@@ -1,6 +1,5 @@
-import { d as defineEventHandler, c as createError, r as readBody } from '../../nitro/nitro.mjs';
-import { createHash } from 'crypto';
-import { r as requireSession } from '../../_/session.mjs';
+import { d as defineEventHandler, r as requireSession, c as createError, a as readBody } from '../../nitro/nitro.mjs';
+import bcrypt from 'bcryptjs';
 import { p as prisma } from '../../_/prisma.mjs';
 import 'node:http';
 import 'node:https';
@@ -10,6 +9,7 @@ import 'node:fs';
 import 'node:path';
 import 'node:crypto';
 import 'node:url';
+import 'crypto';
 import '@prisma/client';
 
 const index_post = defineEventHandler(async (event) => {
@@ -20,11 +20,14 @@ const index_post = defineEventHandler(async (event) => {
   if (!name || !email || !password || !role || !status) {
     throw createError({ statusCode: 400, message: "Faltan campos requeridos" });
   }
+  if (password.length < 8) {
+    throw createError({ statusCode: 400, message: "La contrase\xF1a debe tener al menos 8 caracteres" });
+  }
   const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
   if (existing) throw createError({ statusCode: 409, message: "Ya existe un usuario con ese correo" });
   const avatar = name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
   const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
-  const hash = createHash("sha256").update(password).digest("hex");
+  const hash = await bcrypt.hash(password, 12);
   const user = await prisma.user.create({
     data: {
       name,

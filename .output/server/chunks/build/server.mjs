@@ -1,5 +1,5 @@
 import process from 'node:process';globalThis._importMeta_=globalThis._importMeta_||{url:"file:///_entry.js",env:process.env};import { hasInjectionContext, inject, getCurrentInstance, defineComponent, createElementBlock, shallowRef, provide, cloneVNode, h, defineAsyncComponent, computed, unref, shallowReactive, ref, Suspense, Fragment, createApp, onErrorCaptured, onServerPrefetch, createVNode, resolveDynamicComponent, reactive, effectScope, mergeProps, getCurrentScope, toRef, withCtx, nextTick, isReadonly, toRaw, useSSRContext, isRef, isShallow, isReactive } from 'vue';
-import { t as parseURL, l as encodePath, v as decodePath, w as hasProtocol, x as isScriptProtocol, y as joinURL, z as withQuery, A as sanitizeStatusCode, B as getContext, $ as $fetch, C as defu, D as createHooks, c as createError$1, E as executeAsync } from '../nitro/nitro.mjs';
+import { y as parseURL, p as encodePath, z as decodePath, A as hasProtocol, B as isScriptProtocol, D as joinURL, E as withQuery, F as sanitizeStatusCode, G as getContext, $ as $fetch, H as defu, I as createHooks, c as createError$1, J as executeAsync } from '../nitro/nitro.mjs';
 import { b as baseURL } from '../routes/renderer.mjs';
 import { createPinia, setActivePinia, shouldHydrate } from 'pinia';
 import { useRoute as useRoute$1, RouterView, createMemoryHistory, createRouter, START_LOCATION } from 'vue-router';
@@ -12,6 +12,7 @@ import 'node:fs';
 import 'node:path';
 import 'node:crypto';
 import 'node:url';
+import 'crypto';
 import 'vue-bundle-renderer/runtime';
 import 'unhead/server';
 import 'devalue';
@@ -444,67 +445,94 @@ const unhead_k2P3m_ZDyjlr2mMYnoDPwavjsDN8hBlk9cFai0bbopU = /* @__PURE__ */ defin
 function toArray$1(value) {
   return Array.isArray(value) ? value : [value];
 }
-const __nuxt_page_meta = { layout: "auth" };
+const __nuxt_page_meta$3 = { layout: "landing" };
+const __nuxt_page_meta$2 = { layout: "auth" };
+const __nuxt_page_meta$1 = { layout: "landing" };
+const __nuxt_page_meta = { layout: "landing" };
 const _routes = [
   {
     name: "cart",
     path: "/cart",
     meta: { "middleware": "auth" },
-    component: () => import('./cart-Da9gRRem.mjs')
+    component: () => import('./cart-BSj7pOB4.mjs')
+  },
+  {
+    name: "admin",
+    path: "/admin",
+    meta: { "middleware": "auth" },
+    component: () => import('./admin-DLF8xl2L.mjs')
   },
   {
     name: "index",
     path: "/",
-    meta: { "middleware": "auth" },
-    component: () => import('./index-DvDd1RKe.mjs')
+    meta: { ...__nuxt_page_meta$3 || {}, ...{ "middleware": "redirect-authenticated" } },
+    component: () => import('./index-xYVvs2Kl.mjs')
   },
   {
     name: "login",
     path: "/login",
-    meta: __nuxt_page_meta || {},
-    component: () => import('./login-BxDaUn0c.mjs')
+    meta: __nuxt_page_meta$2 || {},
+    component: () => import('./login-AUa5jrVi.mjs')
   },
   {
     name: "users",
     path: "/users",
     meta: { "middleware": "auth" },
-    component: () => import('./users-jC-YVF3m.mjs')
+    component: () => import('./users-Ks2wHeue.mjs')
   },
   {
     name: "fiscal",
     path: "/fiscal",
     meta: { "middleware": "auth" },
-    component: () => import('./fiscal-B0dkwVlm.mjs')
+    component: () => import('./fiscal-CZJ29ACw.mjs')
   },
   {
     name: "orders",
     path: "/orders",
     meta: { "middleware": "auth" },
-    component: () => import('./orders-CBsdMqRV.mjs')
+    component: () => import('./orders-CJabfC-i.mjs')
   },
   {
     name: "perfil",
     path: "/perfil",
     meta: { "middleware": "auth" },
-    component: () => import('./perfil-Btu3Nk4q.mjs')
+    component: () => import('./perfil-CFnrnzh_.mjs')
   },
   {
     name: "catalog",
     path: "/catalog",
     meta: { "middleware": "auth" },
-    component: () => import('./catalog-10kkpaaB.mjs')
+    component: () => import('./catalog-Drn24WE-.mjs')
   },
   {
     name: "facturas",
     path: "/facturas",
     meta: { "middleware": "auth" },
-    component: () => import('./facturas-CE__FxlB.mjs')
+    component: () => import('./facturas-Dg4QOd0u.mjs')
+  },
+  {
+    name: "terminos",
+    path: "/terminos",
+    meta: __nuxt_page_meta$1 || {},
+    component: () => import('./terminos-CRGkHxOu.mjs')
   },
   {
     name: "dashboard",
     path: "/dashboard",
     meta: { "middleware": "auth" },
-    component: () => import('./dashboard-CxNsGVxz.mjs')
+    component: () => import('./dashboard-BJ7RosMC.mjs')
+  },
+  {
+    name: "privacidad",
+    path: "/privacidad",
+    meta: __nuxt_page_meta || {},
+    component: () => import('./privacidad-BuSSe7QB.mjs')
+  },
+  {
+    name: "payment-return",
+    path: "/payment/return",
+    meta: { "middleware": "auth" },
+    component: () => import('./return-BGL7NeX_.mjs')
   }
 ];
 const _wrapInTransition = (props, children) => {
@@ -649,7 +677,8 @@ const globalMiddleware = [
   manifest_45route_45rule
 ];
 const namedMiddleware = {
-  auth: () => import('./auth-DvAgt1fG.mjs')
+  auth: () => import('./auth-D2ygV-9l.mjs'),
+  "redirect-authenticated": () => import('./redirect-authenticated-Des8s9e3.mjs')
 };
 Object.assign(/* @__PURE__ */ Object.create(null), {});
 const pageIslandRoutes = Object.assign(/* @__PURE__ */ Object.create(null), {});
@@ -954,7 +983,8 @@ const plugins = [
 ];
 const layouts = {
   auth: defineAsyncComponent(() => import('./auth-2bov0ybJ.mjs').then((m) => m.default || m)),
-  default: defineAsyncComponent(() => import('./default-DY7gQPvn.mjs').then((m) => m.default || m))
+  default: defineAsyncComponent(() => import('./default-CRKbKPNz.mjs').then((m) => m.default || m)),
+  landing: defineAsyncComponent(() => import('./landing-Cf2XonZo.mjs').then((m) => m.default || m))
 };
 const routeRulesMatcher = _routeRulesMatcher;
 const LayoutLoader = defineComponent({
@@ -1236,7 +1266,7 @@ const _sfc_main$1 = {
     const statusText = _error.statusMessage ?? (is404 ? "Page Not Found" : "Internal Server Error");
     const description = _error.message || _error.toString();
     const stack = void 0;
-    const _Error404 = defineAsyncComponent(() => import('./error-404-CznJ3Dnb.mjs'));
+    const _Error404 = defineAsyncComponent(() => import('./error-404-CGX_8KKO.mjs'));
     const _Error = defineAsyncComponent(() => import('./error-500-qL_ddNmu.mjs'));
     const ErrorTemplate = is404 ? _Error404 : _Error;
     return (_ctx, _push, _parent, _attrs) => {
@@ -1329,5 +1359,5 @@ let entry;
 }
 const entry_default = ((ssrContext) => entry(ssrContext));
 
-export { _export_sfc as _, useNuxtApp as a, useRoute as b, useRuntimeConfig as c, defineNuxtRouteMiddleware as d, entry_default as default, encodeRoutePath as e, nuxtLinkDefaults as f, navigateTo as n, resolveRouteObject as r, tryUseNuxtApp as t, useRouter as u };
+export { _export_sfc as _, useRouter as a, useRoute as b, useNuxtApp as c, defineNuxtRouteMiddleware as d, entry_default as default, encodeRoutePath as e, nuxtLinkDefaults as f, navigateTo as n, resolveRouteObject as r, tryUseNuxtApp as t, useRuntimeConfig as u };
 //# sourceMappingURL=server.mjs.map

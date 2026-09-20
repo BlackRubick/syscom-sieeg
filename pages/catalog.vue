@@ -86,6 +86,71 @@
             <div v-if="brandDropOpen" style="position:fixed;inset:0;z-index:40;" @click="brandDropOpen=false" />
           </div>
 
+          <!-- ══ CATEGORÍAS ══ -->
+          <div style="position:relative;flex-shrink:0;">
+            <button @click="catPanelOpen=!catPanelOpen" class="filter-btn cat-btn" :class="{ active: activeCategoryId }">
+              <div style="display:flex;align-items:center;gap:7px;overflow:hidden;">
+                <LayoutGrid :size="13" :stroke-width="1.8" />
+                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:110px;">
+                  {{ activeCategoryId ? (categories.find(c=>c.id===activeCategoryId)?.nombre ?? 'Categoría') : 'Categorías' }}
+                </span>
+              </div>
+              <span v-if="activeCategoryId" @click.stop="selectCategory(null)" class="filter-btn-x">×</span>
+              <ChevronDown v-else :size="12" color="rgba(100,116,139,0.65)" :style="{ transition:'transform 0.2s', transform: catPanelOpen ? 'rotate(180deg)' : 'rotate(0)' }" />
+            </button>
+
+            <!-- Panel desktop (dropdown) -->
+            <Transition name="cat-drop">
+              <div v-if="catPanelOpen && !isMobile" class="cat-dropdown">
+                <!-- Header del panel -->
+                <div class="cat-drop-head">
+                  <span class="cat-drop-title">Categorías</span>
+                  <span class="cat-drop-count">{{ categories.length }}</span>
+                </div>
+
+                <!-- Buscador interno -->
+                <div style="padding:0 12px 10px;">
+                  <div style="position:relative;">
+                    <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:rgba(100,116,139,0.5);" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <input v-model="catSearch" placeholder="Buscar categoría…" class="cat-drop-search" />
+                  </div>
+                </div>
+
+                <!-- Opción "Todos" -->
+                <div style="padding:0 12px 8px;">
+                  <button @click="selectCategory(null); catPanelOpen=false" class="cat-drop-all" :class="{ active: !activeCategoryId }">
+                    <LayoutGrid :size="13" :stroke-width="!activeCategoryId?2.2:1.7" />
+                    Todos los productos
+                    <span v-if="!activeCategoryId" class="cat-drop-check">✓</span>
+                  </button>
+                </div>
+
+                <div class="cat-drop-divider" />
+
+                <!-- Grid de categorías -->
+                <div class="cat-drop-grid no-scrollbar">
+                  <div v-if="loadingCats" v-for="i in 12" :key="i" class="shimmer-bg" style="height:36px;border-radius:9px;" />
+                  <button
+                    v-else
+                    v-for="cat in filteredCats" :key="cat.id"
+                    @click="selectCategory(cat.id); catPanelOpen=false; catSearch=''"
+                    class="cat-drop-item"
+                    :class="{ active: activeCategoryId===cat.id }"
+                  >
+                    <span class="cat-drop-item-dot" :class="{ active: activeCategoryId===cat.id }" />
+                    <span>{{ cat.nombre }}</span>
+                    <span v-if="activeCategoryId===cat.id" class="cat-drop-check">✓</span>
+                  </button>
+                  <div v-if="!loadingCats && filteredCats.length===0" style="grid-column:1/-1;padding:20px;text-align:center;font-size:12px;color:rgba(100,116,139,0.6);">
+                    Sin resultados
+                  </div>
+                </div>
+              </div>
+            </Transition>
+
+            <div v-if="catPanelOpen && !isMobile" style="position:fixed;inset:0;z-index:48;" @click="catPanelOpen=false" />
+          </div>
+
           <!-- Chips activos -->
           <div class="active-chips">
             <div v-if="dSearch" class="chip">
@@ -93,34 +158,71 @@
               <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">"{{ dSearch.length>18?dSearch.slice(0,18)+'…':dSearch }}"</span>
               <button @click="search=''" class="chip-x">×</button>
             </div>
-            <div v-if="activeCategoryId" class="chip">
-              <LayoutGrid :size="10" />
-              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;">{{ categories.find(c=>c.id===activeCategoryId)?.nombre }}</span>
-              <button @click="selectCategory(null)" class="chip-x">×</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Categorías -->
-        <div class="cat-row-wrapper">
-          <div class="cat-row no-scrollbar">
-            <button @click="selectCategory(null)" class="cat-pill" :class="{ active: !activeCategoryId }">
-              <LayoutGrid :size="12" :stroke-width="!activeCategoryId?2.5:1.8" />
-              Todos
-            </button>
-            <template v-if="loadingCats">
-              <div v-for="i in 8" :key="i" class="shimmer-bg" style="flex-shrink:0;height:34px;width:96px;border-radius:20px;" />
-            </template>
-            <button v-else v-for="cat in categories" :key="cat.id"
-              @click="selectCategory(cat.id)"
-              class="cat-pill" :class="{ active: activeCategoryId===cat.id }">
-              {{ cat.nombre }}
-            </button>
           </div>
         </div>
 
       </div>
     </div>
+
+    <!-- ══ BOTTOM SHEET mobile ══ -->
+    <Transition name="sheet-bg">
+      <div v-if="catPanelOpen && isMobile" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;backdrop-filter:blur(3px);" @click="catPanelOpen=false" />
+    </Transition>
+    <Transition name="sheet-up">
+      <div v-if="catPanelOpen && isMobile" class="cat-sheet">
+        <!-- Handle -->
+        <div style="display:flex;justify-content:center;padding:10px 0 4px;">
+          <div style="width:36px;height:4px;border-radius:99px;background:rgba(255,255,255,0.15);" />
+        </div>
+
+        <!-- Header -->
+        <div class="cat-drop-head" style="padding:8px 18px 12px;">
+          <span class="cat-drop-title">Categorías</span>
+          <span class="cat-drop-count">{{ categories.length }}</span>
+          <button @click="catPanelOpen=false" style="margin-left:auto;width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.06);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <!-- Buscador -->
+        <div style="padding:0 16px 12px;">
+          <div style="position:relative;">
+            <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:rgba(100,116,139,0.5);" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input v-model="catSearch" placeholder="Buscar categoría…" class="cat-drop-search" style="height:40px;font-size:13px;" />
+          </div>
+        </div>
+
+        <!-- Opción "Todos" -->
+        <div style="padding:0 16px 8px;">
+          <button @click="selectCategory(null); catPanelOpen=false" class="cat-drop-all" :class="{ active: !activeCategoryId }">
+            <LayoutGrid :size="14" :stroke-width="!activeCategoryId?2.2:1.7" />
+            Todos los productos
+            <span v-if="!activeCategoryId" class="cat-drop-check">✓</span>
+          </button>
+        </div>
+
+        <div class="cat-drop-divider" />
+
+        <!-- Lista de categorías (scroll) -->
+        <div class="cat-sheet-list no-scrollbar">
+          <div v-if="loadingCats" v-for="i in 8" :key="i" class="shimmer-bg" style="height:44px;border-radius:10px;margin-bottom:4px;" />
+          <button
+            v-else
+            v-for="cat in filteredCats" :key="cat.id"
+            @click="selectCategory(cat.id); catPanelOpen=false; catSearch=''"
+            class="cat-sheet-item"
+            :class="{ active: activeCategoryId===cat.id }"
+          >
+            <span class="cat-drop-item-dot" :class="{ active: activeCategoryId===cat.id }" />
+            <span style="flex:1;text-align:left;">{{ cat.nombre }}</span>
+            <span v-if="activeCategoryId===cat.id" style="font-size:13px;color:#38bdf8;">✓</span>
+          </button>
+          <div v-if="!loadingCats && filteredCats.length===0" style="padding:24px;text-align:center;font-size:13px;color:rgba(100,116,139,0.6);">
+            Sin resultados
+          </div>
+        </div>
+      </div>
+    </Transition>
 
     <!-- Error -->
     <div v-if="apiError" class="error-bar">
@@ -187,7 +289,6 @@
               <Package :size="28" color="#38bdf8" :stroke-width="1.6" />
             </div>
 
-            <!-- Hover overlay con "Ver detalles" -->
             <div class="product-hover-overlay" :class="{ visible: hoveredId===product.id }">
               <div class="product-detail-hint">
                 <Eye :size="14" :stroke-width="2" />
@@ -195,7 +296,6 @@
               </div>
             </div>
 
-            <!-- Badges -->
             <div style="position:absolute;top:10px;left:10px;display:flex;gap:5px;z-index:2;">
               <span v-if="product.featured" class="badge-featured">DEST.</span>
               <span v-if="product.discount" class="badge-discount">-{{ product.discount }}%</span>
@@ -275,6 +375,7 @@ import type { Product, SyscomCategoria } from '~/types'
 definePageMeta({ middleware: 'auth' })
 
 const cart = useCartStore()
+const { isMobile } = useBreakpoint()
 
 const search           = ref('')
 const dSearch          = ref('')
@@ -288,6 +389,8 @@ const activeBrandId    = ref<string | null>(null)
 const brandSearch      = ref('')
 const brandDropOpen    = ref(false)
 const loadingBrands    = ref(false)
+const catPanelOpen     = ref(false)
+const catSearch        = ref('')
 const products         = ref<Product[]>([])
 const cantidad         = ref(0)
 const paginas          = ref(1)
@@ -310,6 +413,11 @@ const filteredBrands = computed(() =>
   brands.value
     .filter(b => !brandSearch.value || b.nombre.toLowerCase().includes(brandSearch.value.toLowerCase()))
     .slice(0, 40)
+)
+const filteredCats = computed(() =>
+  catSearch.value
+    ? categories.value.filter(c => c.nombre.toLowerCase().includes(catSearch.value.toLowerCase()))
+    : categories.value
 )
 
 let debounceTimer: ReturnType<typeof setTimeout>
@@ -358,11 +466,11 @@ async function openBrandDrop() {
   loadingBrands.value = false
 }
 
-function selectBrand(id: string)        { activeBrandId.value = id; brandDropOpen.value = false; brandSearch.value = ''; pagina.value = 1 }
-function clearBrand()                   { activeBrandId.value = null; brandSearch.value = ''; pagina.value = 1 }
-function selectCategory(id: string|null){ activeCategoryId.value = id; pagina.value = 1 }
-function clearAll()                     { search.value = ''; dSearch.value = ''; activeCategoryId.value = null; clearBrand() }
-function openDetail(p: Product)         { detailProduct.value = p }
+function selectBrand(id: string)         { activeBrandId.value = id; brandDropOpen.value = false; brandSearch.value = ''; pagina.value = 1 }
+function clearBrand()                    { activeBrandId.value = null; brandSearch.value = ''; pagina.value = 1 }
+function selectCategory(id: string|null) { activeCategoryId.value = id; pagina.value = 1 }
+function clearAll()                      { search.value = ''; dSearch.value = ''; activeCategoryId.value = null; clearBrand() }
+function openDetail(p: Product)          { detailProduct.value = p }
 
 function handleAdd(product: Product) {
   if (product.stock === 0) return
@@ -390,8 +498,8 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 .cat-results-dot { width:6px;height:6px;border-radius:50%;background:#0EA5E9; }
 
 /* ── Filter panel ── */
-.filter-panel { border-radius:16px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.08);overflow:hidden; }
-.filter-accent-bar { height:3px;background:linear-gradient(90deg,#0EA5E9,#22D3EE,#818cf8); }
+.filter-panel { border-radius:16px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.08);overflow:visible; }
+.filter-accent-bar { height:3px;background:linear-gradient(90deg,#0EA5E9,#22D3EE,#818cf8);border-radius:16px 16px 0 0; }
 .filter-body { padding:18px;display:flex;flex-direction:column;gap:14px; }
 
 /* ── Search ── */
@@ -428,6 +536,7 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
   min-width:135px;justify-content:space-between;transition:all 0.15s;
 }
 .filter-btn.active { border-color:rgba(14,165,233,0.4);background:rgba(14,165,233,0.1);color:#38bdf8;font-weight:600; }
+.filter-btn.cat-btn { min-width:155px; }
 .filter-btn-x { font-size:16px;line-height:1;cursor:pointer;opacity:0.65;margin-left:2px; }
 .brand-dropdown { position:absolute;left:0;top:44px;width:248px;background:#0D1B35;border:1px solid rgba(255,255,255,0.1);border-radius:13px;overflow:hidden;z-index:50;box-shadow:0 16px 40px rgba(0,0,0,0.6); }
 .brand-search { width:100%;height:34px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0 10px;font-size:12px;color:#E2E8F0;outline:none;font-family:inherit;box-sizing:border-box; }
@@ -435,26 +544,91 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 .brand-option:hover { background:rgba(255,255,255,0.04); }
 .brand-option.selected { color:#38bdf8;background:rgba(14,165,233,0.1);font-weight:600; }
 
+/* ── Category dropdown panel (desktop) ── */
+.cat-dropdown {
+  position:absolute;left:0;top:46px;
+  width:480px;max-width:calc(100vw - 32px);
+  background:linear-gradient(160deg,#0D1B35,#091228);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px;overflow:hidden;
+  z-index:50;box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(14,165,233,0.06);
+}
+.cat-drop-head {
+  display:flex;align-items:center;gap:8px;
+  padding:14px 14px 10px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.cat-drop-title { font-size:13px;font-weight:700;color:#E2E8F0; }
+.cat-drop-count { font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.2);color:#38bdf8; }
+.cat-drop-search {
+  width:100%;height:32px;padding-left:30px;padding-right:10px;
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);
+  border-radius:8px;font-size:12px;color:#E2E8F0;outline:none;font-family:inherit;
+  box-sizing:border-box;transition:border-color 0.15s;
+}
+.cat-drop-search:focus { border-color:rgba(14,165,233,0.4); }
+.cat-drop-search::placeholder { color:rgba(100,116,139,0.5); }
+.cat-drop-all {
+  width:100%;display:flex;align-items:center;gap:8px;
+  height:36px;padding:0 12px;border-radius:9px;
+  font-size:12.5px;font-weight:500;color:rgba(100,116,139,0.8);
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+  cursor:pointer;font-family:inherit;transition:all 0.15s;
+}
+.cat-drop-all:hover { background:rgba(255,255,255,0.06);color:#CBD5E1; }
+.cat-drop-all.active { background:rgba(14,165,233,0.12);border-color:rgba(14,165,233,0.3);color:#38bdf8;font-weight:600; }
+.cat-drop-check { margin-left:auto;font-size:12px;color:#38bdf8;font-weight:700; }
+.cat-drop-divider { height:1px;background:rgba(255,255,255,0.07);margin:2px 0; }
+.cat-drop-grid {
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:3px;padding:10px 12px 12px;
+  max-height:280px;overflow-y:auto;
+}
+.cat-drop-item {
+  display:flex;align-items:center;gap:8px;
+  height:34px;padding:0 10px;border-radius:8px;
+  font-size:12px;font-weight:400;color:rgba(100,116,139,0.8);
+  background:transparent;border:1px solid transparent;
+  cursor:pointer;font-family:inherit;text-align:left;transition:all 0.12s;
+  overflow:hidden;
+}
+.cat-drop-item:hover { background:rgba(255,255,255,0.05);color:#CBD5E1; }
+.cat-drop-item.active { background:rgba(14,165,233,0.1);border-color:rgba(14,165,233,0.25);color:#38bdf8;font-weight:600; }
+.cat-drop-item span:nth-child(2) { overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1; }
+.cat-drop-item-dot { width:5px;height:5px;border-radius:50%;background:rgba(100,116,139,0.35);flex-shrink:0;transition:background 0.15s; }
+.cat-drop-item-dot.active { background:#0EA5E9;box-shadow:0 0 6px rgba(14,165,233,0.6); }
+
+/* ── Bottom sheet (mobile) ── */
+.cat-sheet {
+  position:fixed;bottom:0;left:0;right:0;
+  background:linear-gradient(180deg,#0D1B35,#081020);
+  border-top:1px solid rgba(255,255,255,0.1);
+  border-radius:20px 20px 0 0;
+  z-index:201;
+  box-shadow:0 -20px 60px rgba(0,0,0,0.6);
+  max-height:82vh;
+  display:flex;flex-direction:column;
+}
+.cat-sheet-list {
+  flex:1;overflow-y:auto;
+  padding:4px 16px 32px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.cat-sheet-item {
+  display:flex;align-items:center;gap:10px;
+  height:44px;padding:0 12px;border-radius:10px;
+  font-size:13px;font-weight:400;color:rgba(100,116,139,0.85);
+  background:transparent;border:1px solid transparent;
+  cursor:pointer;font-family:inherit;transition:all 0.12s;
+}
+.cat-sheet-item:hover { background:rgba(255,255,255,0.04); }
+.cat-sheet-item.active { background:rgba(14,165,233,0.1);border-color:rgba(14,165,233,0.22);color:#38bdf8;font-weight:600; }
+
 /* ── Active chips ── */
 .active-chips { display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:auto; }
 .chip { display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.25);font-size:11px;font-weight:600;color:#38bdf8;max-width:190px; }
 .chip-x { background:none;border:none;cursor:pointer;color:rgba(56,189,248,0.55);font-size:14px;padding:0 0 0 1px;line-height:1;transition:color 0.15s; }
 .chip-x:hover { color:#fb7185; }
-
-/* ── Category pills ── */
-.cat-row-wrapper { border-top:1px solid rgba(255,255,255,0.07);padding-top:14px; }
-.cat-row { display:flex;gap:6px;overflow-x:auto;padding-bottom:4px; }
-.cat-pill {
-  flex-shrink:0;height:32px;padding:0 14px;
-  border-radius:20px;font-size:12px;font-weight:500;
-  cursor:pointer;border:1px solid rgba(255,255,255,0.08);
-  font-family:inherit;background:rgba(255,255,255,0.03);
-  color:rgba(100,116,139,0.75);
-  display:flex;align-items:center;gap:6px;white-space:nowrap;
-  transition:all 0.15s;
-}
-.cat-pill:hover { background:rgba(255,255,255,0.06);color:#94a3b8;border-color:rgba(255,255,255,0.14); }
-.cat-pill.active { background:rgba(14,165,233,0.18);border-color:rgba(14,165,233,0.4);color:#38bdf8;font-weight:700; }
 
 /* ── Errors / states ── */
 .error-bar { padding:12px 15px;border-radius:12px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.22);color:#fb7185;font-size:13px;display:flex;align-items:center;gap:10px; }
@@ -474,8 +648,7 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
   border-radius:16px;
   background:linear-gradient(160deg,#0E1E3E,#080F20);
   border:1px solid rgba(255,255,255,0.07);
-  overflow:hidden;
-  cursor:pointer;
+  overflow:hidden;cursor:pointer;
   transition:border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   box-shadow:0 2px 12px rgba(0,0,0,0.3);
   display:flex;flex-direction:column;
@@ -556,6 +729,17 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 .dropdown-enter-active { transition:opacity 0.15s ease,transform 0.15s ease; }
 .dropdown-leave-active { transition:opacity 0.1s ease; }
 .dropdown-enter-from,.dropdown-leave-to { opacity:0;transform:translateY(-6px); }
+
+.cat-drop-enter-active { transition:opacity 0.18s ease,transform 0.18s cubic-bezier(0.34,1.56,0.64,1); }
+.cat-drop-leave-active { transition:opacity 0.12s ease,transform 0.12s ease; }
+.cat-drop-enter-from,.cat-drop-leave-to { opacity:0;transform:translateY(-8px) scale(0.97); }
+
+.sheet-bg-enter-active,.sheet-bg-leave-active { transition:opacity 0.25s; }
+.sheet-bg-enter-from,.sheet-bg-leave-to { opacity:0; }
+
+.sheet-up-enter-active { transition:transform 0.32s cubic-bezier(0.32,0.72,0,1); }
+.sheet-up-leave-active { transition:transform 0.22s ease-in; }
+.sheet-up-enter-from,.sheet-up-leave-to { transform:translateY(100%); }
 
 /* ── Utils ── */
 .spin { animation:spin 1.2s linear infinite; }

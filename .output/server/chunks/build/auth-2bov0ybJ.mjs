@@ -10,6 +10,7 @@ import 'node:fs';
 import 'node:path';
 import 'node:crypto';
 import 'node:url';
+import 'crypto';
 import '../routes/renderer.mjs';
 import 'vue-bundle-renderer/runtime';
 import 'unhead/server';

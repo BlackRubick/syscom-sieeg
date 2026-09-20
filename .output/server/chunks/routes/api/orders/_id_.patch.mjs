@@ -1,7 +1,6 @@
-import { d as defineEventHandler, c as createError, g as getRouterParam, r as readBody } from '../../../nitro/nitro.mjs';
-import { r as requireSession } from '../../../_/session.mjs';
+import { d as defineEventHandler, r as requireSession, i as getRouterParam, c as createError, a as readBody } from '../../../nitro/nitro.mjs';
 import { p as prisma } from '../../../_/prisma.mjs';
-import { g as generateSyscomOrder } from '../../../_/syscom.mjs';
+import { a as approveOrder } from '../../../_/approveOrder.mjs';
 import 'node:http';
 import 'node:https';
 import 'node:events';
@@ -12,84 +11,95 @@ import 'node:crypto';
 import 'node:url';
 import 'crypto';
 import '@prisma/client';
+import '../../../_/syscom.mjs';
 
-const ALLOWED = ["approved", "rejected", "processing", "shipped", "delivered"];
+const ALLOWED = ["approved", "rejected", "cancelled", "processing", "shipped", "delivered"];
 const _id__patch = defineEventHandler(async (event) => {
-  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
+  var _a;
   const session = requireSession(event);
-  if (session.role !== "admin" && session.role !== "approver") {
-    throw createError({ statusCode: 403, message: "Sin autorizaci\xF3n" });
-  }
+  const isManager = session.role === "admin" || session.role === "approver";
   const id = getRouterParam(event, "id");
   if (!id) throw createError({ statusCode: 400, message: "ID requerido" });
   const body = await readBody(event);
   if (!ALLOWED.includes(body.status)) {
     throw createError({ statusCode: 400, message: "Estado inv\xE1lido" });
   }
-  const existing = await prisma.order.findUnique({ where: { id } });
-  if (!existing) throw createError({ statusCode: 404, message: "Orden no encontrada" });
-  let syscomFolio = (_a = existing.syscomFolio) != null ? _a : null;
-  let syscomData = (_b = existing.syscomData) != null ? _b : void 0;
-  let syscomError;
-  if (body.status === "approved" && !existing.syscomFolio) {
-    const user = await prisma.user.findUnique({
-      where: { id: existing.userId },
-      select: {
-        name: true,
-        fiscalRazonSocial: true,
-        fiscalCalle: true,
-        fiscalNumExt: true,
-        fiscalNumInt: true,
-        fiscalColonia: true,
-        fiscalCodpos: true,
-        fiscalCiudad: true,
-        fiscalEstado: true,
-        fiscalPais: true,
-        fiscalTelefono: true,
-        fiscalUsocfdi: true
-      }
-    });
-    const direccion = {
-      atencion_a: (_d = (_c = user == null ? void 0 : user.fiscalRazonSocial) != null ? _c : user == null ? void 0 : user.name) != null ? _d : "N/A",
-      calle: (_e = user == null ? void 0 : user.fiscalCalle) != null ? _e : "",
-      num_ext: (_f = user == null ? void 0 : user.fiscalNumExt) != null ? _f : "S/N",
-      num_int: (_g = user == null ? void 0 : user.fiscalNumInt) != null ? _g : "",
-      colonia: (_h = user == null ? void 0 : user.fiscalColonia) != null ? _h : "",
-      codigo_postal: (_i = user == null ? void 0 : user.fiscalCodpos) != null ? _i : "",
-      ciudad: (_j = user == null ? void 0 : user.fiscalCiudad) != null ? _j : "",
-      estado: (_k = user == null ? void 0 : user.fiscalEstado) != null ? _k : "",
-      pais: (_l = user == null ? void 0 : user.fiscalPais) != null ? _l : "MEX",
-      telefono: (_m = user == null ? void 0 : user.fiscalTelefono) != null ? _m : ""
-    };
-    const productos = existing.items.map((item) => ({
-      id: Number(item.productId),
-      tipo: "nuevo",
-      cantidad: item.quantity
-    }));
-    try {
-      const result = await generateSyscomOrder({
-        tipo_entrega: "domicilio",
-        direccion,
-        metodo_pago: (_n = process.env.SYSCOM_METODO_PAGO) != null ? _n : "03",
-        productos,
-        uso_cfdi: (_o = user == null ? void 0 : user.fiscalUsocfdi) != null ? _o : "G03",
-        ordenar: process.env.SYSCOM_ORDENAR === "true"
-      });
-      syscomFolio = result.folio;
-      syscomData = (_p = result.data) != null ? _p : void 0;
-      syscomError = result.error;
-    } catch (e) {
-      syscomError = e instanceof Error ? e.message : "Error al conectar con SYSCOM";
-    }
-  }
-  const updated = await prisma.order.update({
+  const existing = await prisma.order.findUnique({
     where: { id },
-    data: {
-      status: body.status,
-      ...body.status === "approved" ? { syscomFolio, syscomData } : {}
-    },
     include: { user: { select: { id: true, name: true, email: true } } }
   });
+  if (!existing) throw createError({ statusCode: 404, message: "Orden no encontrada" });
+  if (!isManager) {
+    if (existing.userId !== session.userId) {
+      throw createError({ statusCode: 403, message: "Sin autorizaci\xF3n" });
+    }
+    if (body.status !== "cancelled") {
+      throw createError({ statusCode: 403, message: "Solo puedes cancelar tus propios pedidos" });
+    }
+    if (!["pending", "approved"].includes(existing.status)) {
+      throw createError({ statusCode: 400, message: `No se puede cancelar un pedido en estado "${existing.status}"` });
+    }
+  }
+  let syscomError;
+  if (body.status === "approved") {
+    const result = await approveOrder(existing.id, session.userId, session.name);
+    syscomError = result.syscomError;
+    const updated2 = result.order;
+    return {
+      order: {
+        id: updated2.id,
+        userId: updated2.userId,
+        userName: updated2.user.name,
+        userEmail: updated2.user.email,
+        status: updated2.status,
+        items: updated2.items,
+        total: updated2.total,
+        priority: updated2.priority,
+        notes: updated2.notes,
+        syscomFolio: updated2.syscomFolio,
+        cfdiUid: updated2.cfdiUid,
+        auditLog: updated2.auditLog,
+        paymentId: updated2.paymentId,
+        paymentStatus: updated2.paymentStatus,
+        paymentMethod: updated2.paymentMethod,
+        paymentData: updated2.paymentData,
+        createdAt: updated2.createdAt.toISOString(),
+        updatedAt: updated2.updatedAt.toISOString()
+      },
+      syscomError
+    };
+  }
+  const auditEntry = {
+    status: body.status,
+    by: session.userId,
+    byName: session.name,
+    at: (/* @__PURE__ */ new Date()).toISOString()
+  };
+  const newLog = [...(_a = existing.auditLog) != null ? _a : [], auditEntry];
+  const updated = await prisma.order.update({
+    where: { id },
+    data: { status: body.status, auditLog: newLog },
+    include: { user: { select: { id: true, name: true, email: true } } }
+  });
+  if (body.status === "rejected" || body.status === "cancelled") {
+    const titles = {
+      rejected: "\u274C Pedido rechazado",
+      cancelled: "\u{1F6AB} Pedido cancelado"
+    };
+    const messages = {
+      rejected: `Tu pedido por ${updated.total.toLocaleString("es-MX", { style: "currency", currency: "MXN" })} fue rechazado.`,
+      cancelled: `Tu pedido por ${updated.total.toLocaleString("es-MX", { style: "currency", currency: "MXN" })} fue cancelado.`
+    };
+    await prisma.notification.create({
+      data: {
+        userId: existing.userId,
+        type: "order",
+        title: titles[body.status],
+        message: messages[body.status],
+        orderId: id
+      }
+    });
+  }
   return {
     order: {
       id: updated.id,
@@ -102,6 +112,12 @@ const _id__patch = defineEventHandler(async (event) => {
       priority: updated.priority,
       notes: updated.notes,
       syscomFolio: updated.syscomFolio,
+      cfdiUid: updated.cfdiUid,
+      auditLog: updated.auditLog,
+      paymentId: updated.paymentId,
+      paymentStatus: updated.paymentStatus,
+      paymentMethod: updated.paymentMethod,
+      paymentData: updated.paymentData,
       createdAt: updated.createdAt.toISOString(),
       updatedAt: updated.updatedAt.toISOString()
     },

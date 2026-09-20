@@ -1,5 +1,4 @@
-import { d as defineEventHandler, c as createError, r as readBody } from '../../../../nitro/nitro.mjs';
-import { r as requireSession } from '../../../../_/session.mjs';
+import { d as defineEventHandler, r as requireSession, c as createError, a as readBody } from '../../../../nitro/nitro.mjs';
 import { p as prisma } from '../../../../_/prisma.mjs';
 import { b as buildCfdiConcepto, c as crearCFDI } from '../../../../_/factura.mjs';
 import 'node:http';
@@ -39,6 +38,15 @@ const create_post = defineEventHandler(async (event) => {
     if (!((_d = c.unidad) == null ? void 0 : _d.trim())) throw createError({ statusCode: 400, message: `Concepto ${i + 1}: unidad requerida` });
     if (!c.cantidad || c.cantidad <= 0) throw createError({ statusCode: 400, message: `Concepto ${i + 1}: cantidad debe ser mayor a 0` });
     if (!c.valorUnitario || c.valorUnitario <= 0) throw createError({ statusCode: 400, message: `Concepto ${i + 1}: valor unitario debe ser mayor a 0` });
+  }
+  if (body.orderId) {
+    const existingOrder = await prisma.order.findUnique({
+      where: { id: body.orderId },
+      select: { cfdiUid: true }
+    });
+    if (existingOrder == null ? void 0 : existingOrder.cfdiUid) {
+      throw createError({ statusCode: 409, message: "Este pedido ya tiene un CFDI generado. Actualiza la p\xE1gina." });
+    }
   }
   const payload = {
     Receptor: { UID: user.facturaUid },

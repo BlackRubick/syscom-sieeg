@@ -347,7 +347,7 @@
           No almacenaremos ni recogeremos los datos de su tarjeta de pago. Esa información se proporciona directamente a nuestros procesadores de pagos de terceros cuyo uso de su información personal se rige por su Política de privacidad. Estos procesadores de pagos se adhieren a los estándares establecidos por PCI-DSS según lo gestionado por el PCI Security Standards Council.
         </p>
         <div style="padding:16px;background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.12);border-radius:10px;">
-          <p style="font-size:13px;font-weight:600;color:#a78bfa;margin:0 0 6px 0;">OpenPay</p>
+          <p style="font-size:13px;font-weight:600;color:#a78bfa;margin:0 0 6px 0;">Openpay</p>
           <p style="font-size:14px;line-height:1.75;color:rgba(148,163,184,0.85);margin:0;">Su Política de Privacidad se puede ver en <span style="color:#a78bfa;">https://www.openpay.mx/aviso-privacidad</span></p>
         </div>
         <p style="font-size:15px;line-height:1.85;color:rgba(148,163,184,0.85);margin:14px 0 0 0;">

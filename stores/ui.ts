@@ -12,15 +12,18 @@ interface AppNotification {
 
 export const useUIStore = defineStore('ui', {
   state: () => ({
-    sidebarCollapsed: false,
-    notifications:    [] as AppNotification[],
-    notifsLoaded:     false,
+    sidebarCollapsed:   false,
+    mobileSidebarOpen:  false,
+    notifications:      [] as AppNotification[],
+    notifsLoaded:       false,
   }),
   getters: {
     unreadCount: (s) => s.notifications.filter(n => !n.read).length,
   },
   actions: {
-    toggleSidebar() { this.sidebarCollapsed = !this.sidebarCollapsed },
+    toggleSidebar()      { this.sidebarCollapsed  = !this.sidebarCollapsed },
+    openMobileSidebar()  { this.mobileSidebarOpen = true },
+    closeMobileSidebar() { this.mobileSidebarOpen = false },
 
     async fetchNotifications() {
       try {

@@ -62,7 +62,7 @@
     </div>
 
     <!-- Main 2-col grid -->
-    <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start;">
+    <div :style="{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 300px', gap:'16px', alignItems:'start' }">
 
       <!-- Facturas recientes -->
       <div style="border-radius:16px;background:linear-gradient(145deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.4);">
@@ -183,6 +183,7 @@ import type { SyscomFactura } from '~/types'
 definePageMeta({ middleware: 'auth' })
 
 const auth = useAuthStore()
+const { isMobile } = useBreakpoint()
 const YEAR         = new Date().getFullYear()
 const CURRENT_MONTH = new Date().getMonth()
 const MONTHS       = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']

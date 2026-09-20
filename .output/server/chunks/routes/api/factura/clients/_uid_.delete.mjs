@@ -1,5 +1,4 @@
-import { d as defineEventHandler, c as createError, g as getRouterParam } from '../../../../nitro/nitro.mjs';
-import { r as requireSession } from '../../../../_/session.mjs';
+import { d as defineEventHandler, r as requireSession, c as createError, i as getRouterParam } from '../../../../nitro/nitro.mjs';
 import { p as prisma } from '../../../../_/prisma.mjs';
 import { e as eliminarCliente } from '../../../../_/factura.mjs';
 import 'node:http';

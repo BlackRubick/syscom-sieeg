@@ -25,6 +25,9 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: 'SIEEG INTEGRADORES',
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      ],
       link: [
         { rel: 'icon', type: 'image/jpeg', href: '/logosieeg.jpg' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

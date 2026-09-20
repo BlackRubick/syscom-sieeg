@@ -1,5 +1,4 @@
-import { d as defineEventHandler, c as createError, r as readBody } from '../../../../nitro/nitro.mjs';
-import { r as requireSession } from '../../../../_/session.mjs';
+import { d as defineEventHandler, r as requireSession, c as createError, a as readBody } from '../../../../nitro/nitro.mjs';
 import { p as prisma } from '../../../../_/prisma.mjs';
 import { h as actualizarCliente, o as obtenerCliente, d as crearCliente } from '../../../../_/factura.mjs';
 import 'node:http';

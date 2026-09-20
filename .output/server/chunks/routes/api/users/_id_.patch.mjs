@@ -1,5 +1,4 @@
-import { d as defineEventHandler, c as createError, g as getRouterParam, r as readBody } from '../../../nitro/nitro.mjs';
-import { r as requireSession } from '../../../_/session.mjs';
+import { d as defineEventHandler, r as requireSession, c as createError, i as getRouterParam, a as readBody } from '../../../nitro/nitro.mjs';
 import { p as prisma } from '../../../_/prisma.mjs';
 import 'node:http';
 import 'node:https';
@@ -28,10 +27,11 @@ const _id__patch = defineEventHandler(async (event) => {
   if (body.email) data.email = body.email.toLowerCase();
   if (body.role) data.role = body.role;
   if (body.status) data.status = body.status;
+  if (body.discountPct !== void 0) data.discountPct = Math.max(0, Math.min(100, Number(body.discountPct)));
   const user = await prisma.user.update({
     where: { id },
     data,
-    select: { id: true, name: true, email: true, role: true, status: true, createdAt: true, lastLogin: true, avatar: true }
+    select: { id: true, name: true, email: true, role: true, status: true, createdAt: true, lastLogin: true, avatar: true, discountPct: true }
   });
   return { user };
 });
