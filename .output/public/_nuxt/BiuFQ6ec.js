@@ -1,0 +1,1 @@
+import{_ as t,o as n,c as o,V as s}from"./BPLRbVyp.js";const c={},r={style:{"min-height":"100vh",background:"#06101E"}};function a(e,_){return n(),o("div",r,[s(e.$slots,"default")])}const l=t(c,[["render",a]]);export{l as default};

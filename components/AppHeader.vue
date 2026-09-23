@@ -1,12 +1,12 @@
 <template>
-  <header :style="{ height:'60px', display:'flex', alignItems:'center', padding: isMobile ? '0 16px' : '0 24px', borderBottom:'1px solid rgba(255,255,255,0.06)', background:'rgba(8,16,32,0.9)', backdropFilter:'blur(12px)', flexShrink:0, gap:'12px', position:'sticky', top:0, zIndex:10, fontFamily:`'Inter',system-ui,sans-serif` }">
+  <header :style="{ height:'60px', display:'flex', alignItems:'center', padding: isMobile ? '0 16px' : '0 24px', borderBottom:'1px solid rgba(255,255,255,0.06)', background:'rgba(4,11,24,0.95)', backdropFilter:'blur(12px)', flexShrink:0, gap:'12px', position:'sticky', top:0, zIndex:10, fontFamily:`'Inter',system-ui,sans-serif` }">
 
     <!-- Hamburger (solo mobile) -->
     <button v-if="isMobile" @click="ui.openMobileSidebar()"
       style="width:36px;height:36px;border-radius:10px;background:transparent;border:1px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;"
       @mouseenter="e => (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.06)'"
       @mouseleave="e => (e.currentTarget as HTMLElement).style.background='transparent'">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(123,146,176,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
     </button>
@@ -19,7 +19,7 @@
           :style="{ width:'36px', height:'36px', borderRadius:'10px', background:notifOpen?'rgba(255,255,255,0.08)':'transparent', border:'1px solid transparent', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', position:'relative' }"
           @mouseenter="e => (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.06)'"
           @mouseleave="e => { if(!notifOpen)(e.currentTarget as HTMLElement).style.background='transparent' }">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.9)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(123,146,176,0.9)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
           </svg>
           <div v-if="ui.unreadCount > 0" style="position:absolute;top:5px;right:5px;width:16px;height:16px;border-radius:50%;background:#0EA5E9;font-size:9px;font-weight:700;color:white;display:flex;align-items:center;justify-content:center;">
@@ -28,10 +28,10 @@
         </button>
 
         <Transition name="dropdown">
-          <div v-if="notifOpen" :style="{ position:'absolute', right:0, top:'44px', width: isMobile ? 'calc(100vw - 32px)' : '300px', maxWidth:'300px', background:'#0D1B35', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'14px', boxShadow:'0 16px 48px rgba(0,0,0,0.6)', overflow:'hidden', zIndex:50 }">
+          <div v-if="notifOpen" :style="{ position:'absolute', right:0, top:'44px', width: isMobile ? 'calc(100vw - 32px)' : '300px', maxWidth:'300px', background:'#0C1A2E', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'14px', boxShadow:'0 16px 48px rgba(0,0,0,0.6)', overflow:'hidden', zIndex:50 }">
             <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
-              <span style="font-size:13px;font-weight:600;color:#E2E8F0;">Notificaciones</span>
-              <button v-if="ui.unreadCount > 0" @click="ui.markAllRead()" style="font-size:11px;color:#38bdf8;background:none;border:none;cursor:pointer;font-weight:500;">Marcar leídas</button>
+              <span style="font-size:13px;font-weight:600;color:#E2EAF4;">Notificaciones</span>
+              <button v-if="ui.unreadCount > 0" @click="ui.markAllRead()" style="font-size:11px;color:#7DD3FC;background:none;border:none;cursor:pointer;font-weight:500;">Marcar leídas</button>
             </div>
             <div style="max-height:280px;overflow-y:auto;">
               <div v-for="n in ui.notifications" :key="n.id" @click="ui.markRead(n.id)"
@@ -42,8 +42,8 @@
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="notifColor(n.type)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" v-html="notifIcon(n.type)" />
                 </div>
                 <div style="flex:1;min-width:0;">
-                  <div style="font-size:12px;font-weight:600;color:#CBD5E1;">{{ n.title }}</div>
-                  <div style="font-size:11px;color:rgba(100,116,139,0.8);margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ n.message }}</div>
+                  <div style="font-size:12px;font-weight:600;color:#7B92B0;">{{ n.title }}</div>
+                  <div style="font-size:11px;color:rgba(100,118,142,0.8);margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ n.message }}</div>
                 </div>
                 <div v-if="!n.read" style="width:6px;height:6px;border-radius:50%;background:#0EA5E9;flex-shrink:0;margin-top:4px;" />
               </div>
@@ -60,28 +60,28 @@
           :style="{ display:'flex', alignItems:'center', gap:'8px', height:'36px', padding:'0 10px 0 6px', borderRadius:'10px', background:userOpen?'rgba(255,255,255,0.08)':'transparent', border:'1px solid transparent', cursor:'pointer' }"
           @mouseenter="e => (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.05)'"
           @mouseleave="e => { if(!userOpen)(e.currentTarget as HTMLElement).style.background='transparent' }">
-          <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#0EA5E9,#22D3EE);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;">
+          <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#0EA5E9,#7DD3FC);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;">
             {{ initials }}
           </div>
           <div v-if="!isMobile" style="text-align:left;">
-            <div style="font-size:12px;font-weight:600;color:#E2E8F0;line-height:1;">{{ firstName }}</div>
-            <div style="font-size:10px;color:rgba(100,116,139,0.8);margin-top:2px;">{{ roleLabel }}</div>
+            <div style="font-size:12px;font-weight:600;color:#E2EAF4;line-height:1;">{{ firstName }}</div>
+            <div style="font-size:10px;color:rgba(100,118,142,0.8);margin-top:2px;">{{ roleLabel }}</div>
           </div>
-          <svg v-if="!isMobile" :width="12" :height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(100,116,139,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" :style="{ transition:'transform 0.2s', transform:userOpen?'rotate(180deg)':'rotate(0deg)', marginLeft:'2px' }">
+          <svg v-if="!isMobile" :width="12" :height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(100,118,142,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" :style="{ transition:'transform 0.2s', transform:userOpen?'rotate(180deg)':'rotate(0deg)', marginLeft:'2px' }">
             <path d="m6 9 6 6 6-6"/>
           </svg>
         </button>
 
         <Transition name="dropdown">
-          <div v-if="userOpen" style="position:absolute;right:0;top:44px;width:200px;background:#0D1B35;border:1px solid rgba(255,255,255,0.1);border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,0.6);overflow:hidden;z-index:50;">
+          <div v-if="userOpen" style="position:absolute;right:0;top:44px;width:200px;background:#0C1A2E;border:1px solid rgba(255,255,255,0.1);border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,0.6);overflow:hidden;z-index:50;">
             <div style="padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
-              <div style="font-size:12px;font-weight:600;color:#E2E8F0;">{{ auth.user?.name }}</div>
-              <div style="font-size:11px;color:rgba(100,116,139,0.8);margin-top:2px;">{{ auth.user?.email }}</div>
+              <div style="font-size:12px;font-weight:600;color:#E2EAF4;">{{ auth.user?.name }}</div>
+              <div style="font-size:11px;color:rgba(100,118,142,0.8);margin-top:2px;">{{ auth.user?.email }}</div>
             </div>
             <div style="border-top:1px solid rgba(255,255,255,0.07);">
               <button @click="handleLogout"
-                style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px;color:#fb7185;background:none;border:none;cursor:pointer;text-align:left;font-family:inherit;"
-                @mouseenter="e => (e.currentTarget as HTMLElement).style.background='rgba(244,63,94,0.06)'"
+                style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px;color:#EF4444;background:none;border:none;cursor:pointer;text-align:left;font-family:inherit;"
+                @mouseenter="e => (e.currentTarget as HTMLElement).style.background='rgba(239,68,68,0.06)'"
                 @mouseleave="e => (e.currentTarget as HTMLElement).style.background='transparent'">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>
@@ -113,7 +113,7 @@ const initials  = computed(() => auth.user?.name.split(' ').slice(0,2).map(n=>n[
 const firstName = computed(() => auth.user?.name.split(' ').slice(0,2).join(' ') ?? '...')
 const roleLabel = computed(() => auth.user ? (roleLabels[auth.user.role] ?? auth.user.role) : '...')
 
-const notifColors: Record<string, string> = { order:'#38bdf8', approval:'#34d399', delivery:'#0EA5E9', system:'#94a3b8', alert:'#f59e0b' }
+const notifColors: Record<string, string> = { order:'#7DD3FC', approval:'#22C55E', delivery:'#0EA5E9', system:'#94a3b8', alert:'#F59E0B' }
 function notifColor(type: string) { return notifColors[type] ?? '#94a3b8' }
 function notifIcon(type: string): string {
   if (type === 'order')    return '<path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>'

@@ -1,1 +1,0 @@
-import{G as i,H as o,z as t}from"./DmBjUm0z.js";function s(){const n=t(!1);function e(){n.value=window.innerWidth<768}return i(()=>{e(),window.addEventListener("resize",e,{passive:!0})}),o(()=>{window.removeEventListener("resize",e)}),{isMobile:n}}export{s as u};

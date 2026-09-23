@@ -1,1 +1,0 @@
-import{_ as t,o,c as s,V as c}from"./DmBjUm0z.js";const n={},r={style:{"min-height":"100vh",background:"#040C1A"}};function a(e,_){return o(),s("div",r,[c(e.$slots,"default")])}const l=t(n,[["render",a]]);export{l as default};

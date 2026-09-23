@@ -1,6 +1,6 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body { height: 100%; font-family: 'Inter', system-ui, sans-serif; background: #040C1A; color: #F1F5F9; }
+html, body { height: 100%; font-family: 'Inter', system-ui, sans-serif; background: #06101E; color: #E2EAF4; }
 
 #__nuxt { height: 100%; }
 
@@ -11,7 +11,7 @@ html, body { height: 100%; font-family: 'Inter', system-ui, sans-serif; backgrou
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-input::placeholder, textarea::placeholder { color: rgba(71,85,105,0.8); }
+input::placeholder, textarea::placeholder { color: rgba(100,118,142,0.8); }
 input, button, select, textarea { font-family: inherit; }
 button { cursor: pointer; }
 a { text-decoration: none; color: inherit; }

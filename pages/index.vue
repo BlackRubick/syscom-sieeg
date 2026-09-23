@@ -1,20 +1,20 @@
 <template>
-  <div style="min-height:100vh;background:#040C1A;font-family:'Inter',system-ui,sans-serif;color:#F1F5F9;overflow-x:hidden;">
+  <div style="min-height:100vh;background:#06101E;font-family:'Inter',system-ui,sans-serif;color:#E2EAF4;overflow-x:hidden;">
 
     <!-- ───────────── NAVBAR ───────────── -->
     <nav :style="navStyle">
       <div style="width:100%;max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:20px;">
 
         <NuxtLink to="/" style="display:flex;align-items:center;gap:10px;flex-shrink:0;text-decoration:none;">
-          <span style="font-size:15px;font-weight:700;color:#F1F5F9;letter-spacing:-0.3px;">SIEEG <span style="color:#0EA5E9;">INTEGRADORES</span></span>
+          <span style="font-size:15px;font-weight:700;color:#E2EAF4;letter-spacing:-0.3px;">SIEEG <span style="color:#0EA5E9;">INTEGRADORES</span></span>
         </NuxtLink>
 
         <div class="nav-links" style="display:flex;gap:4px;margin-left:32px;">
           <a v-for="link in navLinks" :key="link.id" :href="'#' + link.id"
             @click.prevent="scrollTo(link.id)"
-            style="padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;color:rgba(148,163,184,0.9);transition:all 0.2s;cursor:pointer;text-decoration:none;"
-            @mouseenter="e => { (e.currentTarget as HTMLElement).style.color='#F1F5F9'; (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.06)'; }"
-            @mouseleave="e => { (e.currentTarget as HTMLElement).style.color='rgba(148,163,184,0.9)'; (e.currentTarget as HTMLElement).style.background='transparent'; }">
+            style="padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;color:rgba(123,146,176,0.9);transition:all 0.2s;cursor:pointer;text-decoration:none;"
+            @mouseenter="e => { (e.currentTarget as HTMLElement).style.color='#E2EAF4'; (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.06)'; }"
+            @mouseleave="e => { (e.currentTarget as HTMLElement).style.color='rgba(123,146,176,0.9)'; (e.currentTarget as HTMLElement).style.background='transparent'; }">
             {{ link.label }}
           </a>
         </div>
@@ -22,9 +22,9 @@
         <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
           <a href="#contacto" @click.prevent="scrollTo('contacto')"
             class="hide-mobile"
-            style="padding:8px 16px;border-radius:9px;font-size:13px;font-weight:500;color:rgba(148,163,184,0.9);border:1px solid rgba(255,255,255,0.1);background:transparent;cursor:pointer;text-decoration:none;transition:all 0.2s;"
-            @mouseenter="e => { (e.currentTarget as HTMLElement).style.color='#F1F5F9'; (e.currentTarget as HTMLElement).style.borderColor='rgba(255,255,255,0.2)'; (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.04)'; }"
-            @mouseleave="e => { (e.currentTarget as HTMLElement).style.color='rgba(148,163,184,0.9)'; (e.currentTarget as HTMLElement).style.borderColor='rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.background='transparent'; }">
+            style="padding:8px 16px;border-radius:9px;font-size:13px;font-weight:500;color:rgba(123,146,176,0.9);border:1px solid rgba(255,255,255,0.1);background:transparent;cursor:pointer;text-decoration:none;transition:all 0.2s;"
+            @mouseenter="e => { (e.currentTarget as HTMLElement).style.color='#E2EAF4'; (e.currentTarget as HTMLElement).style.borderColor='rgba(255,255,255,0.2)'; (e.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.04)'; }"
+            @mouseleave="e => { (e.currentTarget as HTMLElement).style.color='rgba(123,146,176,0.9)'; (e.currentTarget as HTMLElement).style.borderColor='rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.background='transparent'; }">
             Quiero comprar
           </a>
           <NuxtLink to="/login"
@@ -81,7 +81,7 @@
           <!-- Subtitle -->
           <p class="hero-sub">
             Somos distribuidores especializados en tecnología para empresas.
-            Catálogo completo, <span style="color:#38bdf8;font-weight:500;">precios preferenciales</span>
+            Catálogo completo, <span style="color:#7DD3FC;font-weight:500;">precios preferenciales</span>
             y facturación CFDI inmediata.
           </p>
 
@@ -100,8 +100,8 @@
 
           <!-- Trust marks -->
           <div style="display:flex;gap:20px;flex-wrap:wrap;">
-            <div v-for="t in trustMarks" :key="t" style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(148,163,184,0.7);">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <div v-for="t in trustMarks" :key="t" style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(123,146,176,0.7);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 6L9 17l-5-5"/>
               </svg>
               {{ t }}
@@ -113,17 +113,17 @@
         <div style="position:relative;display:flex;justify-content:center;align-items:center;" class="hero-visual">
 
           <!-- Glow detrás del panel -->
-          <div style="position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(14,165,233,0.18) 0%,rgba(124,58,237,0.12) 50%,transparent 70%);filter:blur(40px);pointer-events:none;" />
+          <div style="position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(14,165,233,0.18) 0%,rgba(14,165,233,0.12) 50%,transparent 70%);filter:blur(40px);pointer-events:none;" />
 
           <!-- Panel principal flotante -->
           <div class="floating-panel">
             <!-- Header del panel -->
             <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,0.07);">
               <div style="display:flex;align-items:center;gap:8px;">
-                <div style="width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 6px #34d399;" />
-                <span style="font-size:12px;font-weight:600;color:rgba(148,163,184,0.85);">Catálogo disponible</span>
+                <div style="width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 6px #22C55E;" />
+                <span style="font-size:12px;font-weight:600;color:rgba(123,146,176,0.85);">Catálogo disponible</span>
               </div>
-              <span style="font-size:11px;color:rgba(100,116,139,0.7);background:rgba(255,255,255,0.05);padding:3px 8px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);">+5,000 SKUs</span>
+              <span style="font-size:11px;color:rgba(100,118,142,0.7);background:rgba(255,255,255,0.05);padding:3px 8px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);">+5,000 SKUs</span>
             </div>
 
             <!-- Grid de categorías dentro del panel -->
@@ -133,33 +133,33 @@
                   <span v-html="item.icon" />
                 </div>
                 <div>
-                  <div style="font-size:12px;font-weight:600;color:#E2E8F0;line-height:1.3;">{{ item.name }}</div>
-                  <div style="font-size:10px;color:rgba(100,116,139,0.75);margin-top:1px;">{{ item.sub }}</div>
+                  <div style="font-size:12px;font-weight:600;color:#E2EAF4;line-height:1.3;">{{ item.name }}</div>
+                  <div style="font-size:10px;color:rgba(100,118,142,0.75);margin-top:1px;">{{ item.sub }}</div>
                 </div>
               </div>
             </div>
 
             <!-- Footer del panel -->
             <div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;">
-              <span style="font-size:11px;color:rgba(100,116,139,0.7);">Precios desde</span>
-              <span style="font-size:14px;font-weight:700;color:#F1F5F9;">Consultar <span style="color:#38bdf8;">→</span></span>
+              <span style="font-size:11px;color:rgba(100,118,142,0.7);">Precios desde</span>
+              <span style="font-size:14px;font-weight:700;color:#E2EAF4;">Consultar <span style="color:#7DD3FC;">→</span></span>
             </div>
           </div>
 
           <!-- Badge flotante: entrega -->
           <div class="float-badge float-badge-1">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 6L9 17l-5-5"/>
             </svg>
-            <span style="font-size:12px;font-weight:600;color:#F1F5F9;">Factura CFDI incluida</span>
+            <span style="font-size:12px;font-weight:600;color:#E2EAF4;">Factura CFDI incluida</span>
           </div>
 
           <!-- Badge flotante: precio -->
           <div class="float-badge float-badge-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
             </svg>
-            <span style="font-size:12px;font-weight:600;color:#F1F5F9;">Precio preferencial</span>
+            <span style="font-size:12px;font-weight:600;color:#E2EAF4;">Precio preferencial</span>
           </div>
 
         </div>
@@ -175,22 +175,22 @@
     <section id="productos" style="padding:80px 24px;background:rgba(13,27,53,0.3);">
       <div style="max-width:1100px;margin:0 auto;">
         <div style="text-align:center;margin-bottom:52px;">
-          <div style="font-size:12px;font-weight:600;color:#38bdf8;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Nuestros productos</div>
-          <h2 style="font-size:clamp(26px,3.5vw,38px);font-weight:800;color:#F1F5F9;letter-spacing:-0.5px;margin-bottom:12px;">¿Qué puedes comprar con nosotros?</h2>
-          <p style="font-size:15px;color:rgba(148,163,184,0.8);max-width:500px;margin:0 auto;">Manejamos un amplio catálogo de productos tecnológicos para todo tipo de empresa.</p>
+          <div style="font-size:12px;font-weight:600;color:#7DD3FC;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Nuestros productos</div>
+          <h2 style="font-size:clamp(26px,3.5vw,38px);font-weight:800;color:#E2EAF4;letter-spacing:-0.5px;margin-bottom:12px;">¿Qué puedes comprar con nosotros?</h2>
+          <p style="font-size:15px;color:rgba(123,146,176,0.8);max-width:500px;margin:0 auto;">Manejamos un amplio catálogo de productos tecnológicos para todo tipo de empresa.</p>
         </div>
 
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;">
           <div v-for="cat in categories" :key="cat.name"
-            style="padding:26px 22px;border-radius:16px;background:linear-gradient(145deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:14px;transition:transform 0.2s,border-color 0.2s,box-shadow 0.2s;cursor:default;"
+            style="padding:26px 22px;border-radius:16px;background:linear-gradient(145deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:14px;transition:transform 0.2s,border-color 0.2s,box-shadow 0.2s;cursor:default;"
             @mouseenter="e => { (e.currentTarget as HTMLElement).style.transform='translateY(-3px)'; (e.currentTarget as HTMLElement).style.borderColor='rgba(14,165,233,0.25)'; (e.currentTarget as HTMLElement).style.boxShadow='0 10px 32px rgba(14,165,233,0.08)'; }"
             @mouseleave="e => { (e.currentTarget as HTMLElement).style.transform='translateY(0)'; (e.currentTarget as HTMLElement).style.borderColor='rgba(255,255,255,0.07)'; (e.currentTarget as HTMLElement).style.boxShadow='none'; }">
             <div :style="{ width:'44px', height:'44px', borderRadius:'11px', background:cat.gradient, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:`0 4px 14px ${cat.glow}` }">
               <span v-html="cat.icon" />
             </div>
             <div>
-              <div style="font-size:15px;font-weight:700;color:#F1F5F9;margin-bottom:6px;">{{ cat.name }}</div>
-              <div style="font-size:13px;color:rgba(148,163,184,0.75);line-height:1.6;">{{ cat.desc }}</div>
+              <div style="font-size:15px;font-weight:700;color:#E2EAF4;margin-bottom:6px;">{{ cat.name }}</div>
+              <div style="font-size:13px;color:rgba(123,146,176,0.75);line-height:1.6;">{{ cat.desc }}</div>
             </div>
           </div>
         </div>
@@ -201,8 +201,8 @@
     <section id="nosotros" style="padding:80px 24px;">
       <div style="max-width:1000px;margin:0 auto;">
         <div style="text-align:center;margin-bottom:52px;">
-          <div style="font-size:12px;font-weight:600;color:#38bdf8;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Por qué elegirnos</div>
-          <h2 style="font-size:clamp(26px,3.5vw,38px);font-weight:800;color:#F1F5F9;letter-spacing:-0.5px;">Lo que nos diferencia</h2>
+          <div style="font-size:12px;font-weight:600;color:#7DD3FC;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Por qué elegirnos</div>
+          <h2 style="font-size:clamp(26px,3.5vw,38px);font-weight:800;color:#E2EAF4;letter-spacing:-0.5px;">Lo que nos diferencia</h2>
         </div>
 
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;">
@@ -211,8 +211,8 @@
               <span v-html="b.icon" />
             </div>
             <div>
-              <div style="font-size:15px;font-weight:700;color:#F1F5F9;margin-bottom:5px;">{{ b.title }}</div>
-              <div style="font-size:13px;color:rgba(148,163,184,0.78);line-height:1.65;">{{ b.desc }}</div>
+              <div style="font-size:15px;font-weight:700;color:#E2EAF4;margin-bottom:5px;">{{ b.title }}</div>
+              <div style="font-size:13px;color:rgba(123,146,176,0.78);line-height:1.65;">{{ b.desc }}</div>
             </div>
           </div>
         </div>
@@ -225,9 +225,9 @@
 
         <!-- Encabezado centrado -->
         <div style="text-align:center;margin-bottom:52px;">
-          <div style="font-size:12px;font-weight:600;color:#38bdf8;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Contáctanos</div>
-          <h2 style="font-size:clamp(26px,3.5vw,38px);font-weight:800;color:#F1F5F9;letter-spacing:-0.5px;margin-bottom:12px;">Estamos para atenderte</h2>
-          <p style="font-size:14px;color:rgba(148,163,184,0.8);line-height:1.65;max-width:480px;margin:0 auto;">
+          <div style="font-size:12px;font-weight:600;color:#7DD3FC;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Contáctanos</div>
+          <h2 style="font-size:clamp(26px,3.5vw,38px);font-weight:800;color:#E2EAF4;letter-spacing:-0.5px;margin-bottom:12px;">Estamos para atenderte</h2>
+          <p style="font-size:14px;color:rgba(123,146,176,0.8);line-height:1.65;max-width:480px;margin:0 auto;">
             Visítanos, llámanos o escríbenos. También puedes dejarnos tus datos y te contactamos a la brevedad.
           </p>
         </div>
@@ -239,68 +239,68 @@
           <div style="display:flex;flex-direction:column;gap:16px;">
 
             <!-- Tarjeta: Visítanos -->
-            <div style="padding:24px;border-radius:18px;background:linear-gradient(145deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);">
+            <div style="padding:24px;border-radius:18px;background:linear-gradient(145deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);">
               <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
                 <div style="width:38px;height:38px;border-radius:10px;background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7DD3FC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
                   </svg>
                 </div>
-                <div style="font-size:14px;font-weight:700;color:#F1F5F9;">Visítanos</div>
+                <div style="font-size:14px;font-weight:700;color:#E2EAF4;">Visítanos</div>
               </div>
-              <p style="font-size:13px;color:rgba(148,163,184,0.85);line-height:1.7;margin:0;">
+              <p style="font-size:13px;color:rgba(123,146,176,0.85);line-height:1.7;margin:0;">
                 Boulevard Belisario Domínguez #4213 L5<br/>
                 Tuxtla Gutiérrez, Chiapas
               </p>
             </div>
 
             <!-- Tarjeta: Horario -->
-            <div style="padding:24px;border-radius:18px;background:linear-gradient(145deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);">
+            <div style="padding:24px;border-radius:18px;background:linear-gradient(145deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);">
               <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
                 <div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                   </svg>
                 </div>
-                <div style="font-size:14px;font-weight:700;color:#F1F5F9;">Horario comercial</div>
+                <div style="font-size:14px;font-weight:700;color:#E2EAF4;">Horario comercial</div>
               </div>
               <div style="display:flex;flex-direction:column;gap:8px;">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-                  <span style="font-size:12px;color:rgba(100,116,139,0.8);">Lunes – Viernes</span>
+                  <span style="font-size:12px;color:rgba(100,118,142,0.8);">Lunes – Viernes</span>
                   <span style="font-size:12px;font-weight:600;color:#fbbf24;">07:00 – 20:00 hrs</span>
                 </div>
                 <div style="height:1px;background:rgba(255,255,255,0.05);" />
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-                  <span style="font-size:12px;color:rgba(100,116,139,0.8);">Sábados</span>
+                  <span style="font-size:12px;color:rgba(100,118,142,0.8);">Sábados</span>
                   <span style="font-size:12px;font-weight:600;color:#fbbf24;">07:00 – 17:00 hrs</span>
                 </div>
               </div>
             </div>
 
             <!-- Tarjeta: Teléfono y correo -->
-            <div style="padding:24px;border-radius:18px;background:linear-gradient(145deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:16px;">
+            <div style="padding:24px;border-radius:18px;background:linear-gradient(145deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:16px;">
               <!-- Teléfono -->
               <div style="display:flex;align-items:center;gap:12px;">
-                <div style="width:38px;height:38px;border-radius:10px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div style="width:38px;height:38px;border-radius:10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
                   </svg>
                 </div>
                 <div>
-                  <div style="font-size:11px;color:rgba(100,116,139,0.7);font-weight:500;margin-bottom:2px;">Teléfono</div>
-                  <a href="tel:9611180157" style="font-size:15px;font-weight:700;color:#34d399;text-decoration:none;letter-spacing:0.3px;">961 118 0157</a>
+                  <div style="font-size:11px;color:rgba(100,118,142,0.7);font-weight:500;margin-bottom:2px;">Teléfono</div>
+                  <a href="tel:9611180157" style="font-size:15px;font-weight:700;color:#22C55E;text-decoration:none;letter-spacing:0.3px;">961 118 0157</a>
                 </div>
               </div>
               <div style="height:1px;background:rgba(255,255,255,0.05);" />
               <!-- Correo -->
               <div style="display:flex;align-items:center;gap:12px;">
-                <div style="width:38px;height:38px;border-radius:10px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <div style="width:38px;height:38px;border-radius:10px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/>
                   </svg>
                 </div>
                 <div>
-                  <div style="font-size:11px;color:rgba(100,116,139,0.7);font-weight:500;margin-bottom:2px;">Correo electrónico</div>
+                  <div style="font-size:11px;color:rgba(100,118,142,0.7);font-weight:500;margin-bottom:2px;">Correo electrónico</div>
                   <a href="mailto:contacto@sieeg.com.mx" style="font-size:13px;font-weight:600;color:#a78bfa;text-decoration:none;">contacto@sieeg.com.mx</a>
                 </div>
               </div>
@@ -311,21 +311,21 @@
           <!-- ── Columna derecha: formulario ── -->
           <div>
             <div style="position:relative;">
-              <div style="position:absolute;inset:-1px;border-radius:22px;background:linear-gradient(135deg,rgba(14,165,233,0.35) 0%,rgba(124,58,237,0.2) 60%,rgba(14,165,233,0.1) 100%);z-index:0;" />
-              <div style="position:relative;z-index:1;border-radius:22px;background:linear-gradient(160deg,#0D1B35,#09122A);padding:36px 32px;box-shadow:0 24px 64px rgba(0,0,0,0.6);">
+              <div style="position:absolute;inset:-1px;border-radius:22px;background:linear-gradient(135deg,rgba(14,165,233,0.35) 0%,rgba(14,165,233,0.2) 60%,rgba(14,165,233,0.1) 100%);z-index:0;" />
+              <div style="position:relative;z-index:1;border-radius:22px;background:linear-gradient(160deg,#0C1A2E,#06101E);padding:36px 32px;box-shadow:0 24px 64px rgba(0,0,0,0.6);">
 
-                <div style="font-size:15px;font-weight:700;color:#F1F5F9;margin-bottom:6px;">¿Listo para comprar con nosotros?</div>
-                <p style="font-size:13px;color:rgba(148,163,184,0.7);margin-bottom:24px;line-height:1.6;">Déjanos tus datos y te contactamos para darte acceso con precios exclusivos.</p>
+                <div style="font-size:15px;font-weight:700;color:#E2EAF4;margin-bottom:6px;">¿Listo para comprar con nosotros?</div>
+                <p style="font-size:13px;color:rgba(123,146,176,0.7);margin-bottom:24px;line-height:1.6;">Déjanos tus datos y te contactamos para darte acceso con precios exclusivos.</p>
 
                 <Transition name="fade">
                   <div v-if="requestSent" style="text-align:center;padding:20px 0;">
-                    <div style="width:64px;height:64px;border-radius:50%;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <div style="width:64px;height:64px;border-radius:50%;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
                       </svg>
                     </div>
-                    <h3 style="font-size:20px;font-weight:700;color:#F1F5F9;margin-bottom:10px;">¡Mensaje recibido!</h3>
-                    <p style="font-size:14px;color:rgba(148,163,184,0.85);line-height:1.65;margin-bottom:24px;">
+                    <h3 style="font-size:20px;font-weight:700;color:#E2EAF4;margin-bottom:10px;">¡Mensaje recibido!</h3>
+                    <p style="font-size:14px;color:rgba(123,146,176,0.85);line-height:1.65;margin-bottom:24px;">
                       Gracias por tu interés. Nos pondremos en contacto contigo a la brevedad.
                     </p>
                     <button @click="requestSent = false; resetForm()"
@@ -339,55 +339,55 @@
                   <form v-if="!requestSent" @submit.prevent="handleRequest" style="display:flex;flex-direction:column;gap:16px;">
 
                     <div>
-                      <label style="display:block;font-size:12px;font-weight:500;color:rgba(148,163,184,0.9);margin-bottom:7px;">Nombre completo *</label>
+                      <label style="display:block;font-size:12px;font-weight:500;color:rgba(123,146,176,0.9);margin-bottom:7px;">Nombre completo *</label>
                       <div :style="fieldWrap(nameFocus)">
-                        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="nameFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="nameFocus?'#0EA5E9':'rgba(100,118,142,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                         </svg>
                         <input v-model="form.name" type="text" placeholder="Juan García" required
                           @focus="nameFocus=true" @blur="nameFocus=false"
-                          style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#F1F5F9;box-sizing:border-box;font-family:inherit;" />
+                          style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#E2EAF4;box-sizing:border-box;font-family:inherit;" />
                       </div>
                     </div>
 
                     <div>
-                      <label style="display:block;font-size:12px;font-weight:500;color:rgba(148,163,184,0.9);margin-bottom:7px;">Correo electrónico *</label>
+                      <label style="display:block;font-size:12px;font-weight:500;color:rgba(123,146,176,0.9);margin-bottom:7px;">Correo electrónico *</label>
                       <div :style="fieldWrap(emailFocus)">
-                        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="emailFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="emailFocus?'#0EA5E9':'rgba(100,118,142,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/>
                         </svg>
                         <input v-model="form.email" type="email" placeholder="juan@miempresa.com" required
                           @focus="emailFocus=true" @blur="emailFocus=false"
-                          style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#F1F5F9;box-sizing:border-box;font-family:inherit;" />
+                          style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#E2EAF4;box-sizing:border-box;font-family:inherit;" />
                       </div>
                     </div>
 
                     <div>
-                      <label style="display:block;font-size:12px;font-weight:500;color:rgba(148,163,184,0.9);margin-bottom:7px;">Empresa</label>
+                      <label style="display:block;font-size:12px;font-weight:500;color:rgba(123,146,176,0.9);margin-bottom:7px;">Empresa</label>
                       <div :style="fieldWrap(companyFocus)">
-                        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="companyFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="companyFocus?'#0EA5E9':'rgba(100,118,142,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
                         </svg>
                         <input v-model="form.company" type="text" placeholder="Mi Empresa S.A. de C.V."
                           @focus="companyFocus=true" @blur="companyFocus=false"
-                          style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#F1F5F9;box-sizing:border-box;font-family:inherit;" />
+                          style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#E2EAF4;box-sizing:border-box;font-family:inherit;" />
                       </div>
                     </div>
 
                     <div>
-                      <label style="display:block;font-size:12px;font-weight:500;color:rgba(148,163,184,0.9);margin-bottom:7px;">Teléfono</label>
+                      <label style="display:block;font-size:12px;font-weight:500;color:rgba(123,146,176,0.9);margin-bottom:7px;">Teléfono</label>
                       <div :style="fieldWrap(phoneFocus)">
-                        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="phoneFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="phoneFocus?'#0EA5E9':'rgba(100,118,142,0.7)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
                         </svg>
                         <input v-model="form.phone" type="tel" placeholder="+52 55 0000 0000"
                           @focus="phoneFocus=true" @blur="phoneFocus=false"
-                          style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#F1F5F9;box-sizing:border-box;font-family:inherit;" />
+                          style="width:100%;height:46px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:14px;font-size:14px;color:#E2EAF4;box-sizing:border-box;font-family:inherit;" />
                       </div>
                     </div>
 
                     <Transition name="fade">
-                      <div v-if="reqError" style="padding:10px 14px;border-radius:10px;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.25);font-size:13px;color:#fb7185;">
+                      <div v-if="reqError" style="padding:10px 14px;border-radius:10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);font-size:13px;color:#EF4444;">
                         {{ reqError }}
                       </div>
                     </Transition>
@@ -410,7 +410,7 @@
                       </div>
                     </button>
 
-                    <p style="text-align:center;font-size:11px;color:rgba(71,85,105,0.85);margin-top:2px;">
+                    <p style="text-align:center;font-size:11px;color:rgba(100,118,142,0.85);margin-top:2px;">
                       Nos pondremos en contacto contigo en menos de 24 horas.
                     </p>
                   </form>
@@ -428,20 +428,20 @@
       <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
         <div style="display:flex;align-items:center;gap:10px;">
           <img src="/logosieeg.jpg" alt="SIEEG" style="height:28px;width:28px;object-fit:contain;border-radius:6px;opacity:0.75;" />
-          <span style="font-size:13px;font-weight:600;color:rgba(148,163,184,0.55);">SIEEG INTEGRADORES</span>
+          <span style="font-size:13px;font-weight:600;color:rgba(123,146,176,0.55);">SIEEG INTEGRADORES</span>
         </div>
         <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-          <NuxtLink to="/terminos" style="font-size:12px;color:rgba(71,85,105,0.75);text-decoration:none;transition:color 0.2s;"
-            @mouseenter="e => (e.currentTarget as HTMLElement).style.color='rgba(148,163,184,0.9)'"
-            @mouseleave="e => (e.currentTarget as HTMLElement).style.color='rgba(71,85,105,0.75)'">
+          <NuxtLink to="/terminos" style="font-size:12px;color:rgba(100,118,142,0.75);text-decoration:none;transition:color 0.2s;"
+            @mouseenter="e => (e.currentTarget as HTMLElement).style.color='rgba(123,146,176,0.9)'"
+            @mouseleave="e => (e.currentTarget as HTMLElement).style.color='rgba(100,118,142,0.75)'">
             Términos y Condiciones
           </NuxtLink>
-          <NuxtLink to="/privacidad" style="font-size:12px;color:rgba(71,85,105,0.75);text-decoration:none;transition:color 0.2s;"
-            @mouseenter="e => (e.currentTarget as HTMLElement).style.color='rgba(148,163,184,0.9)'"
-            @mouseleave="e => (e.currentTarget as HTMLElement).style.color='rgba(71,85,105,0.75)'">
+          <NuxtLink to="/privacidad" style="font-size:12px;color:rgba(100,118,142,0.75);text-decoration:none;transition:color 0.2s;"
+            @mouseenter="e => (e.currentTarget as HTMLElement).style.color='rgba(123,146,176,0.9)'"
+            @mouseleave="e => (e.currentTarget as HTMLElement).style.color='rgba(100,118,142,0.75)'">
             Políticas de Privacidad
           </NuxtLink>
-          <p style="font-size:12px;color:rgba(71,85,105,0.7);margin:0;">© {{ new Date().getFullYear() }} SIEEG INTEGRADORES. Todos los derechos reservados.</p>
+          <p style="font-size:12px;color:rgba(100,118,142,0.7);margin:0;">© {{ new Date().getFullYear() }} SIEEG INTEGRADORES. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>
@@ -491,9 +491,9 @@ function handleMouseMove(e: MouseEvent) {
 // ── Panel items ──
 const panelItems = [
   { name: 'Cómputo',     sub: 'Laptops · Desktops', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>', gradient:'linear-gradient(135deg,#0EA5E9,#0284C7)', glow:'rgba(14,165,233,0.4)' },
-  { name: 'Redes',       sub: 'Switches · WiFi',     icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>', gradient:'linear-gradient(135deg,#7C3AED,#6D28D9)', glow:'rgba(124,58,237,0.35)' },
-  { name: 'Servidores',  sub: 'NAS · UPS · Rack',    icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><line x1="6" x2="6" y1="6" y2="6"/><line x1="6" x2="6" y1="18" y2="18"/></svg>', gradient:'linear-gradient(135deg,#f59e0b,#d97706)', glow:'rgba(245,158,11,0.35)' },
-  { name: 'Seguridad',   sub: 'CCTV · Control',      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', gradient:'linear-gradient(135deg,#f43f5e,#e11d48)', glow:'rgba(244,63,94,0.35)' },
+  { name: 'Redes',       sub: 'Switches · WiFi',     icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>', gradient:'linear-gradient(135deg,#0EA5E9,#0284C7)', glow:'rgba(14,165,233,0.35)' },
+  { name: 'Servidores',  sub: 'NAS · UPS · Rack',    icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><line x1="6" x2="6" y1="6" y2="6"/><line x1="6" x2="6" y1="18" y2="18"/></svg>', gradient:'linear-gradient(135deg,#F59E0B,#d97706)', glow:'rgba(245,158,11,0.35)' },
+  { name: 'Seguridad',   sub: 'CCTV · Control',      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', gradient:'linear-gradient(135deg,#f43f5e,#e11d48)', glow:'rgba(239,68,68,0.35)' },
 ]
 
 const trustMarks = ['Factura CFDI', 'Precios de distribuidor', 'Entrega a domicilio']
@@ -510,35 +510,35 @@ const categories = [
     name: 'Redes y conectividad',
     desc: 'Switches, routers, access points y cableado estructurado para tu infraestructura de red.',
     icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>',
-    gradient: 'linear-gradient(135deg,#7C3AED,#6D28D9)',
-    glow:     'rgba(124,58,237,0.35)',
+    gradient: 'linear-gradient(135deg,#0EA5E9,#0284C7)',
+    glow:     'rgba(14,165,233,0.35)',
   },
   {
     name: 'Servidores y almacenamiento',
     desc: 'Servidores, NAS, UPS y soluciones de respaldo para empresas de cualquier tamaño.',
     icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><line x1="6" x2="6" y1="6" y2="6"/><line x1="6" x2="6" y1="18" y2="18"/></svg>',
-    gradient: 'linear-gradient(135deg,#f59e0b,#d97706)',
+    gradient: 'linear-gradient(135deg,#F59E0B,#d97706)',
     glow:     'rgba(245,158,11,0.3)',
   },
   {
     name: 'Impresión y periféricos',
     desc: 'Impresoras, multifuncionales, escáneres, teclados, monitores y accesorios de oficina.',
     icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect width="10" height="8" x="7" y="14" rx="1"/></svg>',
-    gradient: 'linear-gradient(135deg,#34d399,#059669)',
-    glow:     'rgba(52,211,153,0.3)',
+    gradient: 'linear-gradient(135deg,#22C55E,#059669)',
+    glow:     'rgba(34,197,94,0.3)',
   },
   {
     name: 'Seguridad electrónica',
     desc: 'Cámaras IP, sistemas CCTV, control de acceso y alarmas para proteger tu negocio.',
     icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
     gradient: 'linear-gradient(135deg,#f43f5e,#e11d48)',
-    glow:     'rgba(244,63,94,0.3)',
+    glow:     'rgba(239,68,68,0.3)',
   },
   {
     name: 'Consumibles y accesorios',
     desc: 'Tintas, tóners, cables, memorias, baterías y todo lo que tu equipo necesita día a día.',
     icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>',
-    gradient: 'linear-gradient(135deg,#22d3ee,#0891b2)',
+    gradient: 'linear-gradient(135deg,#7DD3FC,#0EA5E9)',
     glow:     'rgba(34,211,238,0.3)',
   },
 ]
@@ -554,23 +554,23 @@ const benefits = [
   {
     title: 'Factura a tu empresa',
     desc:  'Genera facturas CFDI de cada compra al momento. Proceso 100% digital, sin trámites adicionales.',
-    icon:  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>',
-    bg:    'rgba(52,211,153,0.1)',
-    border:'1px solid rgba(52,211,153,0.2)',
+    icon:  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>',
+    bg:    'rgba(34,197,94,0.1)',
+    border:'1px solid rgba(34,197,94,0.2)',
   },
   {
     title: 'Entrega rápida',
     desc:  'Rastreamos cada pedido en tiempo real. Coordinamos envíos directamente a tu empresa o sucursal.',
-    icon:  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect width="13" height="10" x="9" y="11" rx="1"/><path d="M12 11V5"/><path d="M9 18h1m5 0h1"/><circle cx="11" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
+    icon:  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect width="13" height="10" x="9" y="11" rx="1"/><path d="M12 11V5"/><path d="M9 18h1m5 0h1"/><circle cx="11" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
     bg:    'rgba(245,158,11,0.1)',
     border:'1px solid rgba(245,158,11,0.2)',
   },
   {
     title: 'Atención personalizada',
     desc:  'Tienes un ejecutivo dedicado para cotizaciones, soporte y seguimiento de tus compras.',
-    icon:  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-    bg:    'rgba(124,58,237,0.1)',
-    border:'1px solid rgba(124,58,237,0.2)',
+    icon:  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    bg:    'rgba(14,165,233,0.1)',
+    border:'1px solid rgba(14,165,233,0.2)',
   },
 ]
 
@@ -670,7 +670,7 @@ async function handleRequest() {
 }
 .orb-2 {
   width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(14,165,233,0.18) 0%, transparent 70%);
   bottom: -150px; right: -80px;
   animation: orbFloat2 22s ease-in-out infinite;
 }
@@ -715,7 +715,7 @@ async function handleRequest() {
   border: 1px solid rgba(14,165,233,0.22);
   font-size: 11px;
   font-weight: 700;
-  color: #38bdf8;
+  color: #7DD3FC;
   letter-spacing: 1.2px;
   margin-bottom: 28px;
 }
@@ -733,11 +733,11 @@ async function handleRequest() {
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -2px;
-  color: #F1F5F9;
+  color: #E2EAF4;
   margin-bottom: 22px;
 }
 .hero-gradient-text {
-  background: linear-gradient(135deg, #0EA5E9 0%, #22D3EE 40%, #7C3AED 100%);
+  background: linear-gradient(135deg, #0EA5E9 0%, #7DD3FC 40%, #0EA5E9 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -747,7 +747,7 @@ async function handleRequest() {
   position: absolute;
   bottom: -4px; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #0EA5E9, #7C3AED);
+  background: linear-gradient(90deg, #0EA5E9, #0EA5E9);
   border-radius: 999px;
   animation: lineGrow 0.5s ease forwards;
   transform-origin: left;
@@ -760,7 +760,7 @@ async function handleRequest() {
 /* ── Subtitle ── */
 .hero-sub {
   font-size: 16px;
-  color: rgba(148,163,184,0.82);
+  color: rgba(123,146,176,0.82);
   line-height: 1.75;
   max-width: 480px;
   margin-bottom: 36px;

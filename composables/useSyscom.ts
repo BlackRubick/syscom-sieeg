@@ -128,9 +128,9 @@ export function fmtDate(s?: string): string {
 
 export function facturaStatusStyle(estatus?: string) {
   const s = (estatus ?? '').toLowerCase()
-  if (s.includes('cancel'))                          return { color: '#fb7185', dot: '#f43f5e', bg: 'rgba(244,63,94,0.12)',  label: estatus ?? 'Cancelada'  }
+  if (s.includes('cancel'))                          return { color: '#EF4444', dot: '#f43f5e', bg: 'rgba(239,68,68,0.12)',  label: estatus ?? 'Cancelada'  }
   if (s.includes('entrega') || s.includes('recib'))  return { color: '#4ade80', dot: '#22c55e', bg: 'rgba(34,197,94,0.12)',  label: estatus ?? 'Entregada'  }
-  if (s.includes('enviad')  || s.includes('transit'))return { color: '#22d3ee', dot: '#06b6d4', bg: 'rgba(6,182,212,0.12)',  label: estatus ?? 'Enviada'    }
-  if (s.includes('aprob'))                           return { color: '#34d399', dot: '#10b981', bg: 'rgba(16,185,129,0.12)', label: estatus ?? 'Aprobada'   }
-  return { color: '#38bdf8', dot: '#0ea5e9', bg: 'rgba(14,165,233,0.12)', label: estatus ?? 'En proceso' }
+  if (s.includes('enviad')  || s.includes('transit'))return { color: '#7DD3FC', dot: '#7DD3FC', bg: 'rgba(6,182,212,0.12)',  label: estatus ?? 'Enviada'    }
+  if (s.includes('aprob'))                           return { color: '#22C55E', dot: '#22C55E', bg: 'rgba(34,197,94,0.12)', label: estatus ?? 'Aprobada'   }
+  return { color: '#7DD3FC', dot: '#7DD3FC', bg: 'rgba(14,165,233,0.12)', label: estatus ?? 'En proceso' }
 }

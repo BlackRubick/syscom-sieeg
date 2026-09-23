@@ -3,32 +3,32 @@
 
     <!-- Header -->
     <div style="margin-bottom:28px;text-align:center;">
-      <h1 style="font-size:22px;font-weight:800;color:#F1F5F9;margin:0;">Control de Precios</h1>
-      <p style="font-size:13px;color:rgba(100,116,139,0.85);margin-top:4px;">
+      <h1 style="font-size:22px;font-weight:800;color:#E2EAF4;margin:0;">Control de Precios</h1>
+      <p style="font-size:13px;color:rgba(100,118,142,0.85);margin-top:4px;">
         Ajusta el incremento global que se aplica al catálogo SYSCOM.
       </p>
     </div>
 
     <!-- Card principal -->
     <div style="max-width:520px;margin:0 auto;">
-      <div style="border-radius:18px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);padding:28px;">
+      <div style="border-radius:18px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);padding:28px;">
 
         <!-- Ícono + título -->
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
           <div style="width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,rgba(14,165,233,0.18),rgba(14,165,233,0.08));border:1px solid rgba(14,165,233,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7DD3FC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
             </svg>
           </div>
           <div>
-            <div style="font-size:15px;font-weight:700;color:#F1F5F9;">Incremento global de precios</div>
-            <div style="font-size:12px;color:rgba(100,116,139,0.8);margin-top:2px;">Se aplica a todos los productos del catálogo</div>
+            <div style="font-size:15px;font-weight:700;color:#E2EAF4;">Incremento global de precios</div>
+            <div style="font-size:12px;color:rgba(100,118,142,0.8);margin-top:2px;">Se aplica a todos los productos del catálogo</div>
           </div>
         </div>
 
         <!-- Input de porcentaje -->
         <div style="margin-bottom:20px;">
-          <label style="display:block;font-size:12px;font-weight:600;color:rgba(148,163,184,0.9);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:rgba(123,146,176,0.9);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">
             Porcentaje de incremento (%)
           </label>
           <div style="position:relative;">
@@ -43,14 +43,14 @@
                 width:'100%', height:'48px', background:'rgba(255,255,255,0.04)',
                 border:`1px solid ${focused ? 'rgba(14,165,233,0.5)' : 'rgba(255,255,255,0.09)'}`,
                 borderRadius:'12px', paddingLeft:'16px', paddingRight:'52px',
-                fontSize:'18px', fontWeight:700, color:'#E2E8F0', outline:'none',
+                fontSize:'18px', fontWeight:700, color:'#E2EAF4', outline:'none',
                 fontFamily:'inherit', boxSizing:'border-box', transition:'border-color 0.2s',
                 MozAppearance:'textfield',
               }"
               @focus="focused=true"
               @blur="focused=false"
             />
-            <span style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:18px;font-weight:700;color:rgba(100,116,139,0.6);">%</span>
+            <span style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:18px;font-weight:700;color:rgba(100,118,142,0.6);">%</span>
           </div>
         </div>
 
@@ -59,15 +59,15 @@
           <div style="font-size:11px;font-weight:600;color:rgba(14,165,233,0.8);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Vista previa</div>
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
             <div style="text-align:center;">
-              <div style="font-size:11px;color:rgba(100,116,139,0.7);margin-bottom:3px;">Precio SYSCOM</div>
-              <div style="font-size:16px;font-weight:700;color:rgba(148,163,184,0.6);">$1,000</div>
+              <div style="font-size:11px;color:rgba(100,118,142,0.7);margin-bottom:3px;">Precio SYSCOM</div>
+              <div style="font-size:16px;font-weight:700;color:rgba(123,146,176,0.6);">$1,000</div>
             </div>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(14,165,233,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
             </svg>
             <div style="text-align:center;">
-              <div style="font-size:11px;color:rgba(100,116,139,0.7);margin-bottom:3px;">Precio al cliente</div>
-              <div style="font-size:16px;font-weight:700;color:#38bdf8;">${{ previewPrice }}</div>
+              <div style="font-size:11px;color:rgba(100,118,142,0.7);margin-bottom:3px;">Precio al cliente</div>
+              <div style="font-size:16px;font-weight:700;color:#7DD3FC;">${{ previewPrice }}</div>
             </div>
           </div>
         </div>
@@ -76,13 +76,13 @@
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
           <div :style="{
             width:'8px', height:'8px', borderRadius:'50%',
-            background: currentPct > 0 ? '#34d399' : 'rgba(100,116,139,0.4)',
-            boxShadow: currentPct > 0 ? '0 0 8px rgba(52,211,153,0.6)' : 'none',
+            background: currentPct > 0 ? '#22C55E' : 'rgba(100,118,142,0.4)',
+            boxShadow: currentPct > 0 ? '0 0 8px rgba(34,197,94,0.6)' : 'none',
             flexShrink:0
           }"/>
-          <span style="font-size:12px;color:rgba(100,116,139,0.8);">
+          <span style="font-size:12px;color:rgba(100,118,142,0.8);">
             <span v-if="loading">Cargando configuración...</span>
-            <span v-else-if="currentPct > 0">Incremento activo: <strong style="color:#34d399;">{{ currentPct }}%</strong></span>
+            <span v-else-if="currentPct > 0">Incremento activo: <strong style="color:#22C55E;">{{ currentPct }}%</strong></span>
             <span v-else>Sin incremento activo — precios originales de SYSCOM</span>
           </span>
         </div>
@@ -96,7 +96,7 @@
             background: saving || inputPct === currentPct
               ? 'rgba(255,255,255,0.06)'
               : 'linear-gradient(135deg,#0EA5E9,#0284C7)',
-            color: saving || inputPct === currentPct ? 'rgba(100,116,139,0.6)' : 'white',
+            color: saving || inputPct === currentPct ? 'rgba(100,118,142,0.6)' : 'white',
             fontSize:'14px', fontWeight:600, cursor: saving || inputPct === currentPct ? 'not-allowed' : 'pointer',
             fontFamily:'inherit', transition:'all 0.2s',
             boxShadow: saving || inputPct === currentPct ? 'none' : '0 4px 16px rgba(14,165,233,0.3)',
@@ -107,7 +107,7 @@
           <span v-else>Aplicar incremento</span>
         </button>
 
-        <p v-if="error" style="font-size:12px;color:#fb7185;margin-top:10px;text-align:center;">{{ error }}</p>
+        <p v-if="error" style="font-size:12px;color:#EF4444;margin-top:10px;text-align:center;">{{ error }}</p>
       </div>
 
     </div>

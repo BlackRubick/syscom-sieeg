@@ -7,13 +7,13 @@
         <img src="/logosieeg.jpg" alt="SIEEG" style="width:100%;height:100%;object-fit:cover;" />
       </div>
       <div v-if="!collapsed || isMobile" style="overflow:hidden;white-space:nowrap;transition:opacity 0.2s;flex:1;">
-        <div style="font-size:13px;font-weight:800;color:#F1F5F9;line-height:1;letter-spacing:-0.3px;">SIEEG</div>
-        <div style="font-size:9px;color:rgba(100,116,139,0.7);font-weight:500;letter-spacing:0.8px;margin-top:2px;">INTEGRADORES</div>
+        <div style="font-size:13px;font-weight:800;color:#E2EAF4;line-height:1;letter-spacing:-0.3px;">SIEEG</div>
+        <div style="font-size:9px;color:rgba(100,118,142,0.7);font-weight:500;letter-spacing:0.8px;margin-top:2px;">INTEGRADORES</div>
       </div>
       <!-- Close button on mobile -->
       <button v-if="isMobile" @click="ui.closeMobileSidebar()"
         style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:auto;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(123,146,176,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
@@ -21,7 +21,7 @@
 
     <!-- Nav -->
     <nav style="flex:1;padding:8px 6px;overflow-y:auto;overflow-x:hidden;" class="no-scrollbar">
-      <div v-if="!collapsed || isMobile" style="font-size:9px;font-weight:600;color:rgba(71,85,105,0.8);text-transform:uppercase;letter-spacing:1.2px;padding:4px 10px 8px;user-select:none;">
+      <div v-if="!collapsed || isMobile" style="font-size:9px;font-weight:600;color:rgba(100,118,142,0.8);text-transform:uppercase;letter-spacing:1.2px;padding:4px 10px 8px;user-select:none;">
         Navegación
       </div>
 
@@ -36,13 +36,13 @@
 
           <!-- Icono SVG inline -->
           <svg :width="15" :height="15" viewBox="0 0 24 24" fill="none"
-            :stroke="isActive(item.href) ? '#38bdf8' : 'rgba(100,116,139,0.75)'"
+            :stroke="isActive(item.href) ? '#7DD3FC' : 'rgba(100,118,142,0.75)'"
             :stroke-width="isActive(item.href) ? 2.2 : 1.8"
             stroke-linecap="round" stroke-linejoin="round"
             style="flex-shrink:0;" v-html="item.svg" />
 
           <!-- Label -->
-          <span v-if="!collapsed || isMobile" :style="{ fontSize:'12.5px', fontWeight:isActive(item.href)?600:500, color:isActive(item.href)?'#E2E8F0':'rgba(100,116,139,0.8)', whiteSpace:'nowrap', flex:1, overflow:'hidden', textOverflow:'ellipsis', transition:'opacity 0.15s' }">
+          <span v-if="!collapsed || isMobile" :style="{ fontSize:'12.5px', fontWeight:isActive(item.href)?600:500, color:isActive(item.href)?'#E2EAF4':'rgba(100,118,142,0.8)', whiteSpace:'nowrap', flex:1, overflow:'hidden', textOverflow:'ellipsis', transition:'opacity 0.15s' }">
             {{ item.label }}
           </span>
 
@@ -56,8 +56,8 @@
 
     <!-- Botón colapsar (solo desktop) -->
     <button v-if="!isMobile" @click="ui.toggleSidebar()"
-      style="position:absolute;right:-11px;top:72px;width:22px;height:22px;border-radius:50%;background:#0D1B35;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:30;box-shadow:0 2px 8px rgba(0,0,0,0.4);padding:0;">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      style="position:absolute;right:-11px;top:72px;width:22px;height:22px;border-radius:50%;background:#0C1A2E;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:30;box-shadow:0 2px 8px rgba(0,0,0,0.4);padding:0;">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(123,146,176,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path v-if="!collapsed" d="m15 18-6-6 6-6"/>
         <path v-else            d="m9 18 6-6-6-6"/>
       </svg>
@@ -129,7 +129,7 @@ const sidebarStyle = computed(() => {
       width:      '260px',
       display:    'flex',
       flexDirection: 'column',
-      background: 'rgba(6,12,26,0.99)',
+      background: 'rgba(3,9,20,0.99)',
       borderRight: '1px solid rgba(255,255,255,0.07)',
       zIndex:     '200',
       overflow:   'visible',
@@ -144,7 +144,7 @@ const sidebarStyle = computed(() => {
     height:      '100%',
     display:     'flex',
     flexDirection: 'column',
-    background:  'rgba(6,12,26,0.98)',
+    background:  'rgba(3,9,20,0.98)',
     borderRight: '1px solid rgba(255,255,255,0.07)',
     position:    'relative',
     zIndex:      '20',

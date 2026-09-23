@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label :style="labelStyle">{{ label }}<span v-if="required" style="color:#fb7185;margin-left:2px;">*</span></label>
+    <label :style="labelStyle">{{ label }}<span v-if="required" style="color:#EF4444;margin-left:2px;">*</span></label>
     <input v-bind="$attrs" :type="type" :value="modelValue" :placeholder="placeholder" :required="required"
       @input="onInput"
       @focus="focus=true" @blur="focus=false"
@@ -19,12 +19,12 @@ function onInput(e: Event) {
 }
 
 const focus = ref(false)
-const labelStyle = { display:'block', fontSize:'11px', fontWeight:500, color:'rgba(148,163,184,0.85)', marginBottom:'6px' }
+const labelStyle = { display:'block', fontSize:'11px', fontWeight:500, color:'rgba(123,146,176,0.85)', marginBottom:'6px' }
 const inputStyle = computed(() => ({
   width:'100%', height:'40px',
   background: focus.value ? 'rgba(14,165,233,0.06)' : 'rgba(255,255,255,0.04)',
   border:`1px solid ${focus.value ? 'rgba(14,165,233,0.45)' : 'rgba(255,255,255,0.1)'}`,
-  borderRadius:'10px', padding:'0 12px', fontSize:'13px', color:'#E2E8F0',
+  borderRadius:'10px', padding:'0 12px', fontSize:'13px', color:'#E2EAF4',
   outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.18s',
   textTransform: props.uppercase ? 'uppercase' : 'none',
 }))

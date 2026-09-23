@@ -36,8 +36,8 @@ export async function sendAccessRequestEmail(data: {
 <!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#040C1A;font-family:'Segoe UI',Arial,sans-serif;">
-  <div style="max-width:560px;margin:40px auto;background:#0D1B35;border-radius:16px;border:1px solid rgba(255,255,255,0.1);overflow:hidden;">
+<body style="margin:0;padding:0;background:#06101E;font-family:'Segoe UI',Arial,sans-serif;">
+  <div style="max-width:560px;margin:40px auto;background:#0C1A2E;border-radius:16px;border:1px solid rgba(255,255,255,0.1);overflow:hidden;">
 
     <!-- Header -->
     <div style="background:linear-gradient(135deg,#0EA5E9,#0284C7);padding:28px 32px;">
@@ -53,18 +53,18 @@ export async function sendAccessRequestEmail(data: {
 
       <table style="width:100%;border-collapse:collapse;">
         <tr><td style="padding:6px 0;color:#94a3b8;font-size:13px;width:100px;">Nombre</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#f1f5f9;">${data.name}</td></tr>
-        <tr><td style="padding:6px 0;color:#94a3b8;font-size:13px;">Correo</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#38bdf8;">${data.email}</td></tr>
+        <tr><td style="padding:6px 0;color:#94a3b8;font-size:13px;">Correo</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#7DD3FC;">${data.email}</td></tr>
         ${companyLine}
         ${phoneLine}
       </table>
 
       <div style="margin-top:24px;padding:14px 16px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:10px;font-size:13px;color:#94a3b8;">
-        Para activar su acceso, entra al panel de administración → <strong style="color:#38bdf8;">Usuarios</strong> y cambia su estado a <strong style="color:#34d399;">Activo</strong>.
+        Para activar su acceso, entra al panel de administración → <strong style="color:#7DD3FC;">Usuarios</strong> y cambia su estado a <strong style="color:#22C55E;">Activo</strong>.
       </div>
     </div>
 
     <!-- Footer -->
-    <div style="padding:16px 32px;border-top:1px solid rgba(255,255,255,0.07);font-size:11px;color:rgba(100,116,139,0.7);">
+    <div style="padding:16px 32px;border-top:1px solid rgba(255,255,255,0.07);font-size:11px;color:rgba(100,118,142,0.7);">
       Este mensaje fue generado automáticamente por la plataforma SIEEG INTEGRADORES.
     </div>
   </div>

@@ -4,10 +4,10 @@
     <!-- Header -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div>
-        <h1 style="font-size:22px;font-weight:800;color:#F1F5F9;margin:0;">Datos Fiscales</h1>
-        <p style="font-size:13px;color:rgba(100,116,139,0.85);margin-top:4px;">
+        <h1 style="font-size:22px;font-weight:800;color:#E2EAF4;margin:0;">Datos Fiscales</h1>
+        <p style="font-size:13px;color:rgba(100,118,142,0.85);margin-top:4px;">
           <span v-if="loading">Cargando...</span>
-          <span v-else-if="apiError" style="color:#fb7185;">{{ apiError }}</span>
+          <span v-else-if="apiError" style="color:#EF4444;">{{ apiError }}</span>
           <span v-else>{{ users.length }} usuarios registrados</span>
         </p>
       </div>
@@ -15,25 +15,25 @@
 
     <!-- KPIs -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
-      <div v-for="k in kpis" :key="k.label" style="border-radius:14px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);padding:16px 18px;">
+      <div v-for="k in kpis" :key="k.label" style="border-radius:14px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);padding:16px 18px;">
         <div :style="{ fontSize:'26px', fontWeight:800, background:k.grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', lineHeight:1 }">
           {{ loading ? '—' : k.value }}
         </div>
-        <div style="font-size:11px;color:rgba(100,116,139,0.8);margin-top:4px;font-weight:500;">{{ k.label }}</div>
+        <div style="font-size:11px;color:rgba(100,118,142,0.8);margin-top:4px;font-weight:500;">{{ k.label }}</div>
       </div>
     </div>
 
     <!-- Filtros -->
-    <div style="border-radius:16px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:12px;">
+    <div style="border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:12px;">
       <div style="position:relative;max-width:380px;">
-        <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#0EA5E9':'rgba(100,116,139,0.7)'" />
+        <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#0EA5E9':'rgba(100,118,142,0.7)'" />
         <input v-model="search" placeholder="Buscar por nombre, RFC o razón social..."
           @focus="searchFocus=true" @blur="searchFocus=false"
-          :style="{ width:'100%', height:'40px', background: searchFocus?'rgba(14,165,233,0.06)':'rgba(255,255,255,0.04)', border:`1px solid ${searchFocus?'rgba(14,165,233,0.45)':'rgba(255,255,255,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#E2E8F0', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
+          :style="{ width:'100%', height:'40px', background: searchFocus?'rgba(14,165,233,0.06)':'rgba(255,255,255,0.04)', border:`1px solid ${searchFocus?'rgba(14,165,233,0.45)':'rgba(255,255,255,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#E2EAF4', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <button v-for="f in statusFilters" :key="f.key" @click="statusFilter=f.key"
-          :style="{ height:'30px', padding:'0 12px', borderRadius:'20px', fontSize:'11px', fontWeight: statusFilter===f.key ? 600:500, cursor:'pointer', border:'none', fontFamily:'inherit', background: statusFilter===f.key ? 'linear-gradient(135deg,#0EA5E9,#0284C7)':'rgba(255,255,255,0.05)', color: statusFilter===f.key ? '#fff':'rgba(100,116,139,0.9)', boxShadow: statusFilter===f.key ? '0 3px 10px rgba(14,165,233,0.25)':'none' }">
+          :style="{ height:'30px', padding:'0 12px', borderRadius:'20px', fontSize:'11px', fontWeight: statusFilter===f.key ? 600:500, cursor:'pointer', border:'none', fontFamily:'inherit', background: statusFilter===f.key ? 'linear-gradient(135deg,#0EA5E9,#0284C7)':'rgba(255,255,255,0.05)', color: statusFilter===f.key ? '#fff':'rgba(100,118,142,0.9)', boxShadow: statusFilter===f.key ? '0 3px 10px rgba(14,165,233,0.25)':'none' }">
           {{ f.label }}
         </button>
       </div>
@@ -41,15 +41,15 @@
 
     <!-- Skeletons -->
     <div v-if="loading" style="display:flex;flex-direction:column;gap:3px;">
-      <div v-for="i in 6" :key="i" class="pulse" style="border-radius:12px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);height:60px;" />
+      <div v-for="i in 6" :key="i" class="pulse" style="border-radius:12px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);height:60px;" />
     </div>
 
     <!-- Tabla -->
-    <div v-else-if="filtered.length > 0" style="border-radius:16px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
+    <div v-else-if="filtered.length > 0" style="border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
 
       <!-- Cabecera -->
       <div style="display:grid;grid-template-columns:2fr 1.5fr 1.5fr 1fr 1fr 1fr 44px;gap:0;padding:10px 18px;border-bottom:1px solid rgba(255,255,255,0.07);">
-        <span v-for="h in headers" :key="h" style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.6);text-transform:uppercase;letter-spacing:0.8px;">{{ h }}</span>
+        <span v-for="h in headers" :key="h" style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);text-transform:uppercase;letter-spacing:0.8px;">{{ h }}</span>
       </div>
 
       <!-- Filas -->
@@ -63,41 +63,41 @@
             {{ u.name.split(' ').slice(0,2).map((n:string)=>n[0]).join('') }}
           </div>
           <div style="min-width:0;">
-            <div style="font-size:13px;font-weight:600;color:#E2E8F0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ u.name }}</div>
-            <div style="font-size:11px;color:rgba(100,116,139,0.7);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ u.email }}</div>
+            <div style="font-size:13px;font-weight:600;color:#E2EAF4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ u.name }}</div>
+            <div style="font-size:11px;color:rgba(100,118,142,0.7);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ u.email }}</div>
           </div>
         </div>
 
         <!-- RFC -->
         <div style="min-width:0;">
-          <span v-if="u.fiscalRfc" style="font-size:12px;font-weight:600;color:#38bdf8;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">{{ u.fiscalRfc }}</span>
-          <span v-else style="font-size:12px;color:rgba(100,116,139,0.45);">—</span>
+          <span v-if="u.fiscalRfc" style="font-size:12px;font-weight:600;color:#7DD3FC;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">{{ u.fiscalRfc }}</span>
+          <span v-else style="font-size:12px;color:rgba(100,118,142,0.45);">—</span>
         </div>
 
         <!-- Razón social -->
         <div style="min-width:0;">
-          <span v-if="u.fiscalRazonSocial" style="font-size:12px;color:#CBD5E1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">{{ u.fiscalRazonSocial }}</span>
-          <span v-else style="font-size:12px;color:rgba(100,116,139,0.45);">—</span>
+          <span v-if="u.fiscalRazonSocial" style="font-size:12px;color:#7B92B0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">{{ u.fiscalRazonSocial }}</span>
+          <span v-else style="font-size:12px;color:rgba(100,118,142,0.45);">—</span>
         </div>
 
         <!-- Régimen -->
         <div style="min-width:0;">
           <span v-if="u.fiscalRegimen" style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(99,102,241,0.12);color:#a5b4fc;white-space:nowrap;">{{ u.fiscalRegimen }}</span>
-          <span v-else style="font-size:12px;color:rgba(100,116,139,0.45);">—</span>
+          <span v-else style="font-size:12px;color:rgba(100,118,142,0.45);">—</span>
         </div>
 
         <!-- Estado fiscal -->
         <div>
-          <span :style="{ fontSize:'11px', fontWeight:600, padding:'3px 10px', borderRadius:'20px', display:'flex', alignItems:'center', gap:'5px', width:'fit-content', background: u.fiscalCompleted ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)', color: u.fiscalCompleted ? '#34d399' : '#fbbf24' }">
-            <span :style="{ width:'5px', height:'5px', borderRadius:'50%', background: u.fiscalCompleted ? '#10b981' : '#f59e0b', display:'inline-block', flexShrink:0 }" />
+          <span :style="{ fontSize:'11px', fontWeight:600, padding:'3px 10px', borderRadius:'20px', display:'flex', alignItems:'center', gap:'5px', width:'fit-content', background: u.fiscalCompleted ? 'rgba(34,197,94,0.12)' : 'rgba(245,158,11,0.12)', color: u.fiscalCompleted ? '#22C55E' : '#fbbf24' }">
+            <span :style="{ width:'5px', height:'5px', borderRadius:'50%', background: u.fiscalCompleted ? '#22C55E' : '#F59E0B', display:'inline-block', flexShrink:0 }" />
             {{ u.fiscalCompleted ? 'Completo' : 'Pendiente' }}
           </span>
         </div>
 
         <!-- Factura.com -->
         <div>
-          <span :style="{ fontSize:'11px', fontWeight:600, padding:'3px 10px', borderRadius:'20px', display:'flex', alignItems:'center', gap:'5px', width:'fit-content', background: u.facturaUid ? 'rgba(99,102,241,0.12)' : 'rgba(100,116,139,0.08)', color: u.facturaUid ? '#818cf8' : 'rgba(100,116,139,0.5)' }">
-            <span :style="{ width:'5px', height:'5px', borderRadius:'50%', background: u.facturaUid ? '#6366f1' : 'rgba(100,116,139,0.4)', display:'inline-block', flexShrink:0 }" />
+          <span :style="{ fontSize:'11px', fontWeight:600, padding:'3px 10px', borderRadius:'20px', display:'flex', alignItems:'center', gap:'5px', width:'fit-content', background: u.facturaUid ? 'rgba(99,102,241,0.12)' : 'rgba(100,118,142,0.08)', color: u.facturaUid ? '#F59E0B' : 'rgba(100,118,142,0.5)' }">
+            <span :style="{ width:'5px', height:'5px', borderRadius:'50%', background: u.facturaUid ? '#6366f1' : 'rgba(100,118,142,0.4)', display:'inline-block', flexShrink:0 }" />
             {{ u.facturaUid ? 'Sincronizado' : 'No sincronizado' }}
           </span>
         </div>
@@ -105,13 +105,13 @@
         <!-- Ver detalle -->
         <div style="display:flex;justify-content:center;">
           <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;">
-            <ChevronRight :size="13" color="rgba(100,116,139,0.7)" />
+            <ChevronRight :size="13" color="rgba(100,118,142,0.7)" />
           </div>
         </div>
       </div>
     </div>
 
-    <div v-else-if="!loading && !apiError" style="display:flex;align-items:center;justify-content:center;padding:60px 0;border-radius:16px;background:linear-gradient(160deg,#0D1B35,#091228);border:1px solid rgba(255,255,255,0.07);font-size:14px;font-weight:600;color:#94a3b8;">
+    <div v-else-if="!loading && !apiError" style="display:flex;align-items:center;justify-content:center;padding:60px 0;border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);font-size:14px;font-weight:600;color:#94a3b8;">
       No se encontraron resultados
     </div>
   </div>
@@ -125,8 +125,8 @@
       <div v-if="detail" style="position:fixed;inset:0;z-index:1051;display:flex;align-items:center;justify-content:center;padding:16px;">
         <div style="width:100%;max-width:620px;max-height:90vh;display:flex;flex-direction:column;">
           <div style="position:relative;">
-            <div style="position:absolute;inset:-1px;border-radius:22px;background:linear-gradient(135deg,rgba(14,165,233,0.35),rgba(124,58,237,0.2));z-index:0;pointer-events:none;" />
-            <div style="position:relative;z-index:1;border-radius:22px;background:linear-gradient(160deg,#0D1B35,#09122A);box-shadow:0 32px 80px rgba(0,0,0,0.75);display:flex;flex-direction:column;max-height:90vh;">
+            <div style="position:absolute;inset:-1px;border-radius:22px;background:linear-gradient(135deg,rgba(14,165,233,0.35),rgba(14,165,233,0.2));z-index:0;pointer-events:none;" />
+            <div style="position:relative;z-index:1;border-radius:22px;background:linear-gradient(160deg,#0C1A2E,#06101E);box-shadow:0 32px 80px rgba(0,0,0,0.75);display:flex;flex-direction:column;max-height:90vh;">
 
               <!-- Header modal -->
               <div style="padding:24px 26px 0;flex-shrink:0;">
@@ -137,21 +137,21 @@
                       {{ detail.name.split(' ').slice(0,2).map((n:string)=>n[0]).join('') }}
                     </div>
                     <div>
-                      <div style="font-size:15px;font-weight:700;color:#F1F5F9;">{{ detail.name }}</div>
-                      <div style="font-size:12px;color:rgba(100,116,139,0.75);margin-top:2px;">{{ detail.email }}</div>
+                      <div style="font-size:15px;font-weight:700;color:#E2EAF4;">{{ detail.name }}</div>
+                      <div style="font-size:12px;color:rgba(100,118,142,0.75);margin-top:2px;">{{ detail.email }}</div>
                     </div>
                   </div>
                   <div style="display:flex;align-items:center;gap:8px;">
-                    <span :style="{ fontSize:'11px', fontWeight:600, padding:'4px 12px', borderRadius:'20px', display:'flex', alignItems:'center', gap:'5px', background: detail.fiscalCompleted ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)', color: detail.fiscalCompleted ? '#34d399' : '#fbbf24', border: `1px solid ${detail.fiscalCompleted ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'}` }">
-                      <span :style="{ width:'5px', height:'5px', borderRadius:'50%', background: detail.fiscalCompleted ? '#10b981':'#f59e0b', display:'inline-block' }" />
+                    <span :style="{ fontSize:'11px', fontWeight:600, padding:'4px 12px', borderRadius:'20px', display:'flex', alignItems:'center', gap:'5px', background: detail.fiscalCompleted ? 'rgba(34,197,94,0.12)' : 'rgba(245,158,11,0.12)', color: detail.fiscalCompleted ? '#22C55E' : '#fbbf24', border: `1px solid ${detail.fiscalCompleted ? 'rgba(34,197,94,0.2)' : 'rgba(245,158,11,0.2)'}` }">
+                      <span :style="{ width:'5px', height:'5px', borderRadius:'50%', background: detail.fiscalCompleted ? '#22C55E':'#F59E0B', display:'inline-block' }" />
                       {{ detail.fiscalCompleted ? 'Datos completos' : 'Datos pendientes' }}
                     </span>
                     <button v-if="!editing" @click="startEdit()"
-                      style="display:flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.25);color:#38bdf8;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">
+                      style="display:flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.25);color:#7DD3FC;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">
                       <Pencil :size="11" /> Editar
                     </button>
                     <button @click="editing ? (editing=false) : (detail=null)"
-                      style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(100,116,139,0.8);">
+                      style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(100,118,142,0.8);">
                       <X :size="14" />
                     </button>
                   </div>
@@ -170,27 +170,27 @@
 
                   <!-- Estado Factura.com -->
                   <div style="padding:14px 16px;border-radius:12px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;"
-                    :style="detail.facturaUid ? 'background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2)' : 'background:rgba(100,116,139,0.06);border:1px solid rgba(100,116,139,0.15)'">
+                    :style="detail.facturaUid ? 'background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2)' : 'background:rgba(100,118,142,0.06);border:1px solid rgba(100,118,142,0.15)'">
                     <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" :stroke="detail.facturaUid ? '#818cf8' : 'rgba(100,116,139,0.5)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="14" height="17" x="5" y="2" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" :stroke="detail.facturaUid ? '#F59E0B' : 'rgba(100,118,142,0.5)'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="14" height="17" x="5" y="2" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
                       <div style="min-width:0;">
-                        <div :style="{ fontSize:'11px', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.8px', marginBottom:'2px', color: detail.facturaUid ? 'rgba(129,140,248,0.7)' : 'rgba(100,116,139,0.5)' }">Factura.com</div>
+                        <div :style="{ fontSize:'11px', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.8px', marginBottom:'2px', color: detail.facturaUid ? 'rgba(129,140,248,0.7)' : 'rgba(100,118,142,0.5)' }">Factura.com</div>
                         <div v-if="detail.facturaUid" style="font-size:12px;font-weight:600;color:#a5b4fc;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">UID: {{ detail.facturaUid }}</div>
-                        <div v-else style="font-size:12px;color:rgba(100,116,139,0.6);">No sincronizado</div>
+                        <div v-else style="font-size:12px;color:rgba(100,118,142,0.6);">No sincronizado</div>
                       </div>
                     </div>
                     <button v-if="detail.fiscalCompleted" @click.stop="syncToFactura(detail)"
                       :disabled="syncing===detail.id"
-                      :style="{ flexShrink:0, height:'32px', padding:'0 14px', borderRadius:'8px', border:'1px solid rgba(99,102,241,0.35)', background:'rgba(99,102,241,0.12)', color:'#818cf8', fontSize:'11px', fontWeight:600, cursor: syncing===detail.id ? 'not-allowed':'pointer', fontFamily:'inherit', opacity: syncing===detail.id ? 0.6 : 1 }">
+                      :style="{ flexShrink:0, height:'32px', padding:'0 14px', borderRadius:'8px', border:'1px solid rgba(99,102,241,0.35)', background:'rgba(99,102,241,0.12)', color:'#F59E0B', fontSize:'11px', fontWeight:600, cursor: syncing===detail.id ? 'not-allowed':'pointer', fontFamily:'inherit', opacity: syncing===detail.id ? 0.6 : 1 }">
                       {{ syncing === detail.id ? 'Sincronizando…' : detail.facturaUid ? 'Re-sincronizar' : 'Sincronizar' }}
                     </button>
                   </div>
-                  <div v-if="syncError" style="font-size:11px;color:#fb7185;margin-bottom:12px;padding:8px 12px;border-radius:8px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);">{{ syncError }}</div>
+                  <div v-if="syncError" style="font-size:11px;color:#EF4444;margin-bottom:12px;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);">{{ syncError }}</div>
 
                   <!-- Generar CFDI -->
                   <button v-if="detail.facturaUid && detail.fiscalCompleted && detail.fiscalUsocfdi"
                     @click="openCfdi(detail)"
-                    style="width:100%;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(79,70,229,0.1));border:1px solid rgba(99,102,241,0.3);color:#818cf8;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:18px;transition:all 0.2s;"
+                    style="width:100%;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(79,70,229,0.1));border:1px solid rgba(99,102,241,0.3);color:#F59E0B;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:18px;transition:all 0.2s;"
                     @mouseenter="e => (e.currentTarget as HTMLButtonElement).style.background='linear-gradient(135deg,rgba(99,102,241,0.25),rgba(79,70,229,0.18))'"
                     @mouseleave="e => (e.currentTarget as HTMLButtonElement).style.background='linear-gradient(135deg,rgba(99,102,241,0.15),rgba(79,70,229,0.1))'">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="17" x="5" y="2" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/><circle cx="17" cy="17" r="5"/><path d="m15.5 17.5 1 1 2-2"/></svg>
@@ -199,7 +199,7 @@
 
                   <!-- Datos fiscales -->
                   <div style="margin-bottom:20px;">
-                    <div style="font-size:10px;font-weight:700;color:rgba(100,116,139,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Datos fiscales</div>
+                    <div style="font-size:10px;font-weight:700;color:rgba(100,118,142,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Datos fiscales</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                       <DetailField label="RFC" :value="detail.fiscalRfc" mono />
                       <DetailField label="País" :value="detail.fiscalPais" />
@@ -213,7 +213,7 @@
 
                   <!-- Domicilio -->
                   <div style="margin-bottom:20px;">
-                    <div style="font-size:10px;font-weight:700;color:rgba(100,116,139,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Domicilio fiscal</div>
+                    <div style="font-size:10px;font-weight:700;color:rgba(100,118,142,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Domicilio fiscal</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                       <DetailField label="Calle" :value="detail.fiscalCalle" />
                       <DetailField label="Número exterior" :value="detail.fiscalNumExt" />
@@ -228,7 +228,7 @@
 
                   <!-- Contacto -->
                   <div>
-                    <div style="font-size:10px;font-weight:700;color:rgba(100,116,139,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Contacto adicional</div>
+                    <div style="font-size:10px;font-weight:700;color:rgba(100,118,142,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Contacto adicional</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                       <DetailField label="Nombre" :value="detail.fiscalNombre" />
                       <DetailField label="Apellidos" :value="detail.fiscalApellidos" />
@@ -242,40 +242,40 @@
                 <template v-else>
                   <!-- Datos fiscales -->
                   <div style="margin-bottom:18px;">
-                    <div style="font-size:10px;font-weight:700;color:rgba(100,116,139,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Datos fiscales <span style="color:#fb7185;">*requeridos</span></div>
+                    <div style="font-size:10px;font-weight:700;color:rgba(100,118,142,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Datos fiscales <span style="color:#EF4444;">*requeridos</span></div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                       <div>
-                        <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.6);margin-bottom:4px;">RFC *</div>
-                        <input v-model="editForm.rfc" placeholder="XAXX010101000" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2E8F0;outline:none;font-family:monospace;box-sizing:border-box;" />
+                        <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:4px;">RFC *</div>
+                        <input v-model="editForm.rfc" placeholder="XAXX010101000" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2EAF4;outline:none;font-family:monospace;box-sizing:border-box;" />
                       </div>
                       <div>
-                        <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.6);margin-bottom:4px;">País *</div>
-                        <input v-model="editForm.pais" placeholder="MEX" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2E8F0;outline:none;font-family:inherit;box-sizing:border-box;" />
+                        <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:4px;">País *</div>
+                        <input v-model="editForm.pais" placeholder="MEX" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2EAF4;outline:none;font-family:inherit;box-sizing:border-box;" />
                       </div>
                       <div style="grid-column:1/-1;">
-                        <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.6);margin-bottom:4px;">Razón Social *</div>
-                        <input v-model="editForm.razonSocial" placeholder="Nombre o razón social completa" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2E8F0;outline:none;font-family:inherit;box-sizing:border-box;" />
+                        <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:4px;">Razón Social *</div>
+                        <input v-model="editForm.razonSocial" placeholder="Nombre o razón social completa" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2EAF4;outline:none;font-family:inherit;box-sizing:border-box;" />
                       </div>
                       <div>
-                        <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.6);margin-bottom:4px;">Código Postal *</div>
-                        <input v-model="editForm.codpos" placeholder="31000" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2E8F0;outline:none;font-family:inherit;box-sizing:border-box;" />
+                        <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:4px;">Código Postal *</div>
+                        <input v-model="editForm.codpos" placeholder="31000" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2EAF4;outline:none;font-family:inherit;box-sizing:border-box;" />
                       </div>
                       <div>
-                        <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.6);margin-bottom:4px;">Email fiscal *</div>
-                        <input v-model="editForm.email" type="email" placeholder="facturacion@empresa.com" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2E8F0;outline:none;font-family:inherit;box-sizing:border-box;" />
+                        <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:4px;">Email fiscal *</div>
+                        <input v-model="editForm.email" type="email" placeholder="facturacion@empresa.com" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2EAF4;outline:none;font-family:inherit;box-sizing:border-box;" />
                       </div>
                       <div>
-                        <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.6);margin-bottom:4px;">Régimen Fiscal *</div>
-                        <select v-model="editForm.regimen" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2E8F0;outline:none;font-family:inherit;box-sizing:border-box;cursor:pointer;">
-                          <option value="" style="background:#0D1B35;">Seleccionar…</option>
-                          <option v-for="(nombre, clave) in REGIMENES" :key="clave" :value="clave" style="background:#0D1B35;">{{ clave }} – {{ nombre }}</option>
+                        <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:4px;">Régimen Fiscal *</div>
+                        <select v-model="editForm.regimen" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2EAF4;outline:none;font-family:inherit;box-sizing:border-box;cursor:pointer;">
+                          <option value="" style="background:#0C1A2E;">Seleccionar…</option>
+                          <option v-for="(nombre, clave) in REGIMENES" :key="clave" :value="clave" style="background:#0C1A2E;">{{ clave }} – {{ nombre }}</option>
                         </select>
                       </div>
                       <div>
-                        <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.6);margin-bottom:4px;">Uso de CFDI</div>
-                        <select v-model="editForm.usocfdi" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2E8F0;outline:none;font-family:inherit;box-sizing:border-box;cursor:pointer;">
-                          <option value="" style="background:#0D1B35;">Seleccionar…</option>
-                          <option v-for="(nombre, clave) in USOS_CFDI" :key="clave" :value="clave" style="background:#0D1B35;">{{ clave }} – {{ nombre }}</option>
+                        <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:4px;">Uso de CFDI</div>
+                        <select v-model="editForm.usocfdi" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2EAF4;outline:none;font-family:inherit;box-sizing:border-box;cursor:pointer;">
+                          <option value="" style="background:#0C1A2E;">Seleccionar…</option>
+                          <option v-for="(nombre, clave) in USOS_CFDI" :key="clave" :value="clave" style="background:#0C1A2E;">{{ clave }} – {{ nombre }}</option>
                         </select>
                       </div>
                     </div>
@@ -283,12 +283,12 @@
 
                   <!-- Domicilio -->
                   <div style="margin-bottom:18px;">
-                    <div style="font-size:10px;font-weight:700;color:rgba(100,116,139,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Domicilio fiscal</div>
+                    <div style="font-size:10px;font-weight:700;color:rgba(100,118,142,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Domicilio fiscal</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                       <template v-for="f in domicilioFields" :key="f.key">
                         <div>
-                          <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.6);margin-bottom:4px;">{{ f.label }}</div>
-                          <input v-model="editForm[f.key]" :placeholder="f.placeholder" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2E8F0;outline:none;font-family:inherit;box-sizing:border-box;" />
+                          <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:4px;">{{ f.label }}</div>
+                          <input v-model="editForm[f.key]" :placeholder="f.placeholder" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2EAF4;outline:none;font-family:inherit;box-sizing:border-box;" />
                         </div>
                       </template>
                     </div>
@@ -296,19 +296,19 @@
 
                   <!-- Contacto -->
                   <div style="margin-bottom:18px;">
-                    <div style="font-size:10px;font-weight:700;color:rgba(100,116,139,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Contacto adicional</div>
+                    <div style="font-size:10px;font-weight:700;color:rgba(100,118,142,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Contacto adicional</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                       <template v-for="f in contactoFields" :key="f.key">
                         <div>
-                          <div style="font-size:10px;font-weight:600;color:rgba(100,116,139,0.6);margin-bottom:4px;">{{ f.label }}</div>
-                          <input v-model="editForm[f.key]" :placeholder="f.placeholder" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2E8F0;outline:none;font-family:inherit;box-sizing:border-box;" />
+                          <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:4px;">{{ f.label }}</div>
+                          <input v-model="editForm[f.key]" :placeholder="f.placeholder" style="width:100%;height:36px;padding:0 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:12px;color:#E2EAF4;outline:none;font-family:inherit;box-sizing:border-box;" />
                         </div>
                       </template>
                     </div>
                   </div>
 
                   <!-- Error + botones -->
-                  <div v-if="editError" style="padding:9px 12px;border-radius:8px;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.25);font-size:12px;color:#fb7185;margin-bottom:12px;">{{ editError }}</div>
+                  <div v-if="editError" style="padding:9px 12px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);font-size:12px;color:#EF4444;margin-bottom:12px;">{{ editError }}</div>
                   <div style="display:flex;gap:10px;">
                     <button @click="editing=false" :disabled="editSaving"
                       style="flex:1;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#94a3b8;font-size:13px;cursor:pointer;font-family:inherit;">
@@ -391,10 +391,10 @@ const filtered = computed(() => users.value.filter(u => {
 }))
 
 const kpis = computed(() => [
-  { label: 'Total usuarios',    value: users.value.length,                                  grad: 'linear-gradient(135deg,#0EA5E9,#22D3EE)' },
-  { label: 'Datos completos',   value: users.value.filter(u =>  u.fiscalCompleted).length,  grad: 'linear-gradient(135deg,#10B981,#34D399)' },
+  { label: 'Total usuarios',    value: users.value.length,                                  grad: 'linear-gradient(135deg,#0EA5E9,#7DD3FC)' },
+  { label: 'Datos completos',   value: users.value.filter(u =>  u.fiscalCompleted).length,  grad: 'linear-gradient(135deg,#22C55E,#34D399)' },
   { label: 'Datos pendientes',  value: users.value.filter(u => !u.fiscalCompleted).length,  grad: 'linear-gradient(135deg,#F59E0B,#FCD34D)' },
-  { label: '% completado',      value: users.value.length ? `${Math.round(users.value.filter(u => u.fiscalCompleted).length / users.value.length * 100)}%` : '—', grad: 'linear-gradient(135deg,#7C3AED,#A78BFA)' },
+  { label: '% completado',      value: users.value.length ? `${Math.round(users.value.filter(u => u.fiscalCompleted).length / users.value.length * 100)}%` : '—', grad: 'linear-gradient(135deg,#0EA5E9,#7DD3FC)' },
 ])
 
 const headers = ['Usuario', 'RFC', 'Razón Social', 'Régimen', 'Estado fiscal', 'Factura.com', '']
@@ -509,7 +509,7 @@ async function syncToFactura(u: FiscalUser) {
 }
 
 /* ── helpers visuales ── */
-const palette = [['#0EA5E9','#22D3EE'],['#7C3AED','#A78BFA'],['#10B981','#34D399'],['#F59E0B','#FCD34D'],['#F43F5E','#FB7185'],['#6366F1','#818CF8']]
+const palette = [['#0EA5E9','#7DD3FC'],['#0EA5E9','#7DD3FC'],['#22C55E','#34D399'],['#F59E0B','#FCD34D'],['#F43F5E','#FB7185'],['#6366F1','#818CF8']]
 const avatarGrad = (name: string) => palette[name.charCodeAt(0) % palette.length]
 
 const REGIMENES: Record<string, string> = {

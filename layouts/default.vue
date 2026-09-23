@@ -1,8 +1,8 @@
 <template>
-  <div style="display:flex; height:100vh; background:#040C1A; position:relative; overflow:hidden;">
+  <div style="display:flex; height:100vh; background:#06101E; position:relative; overflow:hidden;">
     <!-- Fondo -->
-    <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 10% 0%,rgba(14,165,233,0.07) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 90% 100%,rgba(124,58,237,0.06) 0%,transparent 60%)" />
-    <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);background-size:60px 60px" />
+    <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 70% 50% at 0% 0%,rgba(14,165,233,0.09) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 100% 100%,rgba(14,165,233,0.06) 0%,transparent 60%)" />
+    <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,0.016) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.016) 1px,transparent 1px);background-size:64px 64px" />
 
     <!-- Backdrop mobile -->
     <Transition name="fade">

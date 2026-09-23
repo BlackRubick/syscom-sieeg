@@ -445,85 +445,85 @@ const _routes = [
     name: "cart",
     path: "/cart",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/cart-BSj7pOB4.js")
+    component: () => import("./_nuxt/cart-DloiQFMN.js")
   },
   {
     name: "admin",
     path: "/admin",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/admin-DLF8xl2L.js")
+    component: () => import("./_nuxt/admin-CCXsw7OA.js")
   },
   {
     name: "index",
     path: "/",
     meta: { ...__nuxt_page_meta$3 || {}, ...{ "middleware": "redirect-authenticated" } },
-    component: () => import("./_nuxt/index-xYVvs2Kl.js")
+    component: () => import("./_nuxt/index-BTkJp9do.js")
   },
   {
     name: "login",
     path: "/login",
     meta: __nuxt_page_meta$2 || {},
-    component: () => import("./_nuxt/login-AUa5jrVi.js")
+    component: () => import("./_nuxt/login-CeS66-1V.js")
   },
   {
     name: "users",
     path: "/users",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/users-Ks2wHeue.js")
+    component: () => import("./_nuxt/users-CD_3iC5x.js")
   },
   {
     name: "fiscal",
     path: "/fiscal",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/fiscal-CZJ29ACw.js")
+    component: () => import("./_nuxt/fiscal-DX1pMPbW.js")
   },
   {
     name: "orders",
     path: "/orders",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/orders-CJabfC-i.js")
+    component: () => import("./_nuxt/orders-DsMINyS8.js")
   },
   {
     name: "perfil",
     path: "/perfil",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/perfil-CFnrnzh_.js")
+    component: () => import("./_nuxt/perfil-CcfEOnFu.js")
   },
   {
     name: "catalog",
     path: "/catalog",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/catalog-Drn24WE-.js")
+    component: () => import("./_nuxt/catalog-BRm_psQp.js")
   },
   {
     name: "facturas",
     path: "/facturas",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/facturas-Dg4QOd0u.js")
+    component: () => import("./_nuxt/facturas-DlxOXPAO.js")
   },
   {
     name: "terminos",
     path: "/terminos",
     meta: __nuxt_page_meta$1 || {},
-    component: () => import("./_nuxt/terminos-CRGkHxOu.js")
+    component: () => import("./_nuxt/terminos-BWe5XT9j.js")
   },
   {
     name: "dashboard",
     path: "/dashboard",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/dashboard-BJ7RosMC.js")
+    component: () => import("./_nuxt/dashboard-ClPBfnZo.js")
   },
   {
     name: "privacidad",
     path: "/privacidad",
     meta: __nuxt_page_meta || {},
-    component: () => import("./_nuxt/privacidad-BuSSe7QB.js")
+    component: () => import("./_nuxt/privacidad-OjAQ46Db.js")
   },
   {
     name: "payment-return",
     path: "/payment/return",
     meta: { "middleware": "auth" },
-    component: () => import("./_nuxt/return-BGL7NeX_.js")
+    component: () => import("./_nuxt/return-adEkIlTt.js")
   }
 ];
 const _wrapInTransition = (props, children) => {
@@ -973,9 +973,9 @@ const plugins = [
   components_plugin_z4hgvsiddfKkfXTP6M8M4zG5Cb7sGnDhcryKVM45Di4
 ];
 const layouts = {
-  auth: defineAsyncComponent(() => import("./_nuxt/auth-2bov0ybJ.js").then((m) => m.default || m)),
-  default: defineAsyncComponent(() => import("./_nuxt/default-CRKbKPNz.js").then((m) => m.default || m)),
-  landing: defineAsyncComponent(() => import("./_nuxt/landing-Cf2XonZo.js").then((m) => m.default || m))
+  auth: defineAsyncComponent(() => import("./_nuxt/auth-DmAkABl4.js").then((m) => m.default || m)),
+  default: defineAsyncComponent(() => import("./_nuxt/default-CiLg_ijk.js").then((m) => m.default || m)),
+  landing: defineAsyncComponent(() => import("./_nuxt/landing-DkZ1leF4.js").then((m) => m.default || m))
 };
 const routeRulesMatcher = _routeRulesMatcher;
 const LayoutLoader = defineComponent({

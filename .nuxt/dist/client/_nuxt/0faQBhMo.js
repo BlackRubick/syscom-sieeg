@@ -1,0 +1,1 @@
+import{S as o,D as u,U as c,E as d}from"./BPLRbVyp.js";import{u as i}from"./C2Ixne4f.js";const f=o(async()=>{let e,a;const t=u();if(!t.loaded){const s=i();try{const r=([e,a]=c(()=>s("/api/auth/me")),e=await e,a(),e);t.setUser(r.user)}catch{t.clear()}}if(t.user)return d("/dashboard")});export{f as default};
