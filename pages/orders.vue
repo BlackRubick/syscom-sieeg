@@ -418,6 +418,7 @@
                   <div>
                     <div style="font-size:12px;font-weight:700;color:#7DD3FC;">Sin folio SYSCOM</div>
                     <div style="font-size:11px;color:rgba(56,189,248,0.6);margin-top:2px;">El pedido fue aprobado pero no llegó a SYSCOM.</div>
+                    <div v-if="lastSyscomError" style="font-size:11px;color:#fca5a5;margin-top:4px;line-height:1.4;">Motivo: {{ lastSyscomError }}</div>
                   </div>
                   <button @click="retrySyscom(detail)" :disabled="retrying===detail.id"
                     style="height:34px;padding:0 14px;border-radius:8px;border:1px solid rgba(14,165,233,0.35);background:rgba(14,165,233,0.1);color:#7DD3FC;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;flex-shrink:0;"
@@ -481,6 +482,10 @@ const orders        = ref<Order[]>([])
 const loading       = ref(true)
 const error         = ref<string | null>(null)
 const detail        = ref<Order | null>(null)
+const lastSyscomError = computed(() => {
+  const log = (detail.value?.auditLog ?? []) as Array<{ syscomError?: string }>
+  return [...log].reverse().find(e => e.syscomError)?.syscomError ?? ''
+})
 const detailTotals  = computed(() => detail.value
   ? desgloseTotales(detail.value.items as { price: number; quantity: number }[], detail.value.total)
   : { subtotal: 0, iva: 0, total: 0 })

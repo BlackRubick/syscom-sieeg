@@ -1,7 +1,10 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
-import { generateSyscomOrder } from '~/server/utils/syscom'
+import { enviarPedidoSyscom } from '~/server/utils/syscom'
 import type { OrderItem } from '~/types'
+
+// Evita dos pedidos reales en SYSCOM si se presiona "Reintentar" dos veces seguidas
+const enCurso = new Set<string>()
 
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
@@ -17,42 +20,29 @@ export default defineEventHandler(async (event) => {
   if (order.status !== 'approved') throw createError({ statusCode: 400, message: 'Solo se puede reintentar en órdenes aprobadas' })
   if (order.syscomFolio)   throw createError({ statusCode: 400, message: 'Esta orden ya tiene folio SYSCOM' })
 
-  const user = await prisma.user.findUnique({
-    where: { id: order.userId },
-    select: {
-      name: true, fiscalRazonSocial: true, fiscalCalle: true, fiscalNumExt: true,
-      fiscalNumInt: true, fiscalColonia: true, fiscalCodpos: true, fiscalCiudad: true,
-      fiscalEstado: true, fiscalPais: true, fiscalTelefono: true, fiscalUsocfdi: true,
-    },
-  })
+  if (enCurso.has(id)) throw createError({ statusCode: 409, message: 'Ya se está enviando este pedido a SYSCOM' })
+  enCurso.add(id)
+  let result
+  try {
+    result = await enviarPedidoSyscom(order.userId, order.items as OrderItem[], order.id.slice(-8).toUpperCase())
+  } finally {
+    enCurso.delete(id)
+  }
 
-  const result = await generateSyscomOrder({
-    tipo_entrega: 'domicilio',
-    direccion: {
-      atencion_a:    user?.fiscalRazonSocial ?? user?.name ?? 'N/A',
-      calle:         user?.fiscalCalle    ?? '',
-      num_ext:       user?.fiscalNumExt   ?? 'S/N',
-      num_int:       user?.fiscalNumInt   ?? '',
-      colonia:       user?.fiscalColonia  ?? '',
-      codigo_postal: user?.fiscalCodpos   ?? '',
-      ciudad:        user?.fiscalCiudad   ?? '',
-      estado:        user?.fiscalEstado   ?? '',
-      pais:          user?.fiscalPais     ?? 'MEX',
-      telefono:      user?.fiscalTelefono ?? '',
-    },
-    metodo_pago:  process.env.SYSCOM_METODO_PAGO ?? '03',
-    productos:    (order.items as OrderItem[]).map(i => ({ id: Number(i.productId), tipo: 'nuevo', cantidad: i.quantity })),
-    uso_cfdi:     user?.fiscalUsocfdi ?? 'G03',
-    ordenar:      process.env.SYSCOM_ORDENAR === 'true',
-  })
+  const auditLog = [...((order.auditLog ?? []) as unknown[]), {
+    status: 'approved', by: session.userId, byName: session.name, at: new Date().toISOString(), retry: true,
+    ...(result.folio ? { syscomFolio: result.folio } : {}),
+    ...(result.error ? { syscomError: result.error } : {}),
+  }]
 
   if (result.error && !result.folio) {
+    await prisma.order.update({ where: { id }, data: { auditLog, syscomData: (result.data ?? { error: result.error }) as object } })
     throw createError({ statusCode: 502, message: result.error })
   }
 
   const updated = await prisma.order.update({
     where: { id },
-    data:  { syscomFolio: result.folio, syscomData: result.data ?? undefined },
+    data:  { auditLog, syscomFolio: result.folio, syscomData: result.data ?? undefined },
   })
 
   return { folio: updated.syscomFolio, syscomError: result.error }

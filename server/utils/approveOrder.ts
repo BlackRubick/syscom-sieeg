@@ -1,5 +1,5 @@
 import prisma from '~/server/utils/prisma'
-import { generateSyscomOrder } from '~/server/utils/syscom'
+import { enviarPedidoSyscom } from '~/server/utils/syscom'
 import type { OrderItem } from '~/types'
 
 const RFC_RE = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i
@@ -34,33 +34,8 @@ export async function approveOrder(
     if (user?.fiscalRfc && !RFC_RE.test(user.fiscalRfc.replace(/\s/g, ''))) {
       syscomError = `RFC inválido: ${user.fiscalRfc}. Verifica los datos fiscales del usuario.`
     } else {
-      const direccion: Record<string, string> = {
-        atencion_a:    user?.fiscalRazonSocial ?? user?.name ?? 'N/A',
-        calle:         user?.fiscalCalle    ?? '',
-        num_ext:       user?.fiscalNumExt   ?? 'S/N',
-        num_int:       user?.fiscalNumInt   ?? '',
-        colonia:       user?.fiscalColonia  ?? '',
-        codigo_postal: user?.fiscalCodpos   ?? '',
-        ciudad:        user?.fiscalCiudad   ?? '',
-        estado:        user?.fiscalEstado   ?? '',
-        pais:          user?.fiscalPais     ?? 'MEX',
-        telefono:      user?.fiscalTelefono ?? '',
-      }
-      const productos = (existing.items as OrderItem[]).map(item => ({
-        id:       Number(item.productId),
-        tipo:     'nuevo',
-        cantidad: item.quantity,
-      }))
-
       try {
-        const result = await generateSyscomOrder({
-          tipo_entrega: 'domicilio',
-          direccion,
-          metodo_pago:  process.env.SYSCOM_METODO_PAGO ?? '03',
-          productos,
-          uso_cfdi:     user?.fiscalUsocfdi ?? 'G03',
-          ordenar:      process.env.SYSCOM_ORDENAR === 'true',
-        })
+        const result = await enviarPedidoSyscom(existing.userId, existing.items as OrderItem[], existing.id.slice(-8).toUpperCase())
         syscomFolio = result.folio
         syscomData  = result.data ?? undefined
         syscomError = result.error
