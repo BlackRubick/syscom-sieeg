@@ -17,6 +17,12 @@
             @mouseleave="e => { (e.currentTarget as HTMLElement).style.color='rgba(123,146,176,0.9)'; (e.currentTarget as HTMLElement).style.background='transparent'; }">
             {{ link.label }}
           </a>
+          <NuxtLink to="/productos"
+            style="padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;color:#7DD3FC;transition:all 0.2s;text-decoration:none;"
+            @mouseenter="e => { (e.currentTarget as HTMLElement).style.background='rgba(14,165,233,0.1)'; }"
+            @mouseleave="e => { (e.currentTarget as HTMLElement).style.background='transparent'; }">
+            Catálogo
+          </NuxtLink>
         </div>
 
         <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
@@ -93,6 +99,9 @@
                 <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
               </svg>
             </a>
+            <NuxtLink to="/productos" class="btn-ghost-hero">
+              Ver catálogo
+            </NuxtLink>
             <NuxtLink to="/login" class="btn-ghost-hero">
               Ya soy cliente
             </NuxtLink>
@@ -192,6 +201,26 @@
               <div style="font-size:15px;font-weight:700;color:#E2EAF4;margin-bottom:6px;">{{ cat.name }}</div>
               <div style="font-size:13px;color:rgba(123,146,176,0.75);line-height:1.6;">{{ cat.desc }}</div>
             </div>
+          </div>
+        </div>
+
+        <!-- Vista previa del catálogo (sin precios) -->
+        <div v-if="destacados.length" class="lp-preview">
+          <div class="lp-preview-head">
+            <div>
+              <div style="font-size:16px;font-weight:700;color:#E2EAF4;">Algunos de nuestros productos</div>
+              <div style="font-size:13px;color:rgba(123,146,176,0.8);margin-top:3px;">Precios de distribuidor disponibles para clientes registrados.</div>
+            </div>
+            <NuxtLink to="/productos" class="lp-preview-all">Ver catálogo completo →</NuxtLink>
+          </div>
+          <div class="lp-preview-grid">
+            <NuxtLink v-for="p in destacados" :key="p.id" to="/productos" class="lp-prod">
+              <div class="lp-prod-img"><img :src="p.imagen" :alt="p.nombre" loading="lazy" /></div>
+              <div class="lp-prod-body">
+                <div class="lp-prod-brand">{{ p.marca }}</div>
+                <div class="lp-prod-name">{{ p.nombre }}</div>
+              </div>
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -451,6 +480,12 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: 'landing', middleware: 'redirect-authenticated' })
+
+// Vista previa del catálogo público (sin precios); si falla, la sección simplemente no se muestra
+const { data: catPreview } = await useFetch<{ productos: Array<{ id: string; nombre: string; marca: string; imagen: string; disponible: boolean }> }>('/api/public/catalogo', {
+  key: 'landing-preview', query: { categoria: '22' },
+})
+const destacados = computed(() => (catPreview.value?.productos ?? []).filter(p => p.disponible).slice(0, 8))
 
 const navLinks = [
   { id: 'inicio',    label: 'Inicio' },
@@ -907,4 +942,19 @@ async function handleRequest() {
   0%, 100% { transform: translateY(0); opacity: 1; }
   80%       { transform: translateY(14px); opacity: 0; }
 }
+
+/* ── Vista previa del catálogo ── */
+.lp-preview { margin-top:44px; }
+.lp-preview-head { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+.lp-preview-all { font-size:13px; font-weight:600; color:#7DD3FC; text-decoration:none; padding:8px 14px; border-radius:9px; border:1px solid rgba(14,165,233,0.3); background:rgba(14,165,233,0.08); transition:background 0.2s; }
+.lp-preview-all:hover { background:rgba(14,165,233,0.16); }
+.lp-preview-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.lp-prod { display:flex; flex-direction:column; border-radius:14px; overflow:hidden; background:linear-gradient(160deg,#0C1A2E,#081426); border:1px solid rgba(255,255,255,0.07); text-decoration:none; transition:transform 0.2s, border-color 0.2s; }
+.lp-prod:hover { transform:translateY(-3px); border-color:rgba(14,165,233,0.3); }
+.lp-prod-img { aspect-ratio:4/3; background:#fff; display:flex; align-items:center; justify-content:center; }
+.lp-prod-img img { width:80%; height:80%; object-fit:contain; }
+.lp-prod-body { padding:10px 12px 12px; }
+.lp-prod-brand { font-size:10.5px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; color:#7DD3FC; }
+.lp-prod-name { margin-top:4px; font-size:12.5px; font-weight:500; color:#E2EAF4; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+@media (max-width: 860px) { .lp-preview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 </style>
