@@ -3,10 +3,12 @@ import prisma from '~/server/utils/prisma'
 import { createCardCharge, createSpeiCharge, openpayErrorMessage } from '~/server/utils/openpay'
 import { approveOrder } from '~/server/utils/approveOrder'
 import { repriceItems } from '~/server/utils/pricing'
+import { totalConIva } from '~/utils/orderTotals'
 import type { OrderItem } from '~/types'
 
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
+  if (session.role === 'viewer') throw createError({ statusCode: 403, message: 'Tu cuenta es de solo consulta y no puede realizar pedidos' })
 
   const body = await readBody<{
     method:           'card' | 'spei'
@@ -44,8 +46,7 @@ export default defineEventHandler(async (event) => {
   const user        = await prisma.user.findUniqueOrThrow({ where: { id: session.userId } })
   // Precios recalculados en servidor con datos de SYSCOM; se ignora lo que manda el cliente
   const items          = await repriceItems(session.userId, body.items)
-  const serverSubtotal = items.reduce((s, i) => s + i.price * i.quantity, 0)
-  const total          = Math.round(serverSubtotal * 1.16 * 100) / 100
+  const total          = totalConIva(items)
 
   const nameParts = user.name.trim().split(' ')
   const firstName = user.fiscalNombre ?? nameParts[0]

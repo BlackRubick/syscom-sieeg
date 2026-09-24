@@ -108,7 +108,10 @@
           </div>
 
           <!-- Total -->
-          <div style="font-size:12px;font-weight:700;color:#a5b4fc;">{{ fmtMXN(o.total) }}</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#a5b4fc;">{{ fmtMXN(o.total) }}</div>
+            <div style="font-size:9px;color:rgba(100,118,142,0.5);">IVA incl.</div>
+          </div>
 
           <!-- Estado fiscal -->
           <div>

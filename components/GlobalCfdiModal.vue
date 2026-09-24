@@ -66,7 +66,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
                 <div>
                   <div style="font-size:13px;font-weight:700;color:#fbbf24;">{{ pendingOrders.length }} pedido{{ pendingOrders.length!==1?'s':'' }} sin facturar individualmente</div>
-                  <div style="font-size:11px;color:rgba(100,118,142,0.7);margin-top:2px;">Total: <span style="color:#E2EAF4;font-weight:600;">{{ fmtMXN(pendingTotal) }}</span></div>
+                  <div style="font-size:11px;color:rgba(100,118,142,0.7);margin-top:2px;">Total: <span style="color:#E2EAF4;font-weight:600;">{{ fmtMXN(pendingTotal) }}</span> <span style="font-size:10px;">IVA incl.</span></div>
                 </div>
               </div>
 

@@ -104,7 +104,7 @@ export async function approveOrder(
       userId:  existing.userId,
       type:    'order',
       title:   '✅ Pedido aprobado',
-      message: `Tu pedido por ${updated.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} fue aprobado${syscomFolio ? ` · Folio SYSCOM: ${syscomFolio}` : ''}.`,
+      message: `Tu pedido por ${updated.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} IVA incl. fue aprobado${syscomFolio ? ` · Folio SYSCOM: ${syscomFolio}` : ''}.`,
       orderId,
     },
   })

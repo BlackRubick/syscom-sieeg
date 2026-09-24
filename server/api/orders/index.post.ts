@@ -1,10 +1,12 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { repriceItems } from '~/server/utils/pricing'
+import { totalConIva } from '~/utils/orderTotals'
 import type { OrderItem } from '~/types'
 
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
+  if (session.role === 'viewer') throw createError({ statusCode: 403, message: 'Tu cuenta es de solo consulta y no puede realizar pedidos' })
 
   const body = await readBody<{
     items:     OrderItem[]
@@ -24,9 +26,9 @@ export default defineEventHandler(async (event) => {
   }
 
   // #2 — Precios y total calculados en servidor con datos de SYSCOM; se ignora lo que manda el cliente
-  const items       = await repriceItems(session.userId, body.items)
-  const serverTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const total       = Math.round(serverTotal * 100) / 100
+  // El total se guarda con IVA; los precios de los artículos son sin IVA
+  const items = await repriceItems(session.userId, body.items)
+  const total = totalConIva(items)
 
   const order = await prisma.order.create({
     data: {
@@ -50,7 +52,7 @@ export default defineEventHandler(async (event) => {
         userId:  a.id,
         type:    'order',
         title:   'Nuevo pedido recibido',
-        message: `${order.user.name} realizó un pedido por ${total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} (${items.length} art.)`,
+        message: `${order.user.name} realizó un pedido por ${total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} IVA incl. (${items.length} art.)`,
         orderId: order.id,
       })),
     })

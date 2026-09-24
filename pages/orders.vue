@@ -103,7 +103,7 @@
 
             <div style="text-align:right;flex-shrink:0;">
               <div style="font-size:14px;font-weight:700;color:#E2EAF4;">{{ order.total > 0 ? fmtCurrency(order.total) : '—' }}</div>
-              <div style="font-size:10px;color:rgba(100,118,142,0.6);margin-top:1px;">MXN</div>
+              <div style="font-size:10px;color:rgba(100,118,142,0.6);margin-top:1px;">MXN · IVA incl.</div>
             </div>
 
             <ChevronRight :size="15" color="rgba(100,118,142,0.5)" style="flex-shrink:0;" />
@@ -225,10 +225,19 @@
                   </div>
                 </div>
 
-                <!-- Total -->
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:14px;background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.14);">
-                  <span style="font-size:13px;font-weight:600;color:#94a3b8;">Total de la orden</span>
-                  <span style="font-size:20px;font-weight:800;color:#E2EAF4;">{{ fmtCurrency(detail.total) }}</span>
+                <!-- Totales: subtotal + IVA = total -->
+                <div style="padding:14px 18px;border-radius:14px;background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.14);display:flex;flex-direction:column;gap:8px;">
+                  <div style="display:flex;justify-content:space-between;font-size:13px;color:#94a3b8;">
+                    <span>Subtotal</span><span>{{ fmtCurrency(detailTotals.subtotal) }}</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px;color:#94a3b8;">
+                    <span>IVA (16%)</span><span>{{ fmtCurrency(detailTotals.iva) }}</span>
+                  </div>
+                  <div style="height:1px;background:rgba(14,165,233,0.14);" />
+                  <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <span style="font-size:13px;font-weight:600;color:#94a3b8;">Total con IVA</span>
+                    <span style="font-size:20px;font-weight:800;color:#E2EAF4;">{{ fmtCurrency(detailTotals.total) }}</span>
+                  </div>
                 </div>
 
                 <!-- Info de la orden -->
@@ -472,6 +481,9 @@ const orders        = ref<Order[]>([])
 const loading       = ref(true)
 const error         = ref<string | null>(null)
 const detail        = ref<Order | null>(null)
+const detailTotals  = computed(() => detail.value
+  ? desgloseTotales(detail.value.items as { price: number; quantity: number }[], detail.value.total)
+  : { subtotal: 0, iva: 0, total: 0 })
 const search        = ref('')
 const searchFocus   = ref(false)
 const activeTab     = ref('all')
@@ -613,17 +625,21 @@ async function cancelOrder(order: Order) {
 
 // #16 — Exportar CSV
 function exportCSV() {
-  const headers = ['ID','Usuario','Email','Estado','Total','Artículos','Folio SYSCOM','Fecha']
-  const rows = orders.value.map(o => [
+  const headers = ['ID','Usuario','Email','Estado','Subtotal','IVA','Total con IVA','Artículos','Folio SYSCOM','Fecha']
+  const rows = orders.value.map(o => {
+    const t = desgloseTotales(o.items as { price: number; quantity: number }[], o.total)
+    return [
     o.id,
     o.userName ?? '',
     o.userEmail ?? '',
     o.status,
-    o.total.toFixed(2),
+    t.subtotal.toFixed(2),
+    t.iva.toFixed(2),
+    t.total.toFixed(2),
     (o.items as { quantity: number }[]).reduce((s, i) => s + i.quantity, 0),
     o.syscomFolio ?? '',
     o.createdAt,
-  ])
+  ]})
   const csv  = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
   const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
   const url  = URL.createObjectURL(blob)

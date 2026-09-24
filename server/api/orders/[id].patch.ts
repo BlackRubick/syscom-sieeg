@@ -88,8 +88,8 @@ export default defineEventHandler(async (event) => {
       cancelled: '🚫 Pedido cancelado',
     }
     const messages: Record<string, string> = {
-      rejected:  `Tu pedido por ${updated.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} fue rechazado.`,
-      cancelled: `Tu pedido por ${updated.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} fue cancelado.`,
+      rejected:  `Tu pedido por ${updated.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} IVA incl. fue rechazado.`,
+      cancelled: `Tu pedido por ${updated.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} IVA incl. fue cancelado.`,
     }
     await prisma.notification.create({
       data: {
