@@ -213,15 +213,7 @@
             </div>
             <NuxtLink to="/productos" class="lp-preview-all">Ver catálogo completo →</NuxtLink>
           </div>
-          <div class="lp-preview-grid">
-            <NuxtLink v-for="p in destacados" :key="p.id" to="/productos" class="lp-prod">
-              <div class="lp-prod-img"><img :src="p.imagen" :alt="p.nombre" loading="lazy" /></div>
-              <div class="lp-prod-body">
-                <div class="lp-prod-brand">{{ p.marca }}</div>
-                <div class="lp-prod-name">{{ p.nombre }}</div>
-              </div>
-            </NuxtLink>
-          </div>
+          <ProductCarousel :productos="destacados" @cotizar="scrollTo('contacto')" />
         </div>
       </div>
     </section>
@@ -481,11 +473,23 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'landing', middleware: 'redirect-authenticated' })
 
-// Vista previa del catálogo público (sin precios); si falla, la sección simplemente no se muestra
-const { data: catPreview } = await useFetch<{ productos: Array<{ id: string; nombre: string; marca: string; imagen: string; disponible: boolean }> }>('/api/public/catalogo', {
-  key: 'landing-preview', query: { categoria: '22' },
+// Carrusel del catálogo público (sin precios). Mezcla varias categorías; si falla, la sección no se muestra.
+interface ProductoPublico { id: string; nombre: string; modelo: string; marca: string; marcaLogo: string; imagen: string; disponible: boolean }
+const CATEGORIAS_CARRUSEL = ['22', '26', '37'] // Videovigilancia, Redes e IT, Control de Acceso
+const { data: catPreview } = await useAsyncData('landing-carrusel', async () => {
+  const listas = await Promise.all(CATEGORIAS_CARRUSEL.map(categoria =>
+    $fetch<{ productos: ProductoPublico[] }>('/api/public/catalogo', { query: { categoria } })
+      .then(r => r.productos.filter(p => p.disponible))
+      .catch(() => [] as ProductoPublico[]),
+  ))
+  // Intercalar categorías para que el carrusel se vea variado
+  const out: ProductoPublico[] = []
+  for (let i = 0; out.length < 16 && listas.some(l => i < l.length); i++) {
+    for (const l of listas) if (l[i] && out.length < 16) out.push(l[i])
+  }
+  return out
 })
-const destacados = computed(() => (catPreview.value?.productos ?? []).filter(p => p.disponible).slice(0, 8))
+const destacados = computed(() => catPreview.value ?? [])
 
 const navLinks = [
   { id: 'inicio',    label: 'Inicio' },
@@ -948,13 +952,4 @@ async function handleRequest() {
 .lp-preview-head { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
 .lp-preview-all { font-size:13px; font-weight:600; color:#7DD3FC; text-decoration:none; padding:8px 14px; border-radius:9px; border:1px solid rgba(14,165,233,0.3); background:rgba(14,165,233,0.08); transition:background 0.2s; }
 .lp-preview-all:hover { background:rgba(14,165,233,0.16); }
-.lp-preview-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
-.lp-prod { display:flex; flex-direction:column; border-radius:14px; overflow:hidden; background:linear-gradient(160deg,#0C1A2E,#081426); border:1px solid rgba(255,255,255,0.07); text-decoration:none; transition:transform 0.2s, border-color 0.2s; }
-.lp-prod:hover { transform:translateY(-3px); border-color:rgba(14,165,233,0.3); }
-.lp-prod-img { aspect-ratio:4/3; background:#fff; display:flex; align-items:center; justify-content:center; }
-.lp-prod-img img { width:80%; height:80%; object-fit:contain; }
-.lp-prod-body { padding:10px 12px 12px; }
-.lp-prod-brand { font-size:10.5px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; color:#7DD3FC; }
-.lp-prod-name { margin-top:4px; font-size:12.5px; font-weight:500; color:#E2EAF4; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-@media (max-width: 860px) { .lp-preview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 </style>
