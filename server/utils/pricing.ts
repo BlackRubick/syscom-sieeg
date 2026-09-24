@@ -3,8 +3,10 @@ import { syscomGet } from '~/server/utils/syscom'
 import type { OrderItem, SyscomProducto } from '~/types'
 
 /* Precios de venta calculados siempre en servidor:
-   costo SYSCOM → + margen global (siteConfig.markupPct) → − descuento del cliente (user.discountPct).
-   El costo de SYSCOM nunca debe llegar al navegador. */
+   costo SYSCOM (sin IVA) → + margen global (siteConfig.markupPct) → − descuento del cliente (user.discountPct) → + IVA 16%.
+   El precio que ve el cliente YA INCLUYE IVA. El costo de SYSCOM nunca debe llegar al navegador. */
+
+const IVA = 1.16
 
 export interface Pricing { markupPct: number; discountPct: number }
 
@@ -25,14 +27,14 @@ export function costoSyscom(p: Pick<SyscomProducto, 'precios'>): number {
   return especial > 0 ? especial : lista
 }
 
-/** Precio con margen, antes del descuento del cliente. */
+/** Precio con margen e IVA, antes del descuento del cliente. */
 export function precioConMargen(p: Pick<SyscomProducto, 'precios'>, pr: Pricing): number {
-  return Math.round(costoSyscom(p) * (1 + pr.markupPct / 100) * 100) / 100
+  return Math.round(costoSyscom(p) * (1 + pr.markupPct / 100) * IVA * 100) / 100
 }
 
-/** Precio final de venta para el cliente. */
+/** Precio final de venta para el cliente, con IVA incluido. */
 export function precioVenta(p: Pick<SyscomProducto, 'precios'>, pr: Pricing): number {
-  return Math.round(costoSyscom(p) * (1 + pr.markupPct / 100) * (1 - pr.discountPct / 100) * 100) / 100
+  return Math.round(costoSyscom(p) * (1 + pr.markupPct / 100) * (1 - pr.discountPct / 100) * IVA * 100) / 100
 }
 
 /** Reemplaza `precios` de un producto SYSCOM por los precios de venta (oculta el costo). */

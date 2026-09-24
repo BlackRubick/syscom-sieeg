@@ -1,3 +1,4 @@
+import { precioSinIva } from '~/utils/orderTotals'
 const HOSTS = {
   sandbox:    'https://sandbox.factura.com/api',
   production: 'https://api.factura.com',
@@ -339,7 +340,7 @@ export function conceptosDePedidos(orders: Array<{ items: unknown }>): ConceptoI
         claveUnidad:   'H87',
         unidad:        'Pieza',
         cantidad:      item.quantity,
-        valorUnitario: item.price,
+        valorUnitario: precioSinIva(item.price), // el precio del pedido ya incluye IVA
       })
     }
   }

@@ -332,15 +332,15 @@
           </div>
           <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(100,118,142,0.8);">
-              <span>Subtotal</span><span>{{ fmt(subtotal) }}</span>
+              <span>Subtotal (sin IVA)</span><span>{{ fmt(subtotal) }}</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(100,118,142,0.8);">
               <span>IVA (16%)</span><span>{{ fmt(iva) }}</span>
             </div>
           </div>
           <div style="padding:14px 20px;border-top:1px solid rgba(14,165,233,0.12);background:rgba(14,165,233,0.04);display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:13px;font-weight:700;color:#E2EAF4;">Total con IVA</span>
-            <span style="font-size:18px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,#0EA5E9,#7DD3FC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">{{ fmt(subtotal + iva) }}</span>
+            <span style="font-size:13px;font-weight:700;color:#E2EAF4;">Total (IVA incluido)</span>
+            <span style="font-size:18px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,#0EA5E9,#7DD3FC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">{{ fmt(totales.total) }}</span>
           </div>
           <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;">
             <button @click="openPaymentModal"
@@ -399,7 +399,7 @@
             <!-- Total -->
             <div style="padding:11px 14px;border-radius:11px;background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.18);display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
               <span style="font-size:12px;color:rgba(100,118,142,0.8);">Total a pagar</span>
-              <span style="font-size:20px;font-weight:800;background:linear-gradient(135deg,#0EA5E9,#7DD3FC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">{{ fmt(subtotal + iva) }}</span>
+              <span style="font-size:20px;font-weight:800;background:linear-gradient(135deg,#0EA5E9,#7DD3FC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">{{ fmt(totales.total) }}</span>
             </div>
 
             <!-- Selector método -->
@@ -493,7 +493,7 @@
                 Procesando pago…
               </span>
               <span v-else style="display:flex;align-items:center;gap:8px;">
-                <Lock :size="14" /> Pagar {{ fmt(subtotal + iva) }}
+                <Lock :size="14" /> Pagar {{ fmt(totales.total) }}
               </span>
             </button>
 
@@ -522,7 +522,7 @@
 
             <div style="padding:12px 16px;border-radius:11px;background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.15);display:flex;justify-content:space-between;align-items:center;">
               <span style="font-size:12px;color:rgba(100,118,142,0.8);">Monto a transferir</span>
-              <span style="font-size:18px;font-weight:800;background:linear-gradient(135deg,#0EA5E9,#7DD3FC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">{{ fmt(subtotal + iva) }}</span>
+              <span style="font-size:18px;font-weight:800;background:linear-gradient(135deg,#0EA5E9,#7DD3FC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">{{ fmt(totales.total) }}</span>
             </div>
 
             <div v-if="payError" style="padding:10px 13px;border-radius:9px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);font-size:12px;color:#EF4444;">
@@ -614,8 +614,10 @@ const priorities = [
 
 const activePri     = computed(() => priorities.find(p => p.key === priority.value)!)
 const priorityLabel = computed(() => ({ urgent:'Urgente — notificación inmediata', high:'Alta — procesamiento en 4h', normal:'Normal — procesamiento en 24h', low:'Baja — sin urgencia' }[priority.value] ?? ''))
-const subtotal      = computed(() => cart.total)
-const iva           = computed(() => subtotal.value * 0.16)
+// Los precios ya incluyen IVA: el total es la suma y el IVA solo se desglosa
+const totales       = computed(() => desgloseTotales(cart.total))
+const subtotal      = computed(() => totales.value.subtotal)
+const iva           = computed(() => totales.value.iva)
 const totalUnits    = computed(() => cart.items.reduce((s, i) => s + i.quantity, 0))
 
 const speiPdfUrl = computed(() => {
@@ -872,7 +874,7 @@ async function handlePaySpei() {
       bank:          result.order?.spei?.bank         ?? 'BBVA Bancomer',
       agreement:     result.order?.spei?.agreement    ?? '',
       beneficiary:   result.order?.spei?.beneficiary  ?? 'SIEEG INTEGRADORES',
-      amount:        result.order?.total              ?? (subtotal.value + iva.value),
+      amount:        result.order?.total              ?? totales.value.total,
       reference:     result.order?.spei?.reference    ?? '',
       dueDate:       result.order?.spei?.dueDate      ?? '',
       createdAt:     result.order?.spei?.createdAt    ?? '',

@@ -555,7 +555,7 @@ async function openCfdiFromOrder(o: BillingOrder) {
     claveUnidad:   'H87',
     unidad:        'Pieza',
     cantidad:      item.quantity,
-    valorUnitario: item.price,
+    valorUnitario: precioSinIva(item.price), // el precio del pedido ya incluye IVA
   }))
   cfdiOrderId.value = o.id
   await nextTick()

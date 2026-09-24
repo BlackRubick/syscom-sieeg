@@ -315,6 +315,7 @@
             <div class="product-price-row">
               <div>
                 <div v-if="product.price > 0" class="product-price">{{ fmtCurrency(product.price) }}</div>
+                <div v-if="product.price > 0" class="product-iva">IVA incluido</div>
                 <div v-else class="product-no-price">Consultar precio</div>
                 <div v-if="product.discount" class="product-old-price">{{ fmtCurrency(Math.round(product.price / (1 - product.discount / 100))) }}</div>
               </div>
@@ -691,6 +692,7 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 .product-divider { height:1px;background:rgba(255,255,255,0.06);margin-bottom:11px;margin-top:auto; }
 .product-price-row { display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:0; }
 .product-price { font-size:17px;font-weight:800;color:#E2EAF4;letter-spacing:-0.5px;line-height:1; }
+.product-iva { font-size:9.5px;color:rgba(100,118,142,0.6);margin-top:3px; }
 .product-no-price { font-size:12px;color:rgba(100,118,142,0.6);font-style:italic; }
 .product-old-price { font-size:10px;color:rgba(100,118,142,0.45);text-decoration:line-through;margin-top:2px; }
 

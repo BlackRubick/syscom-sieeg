@@ -83,6 +83,7 @@
               <div style="font-size:28px;font-weight:800;color:#E2EAF4;letter-spacing:-0.5px;line-height:1;">
                 {{ displayProduct.price > 0 ? fmtCurrency(displayProduct.price) : 'Consultar precio' }}
               </div>
+              <div v-if="displayProduct.price > 0" style="font-size:11px;color:rgba(100,118,142,0.7);margin-top:4px;">IVA incluido</div>
               <div v-if="displayProduct.discount" style="display:flex;align-items:center;gap:8px;margin-top:4px;">
                 <span style="font-size:13px;color:rgba(100,118,142,0.6);text-decoration:line-through;">{{ fmtCurrency(Math.round(displayProduct.price / (1 - displayProduct.discount / 100))) }}</span>
                 <span style="font-size:11px;font-weight:700;color:#22C55E;background:rgba(34,197,94,0.1);padding:2px 7px;border-radius:4px;">-{{ displayProduct.discount }}%</span>

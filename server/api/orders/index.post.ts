@@ -1,7 +1,7 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { repriceItems } from '~/server/utils/pricing'
-import { totalConIva } from '~/utils/orderTotals'
+import { totalDe } from '~/utils/orderTotals'
 import type { OrderItem } from '~/types'
 
 export default defineEventHandler(async (event) => {
@@ -26,9 +26,9 @@ export default defineEventHandler(async (event) => {
   }
 
   // #2 — Precios y total calculados en servidor con datos de SYSCOM; se ignora lo que manda el cliente
-  // El total se guarda con IVA; los precios de los artículos son sin IVA
+  // Los precios ya incluyen IVA: el total es la suma de los artículos
   const items = await repriceItems(session.userId, body.items)
-  const total = totalConIva(items)
+  const total = totalDe(items)
 
   const order = await prisma.order.create({
     data: {

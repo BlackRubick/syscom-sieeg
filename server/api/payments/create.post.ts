@@ -3,7 +3,7 @@ import prisma from '~/server/utils/prisma'
 import { createCardCharge, createSpeiCharge, openpayErrorMessage } from '~/server/utils/openpay'
 import { approveOrder } from '~/server/utils/approveOrder'
 import { repriceItems } from '~/server/utils/pricing'
-import { totalConIva } from '~/utils/orderTotals'
+import { totalDe } from '~/utils/orderTotals'
 import type { OrderItem } from '~/types'
 
 export default defineEventHandler(async (event) => {
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
   const user        = await prisma.user.findUniqueOrThrow({ where: { id: session.userId } })
   // Precios recalculados en servidor con datos de SYSCOM; se ignora lo que manda el cliente
   const items          = await repriceItems(session.userId, body.items)
-  const total          = totalConIva(items)
+  const total          = totalDe(items)
 
   const nameParts = user.name.trim().split(' ')
   const firstName = user.fiscalNombre ?? nameParts[0]

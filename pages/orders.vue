@@ -246,9 +246,9 @@
                 </div>
               </div>
               <div class="od-totals">
-                <div class="od-kv"><span>Subtotal</span><span>{{ fmtCurrency(detailTotals.subtotal) }}</span></div>
+                <div class="od-kv"><span>Subtotal (sin IVA)</span><span>{{ fmtCurrency(detailTotals.subtotal) }}</span></div>
                 <div class="od-kv"><span>IVA (16%)</span><span>{{ fmtCurrency(detailTotals.iva) }}</span></div>
-                <div class="od-kv od-kv-total"><span>Total con IVA</span><span>{{ fmtCurrency(detailTotals.total) }}</span></div>
+                <div class="od-kv od-kv-total"><span>Total (IVA incluido)</span><span>{{ fmtCurrency(detailTotals.total) }}</span></div>
               </div>
             </section>
 
@@ -433,7 +433,7 @@ const payStatus = computed(() => {
 })
 
 const detailTotals  = computed(() => detail.value
-  ? desgloseTotales(detail.value.items as { price: number; quantity: number }[], detail.value.total)
+  ? desgloseTotales(detail.value.total)
   : { subtotal: 0, iva: 0, total: 0 })
 const search        = ref('')
 const searchFocus   = ref(false)
@@ -578,7 +578,7 @@ async function cancelOrder(order: Order) {
 function exportCSV() {
   const headers = ['ID','Usuario','Email','Estado','Subtotal','IVA','Total con IVA','Artículos','Folio SYSCOM','Fecha']
   const rows = orders.value.map(o => {
-    const t = desgloseTotales(o.items as { price: number; quantity: number }[], o.total)
+    const t = desgloseTotales(o.total)
     return [
     o.id,
     o.userName ?? '',

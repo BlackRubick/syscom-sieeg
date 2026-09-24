@@ -59,14 +59,14 @@
           <div style="font-size:11px;font-weight:600;color:rgba(14,165,233,0.8);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Vista previa</div>
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
             <div style="text-align:center;">
-              <div style="font-size:11px;color:rgba(100,118,142,0.7);margin-bottom:3px;">Precio SYSCOM</div>
+              <div style="font-size:11px;color:rgba(100,118,142,0.7);margin-bottom:3px;">Costo SYSCOM (sin IVA)</div>
               <div style="font-size:16px;font-weight:700;color:rgba(123,146,176,0.6);">$1,000</div>
             </div>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(14,165,233,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
             </svg>
             <div style="text-align:center;">
-              <div style="font-size:11px;color:rgba(100,118,142,0.7);margin-bottom:3px;">Precio al cliente</div>
+              <div style="font-size:11px;color:rgba(100,118,142,0.7);margin-bottom:3px;">Precio al cliente (IVA incluido)</div>
               <div style="font-size:16px;font-weight:700;color:#7DD3FC;">${{ previewPrice }}</div>
             </div>
           </div>
@@ -129,7 +129,7 @@ const currentPct = ref(0)
 const inputPct   = ref(0)
 
 const previewPrice = computed(() =>
-  (1000 * (1 + inputPct.value / 100)).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  (1000 * (1 + inputPct.value / 100) * 1.16).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 )
 
 onMounted(async () => {
