@@ -85,6 +85,17 @@
                   </span>
                 </template>
               </div>
+              <div v-if="order.syscomFolio" class="sy-row">
+                <span class="sy-folio" title="Folio del pedido en SYSCOM">SYSCOM {{ order.syscomFolio }}</span>
+                <span v-if="order.syscomEstado" class="sy-pill" :style="syscomStyle(order.syscomEstado.estado)" :title="order.syscomEstado.detalle">
+                  <span class="sy-dot" :style="{ background: syscomStyle(order.syscomEstado.estado).color }" />{{ order.syscomEstado.label }}
+                </span>
+                <span v-else class="sy-pill sy-pill-muted">Consultando estado…</span>
+                <span v-if="order.syscomEstado?.guia" class="sy-guia">Guía {{ order.syscomEstado.guia }}</span>
+              </div>
+              <div v-else-if="isManager && order.status === 'approved'" class="sy-row">
+                <span class="sy-pill" style="background:rgba(239,68,68,0.12);color:#f87171;">Sin folio SYSCOM</span>
+              </div>
               <div style="display:flex;align-items:center;gap:6px;">
                 <Clock :size="11" color="rgba(100,118,142,0.6)" />
                 <span style="font-size:11px;color:rgba(100,118,142,0.8);">{{ fmtDate(order.createdAt) }}</span>
@@ -163,7 +174,7 @@
               </div>
               <div class="od-head-right">
                 <div class="od-head-total">
-                  <div class="od-label">Total con IVA</div>
+                  <div class="od-label">Total (IVA incluido)</div>
                   <div class="od-total">{{ fmtCurrency(detailTotals.total) }}</div>
                 </div>
                 <button class="od-close" aria-label="Cerrar" @click="detail=null"><X :size="15" /></button>
@@ -290,9 +301,32 @@
                 <button class="od-btn od-btn-green" :disabled="trackingLoading" @click="fetchTracking">
                   <svg v-if="trackingLoading" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
                   <RefreshCw v-else :size="12" />
-                  {{ trackingLoading ? 'Consultando…' : 'Ver estado' }}
+                  {{ trackingLoading ? 'Consultando…' : 'Actualizar estado' }}
                 </button>
               </div>
+
+              <div v-if="detail.syscomEstado" class="od-tracking">
+                <div style="display:flex;align-items:flex-start;gap:10px;">
+                  <span class="od-status-dot" :style="{ background: syscomStyle(detail.syscomEstado.estado).color }" />
+                  <div style="min-width:0;flex:1;">
+                    <div class="od-strong" :style="{ color: syscomStyle(detail.syscomEstado.estado).color }">{{ detail.syscomEstado.label }}</div>
+                    <div v-if="detail.syscomEstado.detalle" class="od-muted">{{ detail.syscomEstado.detalle }}</div>
+                  </div>
+                  <span v-if="trackingJustUpdated" class="od-tag" style="background:rgba(34,197,94,0.15);color:#22C55E;">✓ Pedido actualizado</span>
+                </div>
+                <div v-if="detail.syscomEstado.fletera" class="od-kv"><span>Paquetería</span><b>{{ detail.syscomEstado.fletera }}</b></div>
+                <div v-if="detail.syscomEstado.guia" class="od-kv"><span>Guía</span><b class="od-mono">{{ detail.syscomEstado.guia }}</b></div>
+                <div v-if="isManager && detail.syscomEstado.factura" class="od-kv"><span>Factura SYSCOM</span><b class="od-mono">{{ detail.syscomEstado.factura }}</b></div>
+                <ol v-if="isManager && detail.syscomEstado.pasos?.length" class="od-log" style="margin-top:6px;">
+                  <li v-for="(p, i) in detail.syscomEstado.pasos" :key="i">
+                    <span class="od-status-dot" style="background:rgba(74,222,128,0.6);" />
+                    <div class="od-log-note" style="margin:0;">{{ p.mensaje }}<span v-if="p.fecha && p.fecha !== '0'" class="od-muted"> · {{ p.fecha }}</span></div>
+                  </li>
+                </ol>
+                <div v-if="detail.syscomEstado.consultado" class="od-muted" style="font-size:10.5px;">Consultado {{ fmtDateLong(detail.syscomEstado.consultado) }}</div>
+              </div>
+              <div v-else class="od-muted" style="margin-top:10px;">Aún no se ha consultado el estado en SYSCOM.</div>
+              <div v-if="trackingError" class="od-reason">{{ trackingError }}</div>
 
               <!-- Costo SYSCOM vs venta (solo admin/approver) -->
               <div v-if="isManager && detail.syscom" class="od-cost">
@@ -305,20 +339,6 @@
                 </div>
               </div>
 
-              <Transition name="slide-down">
-                <div v-if="tracking" class="od-tracking">
-                  <div style="display:flex;align-items:center;gap:10px;">
-                    <span class="od-status-dot" :style="{ background: trackingStatusCfg.dot }" />
-                    <div>
-                      <div class="od-strong" :style="{ color: trackingStatusCfg.color }">{{ trackingStatusCfg.label }}</div>
-                      <div v-if="tracking.fecha_creacion" class="od-muted">Pedido creado: {{ tracking.fecha_creacion }}</div>
-                    </div>
-                    <span v-if="trackingJustUpdated" class="od-tag" style="margin-left:auto;background:rgba(34,197,94,0.15);color:#22C55E;">✓ Estado actualizado</span>
-                  </div>
-                  <div v-if="tracking.fecha_entrega" class="od-kv"><span>Entrega estimada</span><b>{{ tracking.fecha_entrega }}</b></div>
-                </div>
-              </Transition>
-              <div v-if="trackingError" class="od-reason">{{ trackingError }}</div>
             </section>
 
             <!-- Pago -->
@@ -382,7 +402,7 @@
 
 <script setup lang="ts">
 import { Search, ChevronRight, Clock, Package, AlertCircle, ShoppingCart, User, X, Download, RefreshCw } from '@lucide/vue'
-import type { Order, SyscomFactura } from '~/types'
+import type { Order } from '~/types'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -660,19 +680,22 @@ function tabCount(key: string) {
 }
 
 /* ════════════════════════════════
-   RASTREO SYSCOM
+   ESTADO SYSCOM
 ════════════════════════════════ */
-const tracking          = ref<SyscomFactura | null>(null)
-const trackingLoading   = ref(false)
-const trackingError     = ref('')
+const trackingLoading     = ref(false)
+const trackingError       = ref('')
 const trackingJustUpdated = ref(false)
 
-// Limpiar rastreo al cambiar de pedido
-watch(detail, () => {
-  tracking.value          = null
-  trackingError.value     = ''
+watch(() => detail.value?.id, () => {
+  trackingError.value       = ''
   trackingJustUpdated.value = false
 })
+
+function reemplazarOrden(o: Order) {
+  const idx = orders.value.findIndex(x => x.id === o.id)
+  if (idx >= 0) orders.value[idx] = o
+  if (detail.value?.id === o.id) detail.value = o
+}
 
 async function fetchTracking() {
   if (!detail.value?.syscomFolio || trackingLoading.value) return
@@ -680,19 +703,9 @@ async function fetchTracking() {
   trackingError.value       = ''
   trackingJustUpdated.value = false
   try {
-    const res = await $fetch<{ tracking: SyscomFactura; statusUpdated: boolean }>(
-      `/api/orders/${detail.value.id}/syscom-track`,
-    )
-    tracking.value = res.tracking
-
-    if (res.statusUpdated) {
-      // Actualizar el status a "delivered" localmente
-      trackingJustUpdated.value = true
-      const updated = { ...detail.value, status: 'delivered' as const }
-      detail.value = updated
-      const idx = orders.value.findIndex(o => o.id === updated.id)
-      if (idx >= 0) orders.value[idx] = updated
-    }
+    const res = await $fetch<{ statusUpdated: string | null; order: Order }>(`/api/orders/${detail.value.id}/syscom-track`)
+    reemplazarOrden(res.order)
+    trackingJustUpdated.value = !!res.statusUpdated
   } catch (e: unknown) {
     trackingError.value = (e as { data?: { message?: string } })?.data?.message ?? 'No se pudo consultar el estado en SYSCOM'
   } finally {
@@ -700,16 +713,25 @@ async function fetchTracking() {
   }
 }
 
-const trackingStatusCfg = computed(() => {
-  const s = (tracking.value?.estatus ?? tracking.value?.estado ?? '').toLowerCase()
-  if (s.includes('entrega') || s.includes('recib'))
-    return { dot:'#22c55e', color:'#4ade80', label: tracking.value?.estatus ?? 'Entregado' }
-  if (s.includes('enviad') || s.includes('transit'))
-    return { dot:'#7DD3FC', color:'#7DD3FC', label: tracking.value?.estatus ?? 'En tránsito' }
-  if (s.includes('cancel'))
-    return { dot:'#f43f5e', color:'#EF4444', label: tracking.value?.estatus ?? 'Cancelado' }
-  return { dot:'#7DD3FC', color:'#7DD3FC', label: tracking.value?.estatus ?? tracking.value?.estado ?? 'En proceso' }
-})
+// Al abrir la página, actualizar en segundo plano los estados SYSCOM desactualizados
+async function refrescarEstadosSyscom() {
+  try {
+    const r = await $fetch<{ actualizados: number }>('/api/orders/syscom-refresh', { method: 'POST' })
+    if (r.actualizados > 0) await load()
+  } catch { /* silencioso: la lista ya muestra el último estado guardado */ }
+}
+onMounted(() => { refrescarEstadosSyscom() })
+
+const SYSCOM_COLORS: Record<string, { color: string; background: string }> = {
+  pendiente_pago: { color: '#fbbf24', background: 'rgba(245,158,11,0.12)' },
+  autorizado:     { color: '#7DD3FC', background: 'rgba(14,165,233,0.12)' },
+  en_proceso:     { color: '#7DD3FC', background: 'rgba(14,165,233,0.12)' },
+  facturado:      { color: '#a5b4fc', background: 'rgba(99,102,241,0.14)' },
+  en_camino:      { color: '#c4b5fd', background: 'rgba(139,92,246,0.14)' },
+  entregado:      { color: '#4ade80', background: 'rgba(34,197,94,0.14)' },
+  cancelado:      { color: '#f87171', background: 'rgba(239,68,68,0.12)' },
+}
+const syscomStyle = (estado?: string) => SYSCOM_COLORS[estado ?? ''] ?? { color: '#94a3b8', background: 'rgba(148,163,184,0.12)' }
 
 const fmtCurrency = (n: number) => new Intl.NumberFormat('es-MX', { style:'currency', currency:'MXN' }).format(n)
 const fmtDate     = (d: string) => new Intl.DateTimeFormat('es-MX', { day:'2-digit', month:'short', year:'numeric' }).format(new Date(d))
@@ -727,6 +749,13 @@ const fmtDateLong = (d: string) => new Intl.DateTimeFormat('es-MX', { day:'2-dig
 .modal-enter-from,.modal-leave-to { opacity:0; transform:scale(0.97) translateY(-6px); }
 .slide-down-enter-active,.slide-down-leave-active { transition: opacity 0.25s, max-height 0.3s ease; overflow:hidden; max-height:400px; }
 .slide-down-enter-from,.slide-down-leave-to { opacity:0; max-height:0; }
+
+.sy-row { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:5px; }
+.sy-folio { font-size:10.5px; font-weight:700; font-family:ui-monospace,'SF Mono',Menlo,monospace; color:#6ee7b7; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.22); padding:1px 8px; border-radius:6px; }
+.sy-pill { display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:700; padding:2px 9px; border-radius:20px; }
+.sy-pill-muted { color:rgba(148,163,184,0.8); background:rgba(148,163,184,0.1); font-weight:500; }
+.sy-dot { width:6px; height:6px; border-radius:50%; }
+.sy-guia { font-size:10.5px; color:rgba(148,163,184,0.85); font-family:ui-monospace,monospace; }
 
 .cl-num { display:inline-block; margin-left:6px; font-size:10px; font-weight:700; font-family:ui-monospace,'SF Mono',Menlo,monospace; padding:1px 7px; border-radius:6px; color:#7DD3FC; background:rgba(14,165,233,0.1); border:1px solid rgba(14,165,233,0.2); }
 

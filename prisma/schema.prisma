@@ -85,6 +85,9 @@ model Order {
   notes         String?
   syscomFolio   String?     @map("syscom_folio")
   syscomData    Json?       @map("syscom_data")
+  // Último estado consultado en SYSCOM (facturación / entrega) y cuándo se consultó
+  syscomTracking Json?      @map("syscom_tracking")
+  syscomStatusAt DateTime?  @map("syscom_status_at")
   cfdiUid       String?     @map("cfdi_uid")
   auditLog      Json?       @map("audit_log")
   paymentId     String?     @map("payment_id")

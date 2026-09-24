@@ -2,6 +2,7 @@ import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { enviarPedidoSyscom } from '~/server/utils/syscom'
 import { ORDER_INCLUDE, serializeOrder } from '~/server/utils/orderDto'
+import { trackingInicial } from '~/server/utils/syscomTracking'
 import type { OrderItem } from '~/types'
 
 // Evita dos pedidos reales en SYSCOM si se presiona "Reintentar" dos veces seguidas
@@ -43,7 +44,7 @@ export default defineEventHandler(async (event) => {
 
   const updated = await prisma.order.update({
     where: { id },
-    data:  { auditLog, syscomFolio: result.folio, syscomData: result.data ?? undefined },
+    data:  { auditLog, syscomFolio: result.folio, syscomData: result.data ?? undefined, syscomTracking: trackingInicial() as object, syscomStatusAt: new Date() },
     include: ORDER_INCLUDE,
   })
 

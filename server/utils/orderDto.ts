@@ -76,6 +76,20 @@ export function serializeOrder(o: OrderWithUser, isManager: boolean) {
       }
     : null
 
+  // Estado en SYSCOM: el cliente solo ve el estado del envío; admin/approver ven folio de factura y pasos
+  const tr = (o.syscomTracking ?? null) as Record<string, unknown> | null
+  const syscomEstado = tr
+    ? {
+        estado:     String(tr.estado ?? ''),
+        label:      String(tr.label ?? ''),
+        detalle:    String(tr.detalle ?? ''),
+        fletera:    (tr.fletera as string | undefined) ?? null,
+        guia:       (tr.guia as string | undefined) ?? null,
+        consultado: (tr.consultado as string | undefined) ?? o.syscomStatusAt?.toISOString() ?? null,
+        ...(isManager ? { factura: (tr.factura as string | undefined) ?? null, pasos: (tr.pasos as unknown[]) ?? [] } : {}),
+      }
+    : null
+
   return {
     id:            o.id,
     userId:        o.userId,
@@ -88,6 +102,7 @@ export function serializeOrder(o: OrderWithUser, isManager: boolean) {
     priority:      o.priority,
     notes:         o.notes,
     syscomFolio:   o.syscomFolio,
+    syscomEstado,
     cfdiUid:       o.cfdiUid,
     auditLog:      o.auditLog,
     paymentId:     o.paymentId,

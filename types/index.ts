@@ -82,6 +82,7 @@ export interface Order {
   priority: string
   notes?: string
   syscomFolio?: string | null
+  syscomEstado?: { estado: string; label: string; detalle: string; fletera: string | null; guia: string | null; consultado: string | null; factura?: string | null; pasos?: Array<{ paso: string; mensaje: string; fecha: string }> } | null
   cfdiUid?: string | null
   auditLog?: { status: string; by: string; byName: string; at: string }[] | null
   paymentId?: string | null

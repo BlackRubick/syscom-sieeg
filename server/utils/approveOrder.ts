@@ -2,6 +2,7 @@ import prisma from '~/server/utils/prisma'
 import { enviarPedidoSyscom } from '~/server/utils/syscom'
 import type { OrderItem } from '~/types'
 import { ORDER_INCLUDE } from '~/server/utils/orderDto'
+import { trackingInicial } from '~/server/utils/syscomTracking'
 
 const RFC_RE = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i
 
@@ -74,6 +75,7 @@ export async function approveOrder(
       auditLog:  newLog,
       syscomFolio,
       syscomData,
+      ...(syscomFolio && !existing.syscomFolio ? { syscomTracking: trackingInicial() as object, syscomStatusAt: new Date() } : {}),
     },
     include: ORDER_INCLUDE,
   })
