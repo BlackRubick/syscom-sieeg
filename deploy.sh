@@ -2,7 +2,9 @@
 set -e
 
 SERVER="root@66.179.242.92"
-PASS="QlM7Lm2iMj5AF"
+# La contraseña vive en .deploy.env (no se sube a git): SIEEG_SSH_PASS=...
+[ -f "$(dirname "$0")/.deploy.env" ] && . "$(dirname "$0")/.deploy.env"
+PASS="${SIEEG_SSH_PASS:?Falta SIEEG_SSH_PASS (créalo en .deploy.env)}"
 REMOTE_DIR="/root/syscom-sieeg"
 
 echo "▶ Building..."
