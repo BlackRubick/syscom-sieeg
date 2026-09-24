@@ -1,6 +1,7 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { approveOrder } from '~/server/utils/approveOrder'
+import { ORDER_INCLUDE, serializeOrder } from '~/server/utils/orderDto'
 
 const ALLOWED = ['approved', 'rejected', 'cancelled', 'processing', 'shipped', 'delivered'] as const
 type AllowedStatus = typeof ALLOWED[number]
@@ -43,26 +44,7 @@ export default defineEventHandler(async (event) => {
     syscomError = result.syscomError
     const updated = result.order
     return {
-      order: {
-        id:            updated.id,
-        userId:        updated.userId,
-        userName:      updated.user.name,
-        userEmail:     updated.user.email,
-        status:        updated.status,
-        items:         updated.items,
-        total:         updated.total,
-        priority:      updated.priority,
-        notes:         updated.notes,
-        syscomFolio:   updated.syscomFolio,
-        cfdiUid:       updated.cfdiUid,
-        auditLog:      updated.auditLog,
-        paymentId:     updated.paymentId,
-        paymentStatus: updated.paymentStatus,
-        paymentMethod: updated.paymentMethod,
-        paymentData:   updated.paymentData,
-        createdAt:     updated.createdAt.toISOString(),
-        updatedAt:     updated.updatedAt.toISOString(),
-      },
+      order: serializeOrder(updated, isManager),
       syscomError,
     }
   }
@@ -79,7 +61,7 @@ export default defineEventHandler(async (event) => {
   const updated = await prisma.order.update({
     where: { id },
     data:  { status: body.status, auditLog: newLog },
-    include: { user: { select: { id: true, name: true, email: true } } },
+    include: ORDER_INCLUDE,
   })
 
   if (body.status === 'rejected' || body.status === 'cancelled') {
@@ -103,26 +85,7 @@ export default defineEventHandler(async (event) => {
   }
 
   return {
-    order: {
-      id:            updated.id,
-      userId:        updated.userId,
-      userName:      updated.user.name,
-      userEmail:     updated.user.email,
-      status:        updated.status,
-      items:         updated.items,
-      total:         updated.total,
-      priority:      updated.priority,
-      notes:         updated.notes,
-      syscomFolio:   updated.syscomFolio,
-      cfdiUid:       updated.cfdiUid,
-      auditLog:      updated.auditLog,
-      paymentId:     updated.paymentId,
-      paymentStatus: updated.paymentStatus,
-      paymentMethod: updated.paymentMethod,
-      paymentData:   updated.paymentData,
-      createdAt:     updated.createdAt.toISOString(),
-      updatedAt:     updated.updatedAt.toISOString(),
-    },
+    order: serializeOrder(updated, isManager),
     syscomError,
   }
 })

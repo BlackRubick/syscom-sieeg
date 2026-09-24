@@ -1,6 +1,7 @@
 import prisma from '~/server/utils/prisma'
 import { enviarPedidoSyscom } from '~/server/utils/syscom'
 import type { OrderItem } from '~/types'
+import { ORDER_INCLUDE } from '~/server/utils/orderDto'
 
 const RFC_RE = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i
 
@@ -14,7 +15,10 @@ export async function approveOrder(
     include: { user: { select: { id: true, name: true, email: true } } },
   })
   if (!existing) throw new Error(`Orden ${orderId} no encontrada`)
-  if (existing.status === 'approved') return { order: existing, syscomError: undefined }
+  if (existing.status === 'approved') {
+    const order = await prisma.order.findUniqueOrThrow({ where: { id: orderId }, include: ORDER_INCLUDE })
+    return { order, syscomError: undefined }
+  }
 
   const user = await prisma.user.findUnique({
     where:  { id: existing.userId },
@@ -71,7 +75,7 @@ export async function approveOrder(
       syscomFolio,
       syscomData,
     },
-    include: { user: { select: { id: true, name: true, email: true } } },
+    include: ORDER_INCLUDE,
   })
 
   await prisma.notification.create({

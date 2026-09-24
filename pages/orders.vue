@@ -140,328 +140,237 @@
   <!-- ══ MODAL DETALLE ══ -->
   <Teleport to="body">
     <Transition name="fade">
-      <div v-if="detail" style="position:fixed;inset:0;background:rgba(2,6,14,0.82);backdrop-filter:blur(7px);z-index:1050;" @click.self="detail=null" />
+      <div v-if="detail" class="od-backdrop" @click="detail=null" />
     </Transition>
     <Transition name="modal">
-      <div v-if="detail" style="position:fixed;inset:0;z-index:1051;display:flex;align-items:center;justify-content:center;padding:16px;">
-        <div style="width:100%;max-width:600px;max-height:92vh;display:flex;flex-direction:column;">
-          <div style="position:relative;display:flex;flex-direction:column;min-height:0;">
-            <div style="position:absolute;inset:-1px;border-radius:22px;background:linear-gradient(135deg,rgba(14,165,233,0.3),rgba(14,165,233,0.2),rgba(14,165,233,0.08));z-index:0;pointer-events:none;" />
-            <div style="position:relative;z-index:1;border-radius:22px;background:linear-gradient(160deg,#0C1A2E,#06101E);box-shadow:0 32px 80px rgba(0,0,0,0.75);display:flex;flex-direction:column;min-height:0;">
+      <div v-if="detail" class="od-wrap" @click.self="detail=null">
+        <div class="od-modal" role="dialog" aria-modal="true">
 
-              <!-- ── Header ── -->
-              <div style="padding:22px 24px 0;flex-shrink:0;">
-                <div style="position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,rgba(14,165,233,0.6),transparent);border-radius:999px;" />
-
-                <!-- Título + cerrar -->
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;">
-                  <div style="min-width:0;">
-                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                      <span style="font-size:16px;font-weight:800;color:#E2EAF4;font-family:monospace;letter-spacing:0.5px;">{{ detail.id.slice(-10).toUpperCase() }}</span>
-                      <span :style="{ fontSize:'11px', fontWeight:700, padding:'3px 10px', borderRadius:'20px', background:statusCfg[detail.status].bg, color:statusCfg[detail.status].color }">{{ statusCfg[detail.status].label }}</span>
-                      <span :style="{ fontSize:'11px', fontWeight:600, padding:'3px 9px', borderRadius:'20px', background:priCfg[detail.priority]?.bg??priCfg.normal.bg, color:priCfg[detail.priority]?.color??priCfg.normal.color }">{{ priCfg[detail.priority]?.label??'Normal' }}</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap;">
-                      <Clock :size="11" color="rgba(100,118,142,0.6)" />
-                      <span style="font-size:11px;color:rgba(100,118,142,0.7);">{{ fmtDateLong(detail.createdAt) }}</span>
-                      <template v-if="isManager && detail.userName">
-                        <span style="color:rgba(100,118,142,0.5);">·</span>
-                        <User :size="11" color="rgba(100,118,142,0.5)" />
-                        <span style="font-size:11px;color:rgba(100,118,142,0.7);">{{ detail.userName }}</span>
-                      </template>
-                    </div>
-                  </div>
-                  <button @click="detail=null" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
-                    <X :size="14" color="rgba(123,146,176,0.8)" />
-                  </button>
+          <!-- ── Header ── -->
+          <header class="od-head">
+            <div class="od-head-row">
+              <div style="min-width:0;">
+                <div class="od-title-row">
+                  <span class="od-id">#{{ detail.id.slice(-8).toUpperCase() }}</span>
+                  <span class="od-pill" :style="{ background:statusCfg[detail.status].bg, color:statusCfg[detail.status].color }">{{ statusCfg[detail.status].label }}</span>
+                  <span class="od-pill" :style="{ background:priCfg[detail.priority]?.bg??priCfg.normal.bg, color:priCfg[detail.priority]?.color??priCfg.normal.color }">Prioridad {{ (priCfg[detail.priority]?.label??'Normal').toLowerCase() }}</span>
                 </div>
-
-                <!-- Timeline: línea base + círculos encima -->
-                <div style="position:relative;padding:0 14px;margin-bottom:20px;">
-                  <!-- Línea de fondo -->
-                  <div style="position:absolute;top:13px;left:14px;right:14px;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;" />
-                  <!-- Progreso coloreado -->
-                  <div :style="{ position:'absolute', top:'13px', left:'14px', height:'2px', borderRadius:'2px', background:`linear-gradient(90deg,#fbbf24,#22C55E,#7DD3FC,#F59E0B)`, width: timelineProgress + '%', transition:'width 0.4s ease' }" />
-                  <!-- Pasos -->
-                  <div style="display:flex;justify-content:space-between;position:relative;">
-                    <div v-for="step in timeline" :key="step.key" style="display:flex;flex-direction:column;align-items:center;gap:6px;width:52px;">
-                      <div :style="{ width:'26px', height:'26px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, background: stepState(step.key,detail.status)==='done' ? step.color+'28' : stepState(step.key,detail.status)==='active' ? step.color+'38' : 'rgba(9,18,40,1)', border:`2px solid ${stepState(step.key,detail.status)!=='pending' ? step.color : 'rgba(255,255,255,0.12)'}`, boxShadow: stepState(step.key,detail.status)==='active' ? `0 0 12px ${step.color}60` : 'none', transition:'all 0.25s', zIndex:1 }">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" :stroke="stepState(step.key,detail.status)!=='pending' ? step.color : 'rgba(100,118,142,0.35)'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" v-html="step.icon" />
-                      </div>
-                      <span :style="{ fontSize:'9px', fontWeight: stepState(step.key,detail.status)==='active'?700:500, color: stepState(step.key,detail.status)!=='pending' ? step.color : 'rgba(100,118,142,0.4)', textAlign:'center', lineHeight:1.2, whiteSpace:'nowrap' }">{{ step.label }}</span>
-                    </div>
-                  </div>
+                <div class="od-sub">
+                  <Clock :size="12" /> {{ fmtDateLong(detail.createdAt) }}
+                  <template v-if="isManager && detail.userName"><span class="od-dot">·</span><User :size="12" /> {{ detail.userName }}</template>
                 </div>
               </div>
-
-              <!-- ── Cuerpo scrollable ── -->
-              <div style="overflow-y:auto;flex:1;min-height:0;padding:0 24px 24px;display:flex;flex-direction:column;gap:14px;">
-
-                <!-- Productos -->
-                <div style="border-radius:14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
-                  <div style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:6px;">
-                    <Package :size="12" color="rgba(100,118,142,0.6)" />
-                    <span style="font-size:11px;font-weight:700;color:rgba(100,118,142,0.7);text-transform:uppercase;letter-spacing:0.8px;">Productos · {{ detail.items.length }}</span>
-                  </div>
-                  <div style="display:flex;flex-direction:column;">
-                    <div v-for="(item, idx) in detail.items" :key="item.productId"
-                      :style="{ display:'flex', alignItems:'center', gap:'12px', padding:'11px 16px', borderBottom: idx < detail.items.length-1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }">
-                      <!-- Imagen -->
-                      <div style="width:40px;height:40px;border-radius:10px;background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
-                        <img v-if="item.images?.[0]" :src="item.images[0]" style="width:36px;height:36px;object-fit:contain;" @error="(e)=>(e.currentTarget as HTMLImageElement).style.display='none'" />
-                        <Package v-else :size="16" color="#7DD3FC" :stroke-width="1.5" />
-                      </div>
-                      <!-- Nombre + SKU -->
-                      <div style="flex:1;min-width:0;">
-                        <div style="font-size:13px;font-weight:500;color:#7B92B0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ item.name }}</div>
-                        <div style="font-size:10px;color:rgba(100,118,142,0.55);font-family:monospace;margin-top:2px;">{{ item.sku }}</div>
-                      </div>
-                      <!-- Qty + precio -->
-                      <div style="flex-shrink:0;text-align:right;">
-                        <div style="font-size:12px;font-weight:600;color:#94a3b8;">× {{ item.quantity }}</div>
-                        <div v-if="item.price>0" style="font-size:11px;color:#64748b;margin-top:2px;">{{ fmtCurrency(item.price * item.quantity) }}</div>
-                      </div>
-                    </div>
-                  </div>
+              <div class="od-head-right">
+                <div class="od-head-total">
+                  <div class="od-label">Total con IVA</div>
+                  <div class="od-total">{{ fmtCurrency(detailTotals.total) }}</div>
                 </div>
-
-                <!-- Totales: subtotal + IVA = total -->
-                <div style="padding:14px 18px;border-radius:14px;background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.14);display:flex;flex-direction:column;gap:8px;">
-                  <div style="display:flex;justify-content:space-between;font-size:13px;color:#94a3b8;">
-                    <span>Subtotal</span><span>{{ fmtCurrency(detailTotals.subtotal) }}</span>
-                  </div>
-                  <div style="display:flex;justify-content:space-between;font-size:13px;color:#94a3b8;">
-                    <span>IVA (16%)</span><span>{{ fmtCurrency(detailTotals.iva) }}</span>
-                  </div>
-                  <div style="height:1px;background:rgba(14,165,233,0.14);" />
-                  <div style="display:flex;align-items:center;justify-content:space-between;">
-                    <span style="font-size:13px;font-weight:600;color:#94a3b8;">Total con IVA</span>
-                    <span style="font-size:20px;font-weight:800;color:#E2EAF4;">{{ fmtCurrency(detailTotals.total) }}</span>
-                  </div>
-                </div>
-
-                <!-- Info de la orden -->
-                <div style="border-radius:14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
-                  <div style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">
-                    <span style="font-size:11px;font-weight:700;color:rgba(100,118,142,0.7);text-transform:uppercase;letter-spacing:0.8px;">Información</span>
-                  </div>
-                  <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
-                      <span style="font-size:12px;color:rgba(100,118,142,0.65);flex-shrink:0;">ID</span>
-                      <span style="font-size:11px;color:#64748b;font-family:monospace;text-align:right;word-break:break-all;">{{ detail.id }}</span>
-                    </div>
-                    <div style="height:1px;background:rgba(255,255,255,0.05);" />
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
-                      <span style="font-size:12px;color:rgba(100,118,142,0.65);flex-shrink:0;">Creada</span>
-                      <span style="font-size:12px;color:#94a3b8;">{{ fmtDateLong(detail.createdAt) }}</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
-                      <span style="font-size:12px;color:rgba(100,118,142,0.65);flex-shrink:0;">Actualizada</span>
-                      <span style="font-size:12px;color:#94a3b8;">{{ fmtDateLong(detail.updatedAt) }}</span>
-                    </div>
-                    <template v-if="isManager && detail.userName">
-                      <div style="height:1px;background:rgba(255,255,255,0.05);" />
-                      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
-                        <span style="font-size:12px;color:rgba(100,118,142,0.65);flex-shrink:0;">Solicitante</span>
-                        <span style="font-size:12px;font-weight:600;color:#7B92B0;">{{ detail.userName }}</span>
-                      </div>
-                      <div v-if="detail.userEmail" style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
-                        <span style="font-size:12px;color:rgba(100,118,142,0.65);flex-shrink:0;">Email</span>
-                        <span style="font-size:12px;color:#94a3b8;">{{ detail.userEmail }}</span>
-                      </div>
-                    </template>
-                  </div>
-                </div>
-
-                <!-- Folio SYSCOM + rastreo -->
-                <div v-if="detail.syscomFolio" style="border-radius:14px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);overflow:hidden;">
-                  <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                    <div style="display:flex;align-items:center;gap:10px;">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="14" height="17" x="5" y="2" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
-                      <div>
-                        <div style="font-size:10px;font-weight:700;color:rgba(34,197,94,0.7);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;">Folio SYSCOM</div>
-                        <div style="font-size:14px;font-weight:700;color:#6ee7b7;font-family:monospace;">{{ detail.syscomFolio }}</div>
-                      </div>
-                    </div>
-                    <button @click="fetchTracking" :disabled="trackingLoading"
-                      :style="{ height:'32px', padding:'0 14px', borderRadius:'8px', border:'1px solid rgba(34,197,94,0.3)', background:trackingLoading?'rgba(34,197,94,0.05)':'rgba(34,197,94,0.1)', color:'#22C55E', fontSize:'11px', fontWeight:700, cursor:trackingLoading?'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'6px', flexShrink:0, opacity:trackingLoading?0.7:1 }">
-                      <svg v-if="trackingLoading" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-                      <svg v-else width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
-                      {{ trackingLoading ? 'Consultando…' : 'Ver estado' }}
-                    </button>
-                  </div>
-
-                  <!-- Panel de estado SYSCOM -->
-                  <Transition name="slide-down">
-                    <div v-if="tracking" style="border-top:1px solid rgba(34,197,94,0.15);padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
-
-                      <!-- Estatus principal -->
-                      <div style="display:flex;align-items:center;gap:10px;">
-                        <div :style="{ width:'8px', height:'8px', borderRadius:'50%', background: trackingStatusCfg.dot, boxShadow:`0 0 6px ${trackingStatusCfg.dot}80`, flexShrink:0 }" />
-                        <div>
-                          <div style="font-size:13px;font-weight:700;" :style="{ color: trackingStatusCfg.color }">{{ trackingStatusCfg.label }}</div>
-                          <div v-if="tracking.fecha_creacion" style="font-size:10px;color:rgba(100,118,142,0.6);margin-top:2px;">Pedido creado: {{ tracking.fecha_creacion }}</div>
-                        </div>
-                        <div v-if="trackingJustUpdated" style="margin-left:auto;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(34,197,94,0.15);color:#22C55E;">
-                          ✓ Estado actualizado
-                        </div>
-                      </div>
-
-                      <!-- Fecha estimada de entrega -->
-                      <div v-if="tracking.fecha_entrega" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.15);">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                        <div>
-                          <div style="font-size:10px;font-weight:600;color:rgba(129,140,248,0.7);text-transform:uppercase;letter-spacing:0.7px;">Entrega estimada</div>
-                          <div style="font-size:13px;font-weight:700;color:#a5b4fc;margin-top:2px;">{{ tracking.fecha_entrega }}</div>
-                        </div>
-                      </div>
-
-                      <!-- Dirección de entrega -->
-                      <div v-if="tracking.datos_entrega" style="font-size:11px;color:rgba(100,118,142,0.7);line-height:1.6;">
-                        <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.5);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px;">Enviar a</div>
-                        <div v-if="tracking.datos_entrega.atencion_a" style="font-weight:600;color:#94a3b8;">{{ tracking.datos_entrega.atencion_a }}</div>
-                        <div>{{ [tracking.datos_entrega.calle, tracking.datos_entrega.num_exterior].filter(Boolean).join(' ') }}</div>
-                        <div>{{ [tracking.datos_entrega.colonia, tracking.datos_entrega.ciudad, tracking.datos_entrega.estado].filter(Boolean).join(', ') }}</div>
-                      </div>
-
-                      <!-- Error de rastreo -->
-                      <div v-if="trackingError" style="font-size:11px;color:#EF4444;">{{ trackingError }}</div>
-                    </div>
-                  </Transition>
-
-                  <!-- Error al consultar -->
-                  <div v-if="trackingError && !tracking" style="padding:10px 16px;border-top:1px solid rgba(239,68,68,0.15);font-size:11px;color:#EF4444;">
-                    {{ trackingError }}
-                  </div>
-                </div>
-
-                <!-- Pago OpenPay -->
-                <div v-if="detail.paymentId" style="border-radius:14px;overflow:hidden;"
-                  :style="{ background: detail.paymentMethod==='spei' ? 'rgba(34,197,94,0.05)' : 'rgba(14,165,233,0.05)', border: detail.paymentMethod==='spei' ? '1px solid rgba(34,197,94,0.2)' : '1px solid rgba(14,165,233,0.18)' }">
-                  <!-- Header pago -->
-                  <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-                    <div style="display:flex;align-items:center;gap:10px;">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" :stroke="detail.paymentMethod==='spei'?'#22C55E':'#7DD3FC'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
-                      <div>
-                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;"
-                          :style="{ color: detail.paymentMethod==='spei' ? 'rgba(34,197,94,0.7)' : 'rgba(56,189,248,0.7)' }">
-                          {{ detail.paymentMethod === 'spei' ? 'Transferencia SPEI · OpenPay' : 'Pago con tarjeta · OpenPay' }}
-                        </div>
-                        <div style="font-size:11px;font-family:monospace;color:rgba(100,118,142,0.65);">{{ detail.paymentId }}</div>
-                      </div>
-                    </div>
-                    <span :style="{
-                      fontSize:'11px', fontWeight:700, padding:'3px 10px', borderRadius:'20px',
-                      background: detail.paymentStatus==='paid' ? 'rgba(34,197,94,0.15)' : detail.paymentStatus==='pending_spei' ? 'rgba(245,158,11,0.12)' : 'rgba(245,158,11,0.12)',
-                      color:      detail.paymentStatus==='paid' ? '#22C55E' : '#fbbf24'
-                    }">
-                      {{ detail.paymentStatus === 'paid' ? 'Pagado' : detail.paymentStatus === 'pending_spei' ? 'Esperando transferencia' : detail.paymentStatus ?? 'Pendiente' }}
-                    </span>
-                  </div>
-
-                  <!-- SPEI: datos bancarios -->
-                  <div v-if="detail.paymentMethod === 'spei' && detail.paymentData"
-                    style="border-top:1px solid rgba(34,197,94,0.12);padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                      <div>
-                        <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.5);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px;">CLABE</div>
-                        <div style="font-size:12px;font-weight:700;font-family:monospace;color:#6ee7b7;letter-spacing:1px;">{{ detail.paymentData.clabe }}</div>
-                      </div>
-                      <div>
-                        <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.5);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px;">Banco</div>
-                        <div style="font-size:12px;color:#94a3b8;">{{ detail.paymentData.bank }}</div>
-                      </div>
-                    </div>
-                    <div>
-                      <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.5);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px;">Convenio CIE</div>
-                      <div style="font-size:12px;font-weight:700;font-family:monospace;color:#22C55E;">{{ detail.paymentData.agreement }}</div>
-                    </div>
-                    <div v-if="isManager" style="padding:8px 12px;border-radius:8px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.18);font-size:11px;color:rgba(251,191,36,0.85);line-height:1.5;">
-                      Verifica la recepción de la transferencia antes de aprobar el pedido.
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Notas -->
-                <div v-if="detail.notes" style="border-radius:14px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.18);padding:14px 16px;">
-                  <div style="font-size:11px;font-weight:700;color:rgba(129,140,248,0.7);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Notas</div>
-                  <p style="font-size:13px;color:#94a3b8;line-height:1.65;margin:0;">{{ detail.notes }}</p>
-                </div>
-
-                <!-- Acciones admin — solo órdenes pendientes -->
-                <div v-if="isManager && detail.status === 'pending'" style="border-radius:14px;background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.2);padding:16px;">
-                  <div style="font-size:11px;font-weight:700;color:rgba(251,191,36,0.7);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;">Acción requerida</div>
-                  <Transition name="fade">
-                    <div v-if="actionError" style="padding:9px 12px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);font-size:12px;color:#EF4444;margin-bottom:10px;">{{ actionError }}</div>
-                  </Transition>
-                  <Transition name="fade">
-                    <div v-if="actionSuccess" style="padding:9px 12px;border-radius:8px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);font-size:12px;color:#22C55E;margin-bottom:10px;">{{ actionSuccess }}</div>
-                  </Transition>
-                  <div style="display:flex;gap:10px;">
-                    <button @click="handleAction('reject')" :disabled="actionLoading"
-                      style="flex:1;height:40px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:rgba(239,68,68,0.08);color:#EF4444;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;"
-                      :style="{ opacity: actionLoading ? 0.5 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }">
-                      Rechazar
-                    </button>
-                    <button @click="handleAction('approve')" :disabled="actionLoading"
-                      style="flex:2;height:40px;border-radius:10px;border:none;background:linear-gradient(135deg,#22C55E,#059669);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(34,197,94,0.3);transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:7px;"
-                      :style="{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }">
-                      <svg v-if="!actionLoading" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-                      {{ actionLoading ? 'Procesando…' : 'Aprobar y enviar a SYSCOM' }}
-                    </button>
-                  </div>
-                </div>
-
-                <!-- #6 — Retry SYSCOM: aprobada sin folio -->
-                <div v-if="isManager && detail.status === 'approved' && !detail.syscomFolio" style="border-radius:14px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.18);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
-                  <div>
-                    <div style="font-size:12px;font-weight:700;color:#7DD3FC;">Sin folio SYSCOM</div>
-                    <div style="font-size:11px;color:rgba(56,189,248,0.6);margin-top:2px;">El pedido fue aprobado pero no llegó a SYSCOM.</div>
-                    <div v-if="lastSyscomError" style="font-size:11px;color:#fca5a5;margin-top:4px;line-height:1.4;">Motivo: {{ lastSyscomError }}</div>
-                  </div>
-                  <button @click="retrySyscom(detail)" :disabled="retrying===detail.id"
-                    style="height:34px;padding:0 14px;border-radius:8px;border:1px solid rgba(14,165,233,0.35);background:rgba(14,165,233,0.1);color:#7DD3FC;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;flex-shrink:0;"
-                    :style="{ opacity: retrying===detail.id ? 0.6 : 1 }">
-                    <svg v-if="retrying===detail.id" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-                    <RefreshCw v-else :size="11" />
-                    {{ retrying===detail.id ? 'Enviando…' : 'Reintentar SYSCOM' }}
-                  </button>
-                </div>
-
-                <!-- #13 — Cancelar pedido (pending o approved) -->
-                <div v-if="(detail.status==='pending' || detail.status==='approved') && !isManager" style="border-top:1px solid rgba(255,255,255,0.06);padding-top:10px;">
-                  <button @click="cancelOrder(detail)" :disabled="cancelling"
-                    style="width:100%;height:36px;border-radius:9px;border:1px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.06);color:#EF4444;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;"
-                    :style="{ opacity: cancelling ? 0.6 : 1, cursor: cancelling ? 'not-allowed' : 'pointer' }">
-                    {{ cancelling ? 'Cancelando…' : 'Cancelar pedido' }}
-                  </button>
-                </div>
-                <div v-if="isManager && (detail.status==='pending' || detail.status==='approved')" style="padding-top:4px;">
-                  <button @click="cancelOrder(detail)" :disabled="cancelling"
-                    style="width:100%;height:34px;border-radius:8px;border:1px solid rgba(123,146,176,0.15);background:transparent;color:rgba(123,146,176,0.5);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;"
-                    :style="{ opacity: cancelling ? 0.6 : 1, cursor: cancelling ? 'not-allowed' : 'pointer' }">
-                    {{ cancelling ? 'Cancelando…' : 'Cancelar pedido' }}
-                  </button>
-                </div>
-
-                <!-- #17 — Audit log -->
-                <div v-if="isManager && Array.isArray(detail.auditLog) && detail.auditLog.length" style="border-radius:14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
-                  <div style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">
-                    <span style="font-size:11px;font-weight:700;color:rgba(100,118,142,0.7);text-transform:uppercase;letter-spacing:0.8px;">Historial</span>
-                  </div>
-                  <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
-                    <div v-for="(entry, i) in (detail.auditLog as {status:string;byName:string;at:string}[])" :key="i" style="display:flex;align-items:center;gap:10px;">
-                      <div :style="{ width:'7px', height:'7px', borderRadius:'50%', background:statusCfg[entry.status]?.dot??'#94a3b8', flexShrink:0 }" />
-                      <span style="font-size:11px;color:#94a3b8;">{{ statusCfg[entry.status]?.label??entry.status }}</span>
-                      <span style="font-size:10px;color:rgba(100,118,142,0.55);">por {{ entry.byName }}</span>
-                      <span style="font-size:10px;color:rgba(100,118,142,0.4);margin-left:auto;flex-shrink:0;">{{ fmtDate(entry.at) }}</span>
-                    </div>
-                  </div>
-                </div>
-
+                <button class="od-close" aria-label="Cerrar" @click="detail=null"><X :size="15" /></button>
               </div>
             </div>
+
+            <!-- Timeline -->
+            <div v-if="detail.status==='rejected' || detail.status==='cancelled'" class="od-ended" :style="{ color:statusCfg[detail.status].color, background:statusCfg[detail.status].bg }">
+              Este pedido fue {{ detail.status==='rejected' ? 'rechazado' : 'cancelado' }}.
+            </div>
+            <div v-else class="od-timeline">
+              <div class="od-tl-base" />
+              <div class="od-tl-progress" :style="{ width: `calc((100% - 52px) * ${timelineProgress / 100})` }" />
+              <div v-for="step in timeline" :key="step.key" class="od-tl-step">
+                <div class="od-tl-dot" :style="{ background: stepState(step.key,detail.status)==='pending' ? '#091228' : step.color+'30', borderColor: stepState(step.key,detail.status)!=='pending' ? step.color : 'rgba(255,255,255,0.12)', boxShadow: stepState(step.key,detail.status)==='active' ? `0 0 12px ${step.color}70` : 'none' }">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" :stroke="stepState(step.key,detail.status)!=='pending' ? step.color : 'rgba(100,118,142,0.4)'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" v-html="step.icon" />
+                </div>
+                <span class="od-tl-label" :style="{ color: stepState(step.key,detail.status)!=='pending' ? step.color : 'rgba(100,118,142,0.5)', fontWeight: stepState(step.key,detail.status)==='active' ? 700 : 500 }">{{ step.label }}</span>
+              </div>
+            </div>
+          </header>
+
+          <!-- ── Cuerpo (scroll) ── -->
+          <div class="od-body">
+
+            <Transition name="fade"><div v-if="actionError" class="od-alert od-alert-err">{{ actionError }}</div></Transition>
+            <Transition name="fade"><div v-if="actionSuccess" class="od-alert od-alert-ok">{{ actionSuccess }}</div></Transition>
+
+            <!-- Acciones admin (pendiente) — arriba para que se vean sin hacer scroll -->
+            <section v-if="isManager && detail.status === 'pending'" class="od-card od-card-warn">
+              <div class="od-card-title" style="color:rgba(251,191,36,0.85);">Acción requerida</div>
+              <p class="od-muted" style="margin:0 0 12px;">Al aprobar se genera el pedido real en SYSCOM con cargo a tu cuenta.</p>
+              <div v-if="!detail.entrega" class="od-alert od-alert-err" style="margin-bottom:12px;">Este cliente no tiene dirección de entrega: SYSCOM rechazará el pedido. Captura sus datos en <b>Datos Fiscales</b> antes de aprobar.</div>
+              <div class="od-actions">
+                <button class="od-btn od-btn-danger" :disabled="actionLoading" @click="handleAction('reject')">Rechazar</button>
+                <button class="od-btn od-btn-ok" :disabled="actionLoading" @click="handleAction('approve')">
+                  <svg v-if="actionLoading" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                  <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  {{ actionLoading ? 'Procesando…' : 'Aprobar y enviar a SYSCOM' }}
+                </button>
+              </div>
+            </section>
+
+            <!-- Aprobada sin folio: reintento -->
+            <section v-if="isManager && detail.status === 'approved' && !detail.syscomFolio" class="od-card od-card-err">
+              <div class="od-row-between">
+                <div style="min-width:0;">
+                  <div class="od-card-title" style="color:#fca5a5;margin-bottom:4px;">No llegó a SYSCOM</div>
+                  <div class="od-muted">El pedido está aprobado pero SYSCOM no lo registró.</div>
+                  <div v-if="lastSyscomError" class="od-reason">Motivo: {{ lastSyscomError }}</div>
+                </div>
+                <button class="od-btn od-btn-sky" :disabled="retrying===detail.id" @click="retrySyscom(detail)">
+                  <svg v-if="retrying===detail.id" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                  <RefreshCw v-else :size="12" />
+                  {{ retrying===detail.id ? 'Enviando…' : 'Reintentar' }}
+                </button>
+              </div>
+            </section>
+
+            <!-- Productos + totales -->
+            <section class="od-card od-card-flush">
+              <div class="od-card-head">
+                <span class="od-card-title"><Package :size="13" /> Productos</span>
+                <span class="od-muted">{{ detail.items.length }} producto{{ detail.items.length!==1?'s':'' }} · {{ totalPiezas }} pieza{{ totalPiezas!==1?'s':'' }}</span>
+              </div>
+              <div v-for="item in detail.items" :key="item.productId" class="od-item">
+                <div class="od-item-img">
+                  <img v-if="item.images?.[0]" :src="item.images[0]" alt="" @error="(e)=>(e.currentTarget as HTMLImageElement).style.display='none'" />
+                  <Package v-else :size="18" color="#7DD3FC" :stroke-width="1.5" />
+                </div>
+                <div class="od-item-info">
+                  <div class="od-item-name" :title="item.name">{{ item.name }}</div>
+                  <div class="od-item-meta">
+                    <span v-if="item.sku" class="od-mono">{{ item.sku }}</span>
+                    <span v-if="almacenesDe(item.productId)" class="od-tag">{{ almacenesDe(item.productId) }}</span>
+                  </div>
+                </div>
+                <div class="od-item-price">
+                  <div class="od-muted">{{ item.quantity }} × {{ fmtCurrency(item.price) }}</div>
+                  <div class="od-strong">{{ fmtCurrency(item.price * item.quantity) }}</div>
+                </div>
+              </div>
+              <div class="od-totals">
+                <div class="od-kv"><span>Subtotal</span><span>{{ fmtCurrency(detailTotals.subtotal) }}</span></div>
+                <div class="od-kv"><span>IVA (16%)</span><span>{{ fmtCurrency(detailTotals.iva) }}</span></div>
+                <div class="od-kv od-kv-total"><span>Total con IVA</span><span>{{ fmtCurrency(detailTotals.total) }}</span></div>
+              </div>
+            </section>
+
+            <!-- Cliente + Entrega -->
+            <div class="od-grid2">
+              <section class="od-card">
+                <div class="od-card-title" style="margin-bottom:10px;"><User :size="13" /> Cliente</div>
+                <div class="od-kv"><span>Nombre</span><b>{{ detail.userName || '—' }}</b></div>
+                <div v-if="detail.userEmail" class="od-kv"><span>Correo</span><b class="od-break">{{ detail.userEmail }}</b></div>
+                <div class="od-kv"><span>RFC</span><b class="od-mono">{{ detail.cliente?.rfc || '—' }}</b></div>
+                <div v-if="detail.cliente?.razonSocial" class="od-kv"><span>Razón social</span><b>{{ detail.cliente.razonSocial }}</b></div>
+                <div v-if="detail.cliente?.regimen" class="od-kv"><span>Régimen</span><b>{{ detail.cliente.regimen }}</b></div>
+                <div v-if="detail.cliente?.usoCfdi" class="od-kv"><span>Uso CFDI</span><b>{{ detail.cliente.usoCfdi }}</b></div>
+              </section>
+              <section class="od-card">
+                <div class="od-row-between" style="margin-bottom:10px;">
+                  <span class="od-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Entrega</span>
+                  <span v-if="detail.entrega" class="od-tag" :style="detail.entrega.fuente==='syscom' ? 'background:rgba(34,197,94,0.12);color:#4ade80;' : ''">{{ detail.entrega.fuente==='syscom' ? 'Confirmada por SYSCOM' : 'Dirección fiscal' }}</span>
+                </div>
+                <template v-if="detail.entrega">
+                  <div class="od-strong" style="font-size:13px;">{{ detail.entrega.atencionA }}</div>
+                  <div class="od-text">{{ detail.entrega.linea1 }}</div>
+                  <div class="od-text">{{ detail.entrega.linea2 }}<template v-if="detail.entrega.cp"> · C.P. {{ detail.entrega.cp }}</template></div>
+                  <div v-if="detail.entrega.telefono" class="od-muted" style="margin-top:6px;">Tel. {{ detail.entrega.telefono }}</div>
+                </template>
+                <div v-else class="od-muted">El cliente no ha capturado su dirección.</div>
+              </section>
+            </div>
+
+            <!-- SYSCOM -->
+            <section v-if="detail.syscomFolio" class="od-card od-card-ok">
+              <div class="od-row-between">
+                <div>
+                  <div class="od-label" style="color:rgba(74,222,128,0.8);">Folio SYSCOM</div>
+                  <div class="od-folio">{{ detail.syscomFolio }}</div>
+                </div>
+                <button class="od-btn od-btn-green" :disabled="trackingLoading" @click="fetchTracking">
+                  <svg v-if="trackingLoading" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                  <RefreshCw v-else :size="12" />
+                  {{ trackingLoading ? 'Consultando…' : 'Ver estado' }}
+                </button>
+              </div>
+
+              <!-- Costo SYSCOM vs venta (solo admin/approver) -->
+              <div v-if="isManager && detail.syscom" class="od-cost">
+                <div class="od-kv"><span>Costo productos SYSCOM</span><span>{{ fmtCurrency(detail.syscom.subtotal ?? 0) }}</span></div>
+                <div class="od-kv"><span>Flete</span><span>{{ fmtCurrency(detail.syscom.flete ?? 0) }}</span></div>
+                <div class="od-kv"><span>IVA</span><span>{{ fmtCurrency(detail.syscom.iva ?? 0) }}</span></div>
+                <div class="od-kv od-strong"><span>Total pagado a SYSCOM</span><span>{{ fmtCurrency(detail.syscom.total ?? 0) }}</span></div>
+                <div class="od-kv od-margin" :class="utilidad < 0 ? 'neg' : 'pos'">
+                  <span>Utilidad estimada (sin IVA)</span><span>{{ fmtCurrency(utilidad) }}</span>
+                </div>
+              </div>
+
+              <Transition name="slide-down">
+                <div v-if="tracking" class="od-tracking">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <span class="od-status-dot" :style="{ background: trackingStatusCfg.dot }" />
+                    <div>
+                      <div class="od-strong" :style="{ color: trackingStatusCfg.color }">{{ trackingStatusCfg.label }}</div>
+                      <div v-if="tracking.fecha_creacion" class="od-muted">Pedido creado: {{ tracking.fecha_creacion }}</div>
+                    </div>
+                    <span v-if="trackingJustUpdated" class="od-tag" style="margin-left:auto;background:rgba(34,197,94,0.15);color:#22C55E;">✓ Estado actualizado</span>
+                  </div>
+                  <div v-if="tracking.fecha_entrega" class="od-kv"><span>Entrega estimada</span><b>{{ tracking.fecha_entrega }}</b></div>
+                </div>
+              </Transition>
+              <div v-if="trackingError" class="od-reason">{{ trackingError }}</div>
+            </section>
+
+            <!-- Pago -->
+            <section v-if="detail.paymentId" class="od-card">
+              <div class="od-row-between">
+                <div style="min-width:0;">
+                  <div class="od-card-title" style="margin-bottom:4px;">{{ detail.paymentMethod === 'spei' ? 'Transferencia SPEI' : 'Pago con tarjeta' }} · OpenPay</div>
+                  <div class="od-mono od-muted od-break">{{ detail.paymentId }}</div>
+                </div>
+                <span class="od-pill" :style="payStatus.style">{{ payStatus.label }}</span>
+              </div>
+              <div v-if="detail.paymentMethod === 'spei' && detail.paymentData" class="od-grid2" style="margin-top:12px;">
+                <div><div class="od-label">CLABE</div><div class="od-mono od-strong" style="color:#6ee7b7;">{{ detail.paymentData.clabe }}</div></div>
+                <div><div class="od-label">Banco</div><div class="od-text">{{ detail.paymentData.bank }}</div></div>
+                <div><div class="od-label">Convenio CIE</div><div class="od-mono od-strong" style="color:#22C55E;">{{ detail.paymentData.agreement }}</div></div>
+              </div>
+              <div v-if="isManager && detail.paymentMethod === 'spei' && detail.paymentStatus !== 'paid'" class="od-reason" style="color:rgba(251,191,36,0.9);">Verifica la recepción de la transferencia antes de aprobar.</div>
+            </section>
+
+            <!-- Notas -->
+            <section v-if="detail.notes" class="od-card">
+              <div class="od-card-title" style="margin-bottom:6px;">Notas del cliente</div>
+              <p class="od-text" style="margin:0;white-space:pre-wrap;">{{ detail.notes }}</p>
+            </section>
+
+            <!-- Historial -->
+            <section v-if="isManager && Array.isArray(detail.auditLog) && detail.auditLog.length" class="od-card">
+              <div class="od-card-title" style="margin-bottom:10px;">Historial</div>
+              <ol class="od-log">
+                <li v-for="(entry, i) in (detail.auditLog as AuditEntry[])" :key="i">
+                  <span class="od-status-dot" :style="{ background: statusCfg[entry.status]?.dot ?? '#94a3b8' }" />
+                  <div style="min-width:0;flex:1;">
+                    <div class="od-row-between" style="gap:8px;">
+                      <span class="od-text"><b>{{ entry.retry ? 'Reintento SYSCOM' : (statusCfg[entry.status]?.label ?? entry.status) }}</b> <span class="od-muted">por {{ entry.byName }}</span></span>
+                      <span class="od-muted" style="white-space:nowrap;">{{ fmtDateLong(entry.at) }}</span>
+                    </div>
+                    <div v-if="entry.syscomFolio" class="od-log-note" style="color:#4ade80;">Folio SYSCOM {{ entry.syscomFolio }}</div>
+                    <div v-if="entry.syscomError" class="od-log-note" style="color:#fca5a5;">{{ entry.syscomError }}</div>
+                    <div v-if="entry.note" class="od-log-note">{{ entry.note }}</div>
+                  </div>
+                </li>
+              </ol>
+            </section>
+
+            <!-- Cancelar -->
+            <section v-if="detail.status==='pending' || detail.status==='approved'" class="od-cancel">
+              <p v-if="detail.syscomFolio && isManager" class="od-muted" style="margin:0 0 8px;">Cancelar aquí <b>no</b> cancela el pedido en SYSCOM ({{ detail.syscomFolio }}); cancélalo también con tu ejecutivo.</p>
+              <button class="od-btn od-btn-ghost" :disabled="cancelling" @click="cancelOrder(detail)">{{ cancelling ? 'Cancelando…' : 'Cancelar pedido' }}</button>
+            </section>
+
+            <footer class="od-meta">
+              <span>ID <span class="od-mono">{{ detail.id }}</span></span>
+              <span>Actualizada {{ fmtDateLong(detail.updatedAt) }}</span>
+            </footer>
           </div>
         </div>
       </div>
@@ -486,6 +395,43 @@ const lastSyscomError = computed(() => {
   const log = (detail.value?.auditLog ?? []) as Array<{ syscomError?: string }>
   return [...log].reverse().find(e => e.syscomError)?.syscomError ?? ''
 })
+type AuditEntry = { status: string; byName: string; at: string; retry?: boolean; syscomFolio?: string; syscomError?: string; note?: string }
+
+const totalPiezas = computed(() => (detail.value?.items ?? []).reduce((s, i) => s + i.quantity, 0))
+
+// Almacén SYSCOM que surte cada producto (solo lo recibe admin/approver)
+function almacenesDe(productId: string): string {
+  const a = detail.value?.syscom?.almacenes.find(x => x.productId === String(productId))?.almacenes
+  if (!a) return ''
+  return Object.entries(a).map(([k, v]) => (Object.keys(a).length > 1 ? `${k} (${v})` : k)).join(', ')
+}
+
+// Venta sin IVA − (costo SYSCOM + flete), ambos sin IVA
+const utilidad = computed(() => {
+  const sc = detail.value?.syscom
+  if (!sc) return 0
+  return Math.round((detailTotals.value.subtotal - (sc.subtotal ?? 0) - (sc.flete ?? 0)) * 100) / 100
+})
+
+const PAY_STATUS: Record<string, { label: string; ok?: boolean; bad?: boolean }> = {
+  paid:         { label: 'Pagado', ok: true },
+  pending:      { label: 'Pendiente' },
+  pending_3ds:  { label: 'Pendiente · 3D Secure' },
+  pending_spei: { label: 'Esperando transferencia' },
+  in_progress:  { label: 'En proceso' },
+  failed:       { label: 'Fallido', bad: true },
+  cancelled:    { label: 'Cancelado', bad: true },
+}
+const payStatus = computed(() => {
+  const st = PAY_STATUS[detail.value?.paymentStatus ?? ''] ?? { label: detail.value?.paymentStatus ?? 'Pendiente' }
+  return {
+    label: st.label,
+    style: st.ok  ? { background: 'rgba(34,197,94,0.15)', color: '#22C55E' }
+         : st.bad ? { background: 'rgba(239,68,68,0.12)', color: '#EF4444' }
+         :          { background: 'rgba(245,158,11,0.12)', color: '#fbbf24' },
+  }
+})
+
 const detailTotals  = computed(() => detail.value
   ? desgloseTotales(detail.value.items as { price: number; quantity: number }[], detail.value.total)
   : { subtotal: 0, iva: 0, total: 0 })
@@ -593,8 +539,8 @@ async function retrySyscom(order: Order) {
   retrying.value    = order.id
   actionError.value = null
   try {
-    const res = await $fetch<{ folio: string | null; syscomError?: string }>(`/api/orders/${order.id}/retry-syscom`, { method: 'POST' })
-    const updated = { ...order, syscomFolio: res.folio }
+    const res = await $fetch<{ folio: string | null; syscomError?: string; order?: Order }>(`/api/orders/${order.id}/retry-syscom`, { method: 'POST' })
+    const updated = res.order ?? { ...order, syscomFolio: res.folio }
     orders.value = orders.value.map(o => o.id === order.id ? updated : o)
     if (detail.value?.id === order.id) detail.value = updated
     actionSuccess.value = res.syscomError
@@ -767,4 +713,108 @@ const fmtDateLong = (d: string) => new Intl.DateTimeFormat('es-MX', { day:'2-dig
 .modal-enter-from,.modal-leave-to { opacity:0; transform:scale(0.97) translateY(-6px); }
 .slide-down-enter-active,.slide-down-leave-active { transition: opacity 0.25s, max-height 0.3s ease; overflow:hidden; max-height:400px; }
 .slide-down-enter-from,.slide-down-leave-to { opacity:0; max-height:0; }
+
+/* ── Modal detalle de pedido ── */
+.od-backdrop { position:fixed; inset:0; background:rgba(2,6,14,0.82); backdrop-filter:blur(7px); z-index:1050; }
+.od-wrap { position:fixed; inset:0; z-index:1051; display:flex; align-items:center; justify-content:center; padding:16px; }
+.od-modal { width:100%; max-width:760px; max-height:calc(100vh - 32px); max-height:calc(100dvh - 32px); display:flex; flex-direction:column; overflow:hidden;
+  border-radius:20px; background:linear-gradient(160deg,#0C1A2E,#06101E); border:1px solid rgba(14,165,233,0.22); box-shadow:0 32px 80px rgba(0,0,0,0.75); font-family:'Inter',system-ui,sans-serif; color:#E2EAF4; }
+.od-head { flex-shrink:0; padding:20px 24px 16px; border-bottom:1px solid rgba(255,255,255,0.07); }
+.od-head-row { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
+.od-head-right { display:flex; align-items:flex-start; gap:14px; flex-shrink:0; }
+.od-head-total { text-align:right; }
+.od-title-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.od-id { font-size:18px; font-weight:800; font-family:ui-monospace,monospace; letter-spacing:0.5px; }
+.od-pill { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; white-space:nowrap; }
+.od-sub { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:6px; font-size:12px; color:rgba(123,146,176,0.85); }
+.od-dot { opacity:0.5; }
+.od-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:rgba(100,118,142,0.75); margin-bottom:3px; }
+.od-total { font-size:22px; font-weight:800; letter-spacing:-0.3px; }
+.od-close { width:32px; height:32px; border-radius:9px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:rgba(123,146,176,0.9); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.od-close:hover { background:rgba(255,255,255,0.1); }
+.od-ended { margin-top:14px; padding:9px 12px; border-radius:10px; font-size:12px; font-weight:600; }
+.od-timeline { position:relative; display:flex; justify-content:space-between; margin-top:18px; }
+.od-tl-base, .od-tl-progress { position:absolute; top:13px; left:26px; height:2px; border-radius:2px; }
+.od-tl-base { right:26px; background:rgba(255,255,255,0.08); }
+.od-tl-progress { background:linear-gradient(90deg,#fbbf24,#22C55E,#7DD3FC); transition:width 0.4s ease; }
+.od-tl-step { position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; width:52px; }
+.od-tl-dot { width:28px; height:28px; border-radius:50%; border:2px solid; display:flex; align-items:center; justify-content:center; }
+.od-tl-label { font-size:10px; white-space:nowrap; }
+
+.od-body { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; padding:18px 24px 20px; display:flex; flex-direction:column; gap:14px; }
+.od-body > * { flex-shrink:0; }
+.od-card { border-radius:14px; background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07); padding:14px 16px; }
+.od-card-flush { padding:0; overflow:hidden; }
+.od-card-warn { background:rgba(245,158,11,0.06); border-color:rgba(245,158,11,0.25); }
+.od-card-err  { background:rgba(239,68,68,0.06);  border-color:rgba(239,68,68,0.25); }
+.od-card-ok   { background:rgba(34,197,94,0.05);  border-color:rgba(34,197,94,0.22); }
+.od-card-head { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.06); }
+.od-card-title { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:rgba(148,163,184,0.85); }
+.od-row-between { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.od-muted { font-size:11.5px; color:rgba(123,146,176,0.8); line-height:1.5; }
+.od-text { font-size:12.5px; color:#b6c3d4; line-height:1.55; }
+.od-strong { font-weight:700; color:#E2EAF4; }
+.od-mono { font-family:ui-monospace,'SF Mono',Menlo,monospace; }
+.od-break { word-break:break-all; }
+.od-tag { font-size:10px; font-weight:600; padding:2px 8px; border-radius:20px; background:rgba(14,165,233,0.12); color:#7DD3FC; white-space:nowrap; }
+.od-reason { margin-top:8px; font-size:12px; color:#fca5a5; line-height:1.5; }
+
+.od-item { display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.05); }
+.od-item-img { width:48px; height:48px; border-radius:10px; background:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
+.od-item-img img { width:44px; height:44px; object-fit:contain; }
+.od-item-info { flex:1; min-width:0; }
+.od-item-name { font-size:13px; font-weight:500; color:#d5deea; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.od-item-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:4px; font-size:11px; color:rgba(123,146,176,0.8); }
+.od-item-price { text-align:right; flex-shrink:0; }
+.od-item-price .od-strong { font-size:13.5px; margin-top:2px; }
+
+.od-totals { padding:12px 16px; background:rgba(14,165,233,0.05); display:flex; flex-direction:column; gap:6px; }
+.od-kv { display:flex; justify-content:space-between; align-items:baseline; gap:14px; font-size:12.5px; color:#94a3b8; padding:2px 0; }
+.od-kv > span:first-child { color:rgba(123,146,176,0.85); flex-shrink:0; }
+.od-kv > b { font-weight:600; color:#d5deea; text-align:right; min-width:0; }
+.od-kv-total { margin-top:4px; padding-top:8px; border-top:1px solid rgba(14,165,233,0.18); font-size:14px; }
+.od-kv-total > span { color:#E2EAF4 !important; font-weight:800; }
+.od-kv-total > span:last-child { font-size:18px; }
+
+.od-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.od-folio { font-size:15px; font-weight:800; color:#6ee7b7; font-family:ui-monospace,monospace; }
+.od-cost { margin-top:12px; padding-top:10px; border-top:1px solid rgba(34,197,94,0.15); }
+.od-margin { margin-top:4px; padding:6px 10px; border-radius:8px; font-weight:700; }
+.od-margin.pos { background:rgba(34,197,94,0.1); } .od-margin.pos > span { color:#4ade80 !important; }
+.od-margin.neg { background:rgba(239,68,68,0.12); } .od-margin.neg > span { color:#f87171 !important; }
+.od-tracking { margin-top:12px; padding-top:12px; border-top:1px solid rgba(34,197,94,0.15); display:flex; flex-direction:column; gap:8px; }
+.od-status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+
+.od-log { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.od-log li { display:flex; gap:10px; align-items:flex-start; }
+.od-log-note { font-size:11.5px; color:rgba(148,163,184,0.85); margin-top:2px; line-height:1.45; word-break:break-word; }
+
+.od-alert { padding:10px 14px; border-radius:10px; font-size:12.5px; line-height:1.5; }
+.od-alert-err { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); color:#fca5a5; }
+.od-alert-ok  { background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.25); color:#4ade80; }
+.od-actions { display:flex; gap:10px; }
+.od-btn { height:38px; padding:0 16px; border-radius:10px; font-size:12.5px; font-weight:700; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:7px; white-space:nowrap; transition:opacity 0.15s, background 0.15s; }
+.od-btn:disabled { opacity:0.55; cursor:not-allowed; }
+.od-btn-ok     { flex:2; border:none; background:linear-gradient(135deg,#22C55E,#059669); color:#fff; box-shadow:0 4px 14px rgba(34,197,94,0.3); }
+.od-btn-danger { flex:1; border:1px solid rgba(239,68,68,0.35); background:rgba(239,68,68,0.08); color:#f87171; }
+.od-btn-sky    { border:1px solid rgba(14,165,233,0.35); background:rgba(14,165,233,0.1); color:#7DD3FC; flex-shrink:0; }
+.od-btn-green  { border:1px solid rgba(34,197,94,0.3); background:rgba(34,197,94,0.1); color:#4ade80; flex-shrink:0; }
+.od-btn-ghost  { width:100%; border:1px solid rgba(239,68,68,0.2); background:transparent; color:rgba(248,113,113,0.8); font-weight:600; }
+.od-btn-ghost:hover:not(:disabled) { background:rgba(239,68,68,0.06); }
+.od-cancel { padding-top:2px; }
+.od-meta { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; font-size:10.5px; color:rgba(100,118,142,0.6); padding-top:4px; }
+
+@media (max-width: 640px) {
+  .od-wrap { padding:0; align-items:flex-end; }
+  .od-modal { max-height:94vh; max-height:94dvh; border-radius:18px 18px 0 0; }
+  .od-head { padding:16px 16px 12px; }
+  .od-body { padding:14px 16px 18px; }
+  .od-head-total { display:none; }
+  .od-grid2 { grid-template-columns:1fr; }
+  .od-tl-step { width:44px; }
+  .od-tl-label { font-size:9px; }
+  .od-actions { flex-direction:column-reverse; }
+  .od-item { flex-wrap:wrap; }
+  .od-item-price { width:100%; display:flex; justify-content:space-between; align-items:baseline; padding-left:60px; }
+}
 </style>

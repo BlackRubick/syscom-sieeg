@@ -1,5 +1,6 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
+import { ORDER_INCLUDE, serializeOrder } from '~/server/utils/orderDto'
 
 export default defineEventHandler(async (event) => {
   const session   = requireSession(event)
@@ -30,32 +31,13 @@ export default defineEventHandler(async (event) => {
       orderBy: { createdAt: 'desc' },
       skip:    (page - 1) * perPage,
       take:    perPage,
-      include: { user: { select: { id: true, name: true, email: true } } },
+      include: ORDER_INCLUDE,
     }),
     prisma.order.count({ where }),
   ])
 
   return {
-    orders: orders.map(o => ({
-      id:            o.id,
-      userId:        o.userId,
-      userName:      o.user.name,
-      userEmail:     o.user.email,
-      status:        o.status,
-      items:         o.items,
-      total:         o.total,
-      priority:      o.priority,
-      notes:         o.notes,
-      syscomFolio:   o.syscomFolio,
-      cfdiUid:       o.cfdiUid,
-      auditLog:      o.auditLog,
-      paymentId:     o.paymentId,
-      paymentStatus: o.paymentStatus,
-      paymentMethod: o.paymentMethod,
-      paymentData:   o.paymentData,
-      createdAt:     o.createdAt.toISOString(),
-      updatedAt:     o.updatedAt.toISOString(),
-    })),
+    orders: orders.map(o => serializeOrder(o, isManager)),
     pagination: { total, page, perPage, totalPages: Math.ceil(total / perPage) },
   }
 })

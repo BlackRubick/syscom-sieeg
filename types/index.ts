@@ -86,6 +86,9 @@ export interface Order {
   paymentStatus?: string | null
   paymentMethod?: string | null
   paymentData?: { clabe?: string; bank?: string; agreement?: string; beneficiary?: string } | null
+  cliente?: { rfc?: string | null; razonSocial?: string | null; regimen?: string | null; usoCfdi?: string | null }
+  entrega?: { fuente: 'syscom' | 'fiscal'; atencionA: string; linea1: string; linea2: string; cp: string; telefono: string } | null
+  syscom?: { subtotal: number | null; flete: number | null; iva: number | null; total: number | null; almacenes: Array<{ productId: string; almacenes: Record<string, number> }> } | null
   createdAt: string
   updatedAt: string
 }
