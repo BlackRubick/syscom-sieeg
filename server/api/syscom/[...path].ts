@@ -1,73 +1,54 @@
-import { getSyscomToken } from '~/server/utils/syscom'
+import { syscomGet, SyscomHttpError } from '~/server/utils/syscom'
 import { requireSession } from '~/server/utils/session'
+import { getPricing, sanitizeProductoPrecios } from '~/server/utils/pricing'
 
-const SAFE = /^[a-zA-Z0-9_\-]+$/
+/* Proxy de solo lectura a SYSCOM.
+   - Solo GET y solo las rutas que usa la app: nunca debe poder generar pedidos
+     (carrito/generar) ni leer otros datos de la cuenta de la empresa.
+   - Los precios de productos se devuelven ya con margen y descuento: el costo de SYSCOM no sale del servidor. */
 
-interface CacheEntry { data: unknown; exp: number }
-const serverCache = new Map<string, CacheEntry>()
-
-function ttlFor(path: string): number {
-  if (path === '/categorias' || path === '/marcas' || path === '/tipocambio') return 30 * 60_000
-  if (/^\/productos\/\d+/.test(path)) return 5 * 60_000   // detail + relacionados + accesorios
-  return 2 * 60_000                                         // product lists / searches
-}
+const PRODUCT_ROUTES = [
+  /^\/productos$/,
+  /^\/productos\/\d+$/,
+  /^\/productos\/\d+\/(relacionados|accesorios)$/,
+]
+const CATALOG_ROUTES = [/^\/categorias$/, /^\/categorias\/\d+$/, /^\/marcas$/]
+// Facturas de la empresa con SYSCOM — solo para roles que ven el dashboard
+const FACTURAS_ROUTE = /^\/facturas$/
+const FACTURAS_ROLES = ['admin', 'approver', 'viewer']
 
 export default defineEventHandler(async (event) => {
-  requireSession(event)
+  const session = requireSession(event)
 
-  const segments = (getRouterParam(event, 'path') as string ?? '').split('/').filter(Boolean)
-  if (!segments.length || segments.length > 8 || !segments.every(s => s.length > 0 && s.length < 120 && SAFE.test(s))) {
-    throw createError({ statusCode: 400, message: 'Ruta inválida' })
+  if (getMethod(event) !== 'GET') throw createError({ statusCode: 405, message: 'Método no permitido' })
+
+  const segments = (getRouterParam(event, 'path') ?? '').split('/').filter(Boolean)
+  const path     = '/' + segments.join('/')
+
+  const isProduct  = PRODUCT_ROUTES.some(r => r.test(path))
+  const isCatalog  = CATALOG_ROUTES.some(r => r.test(path))
+  const isFacturas = FACTURAS_ROUTE.test(path)
+  if (!isProduct && !isCatalog && !isFacturas) throw createError({ statusCode: 404, message: 'Ruta no disponible' })
+  if (isFacturas && !FACTURAS_ROLES.includes(session.role)) throw createError({ statusCode: 403, message: 'Sin autorización' })
+
+  const params: Record<string, string> = {}
+  for (const [k, v] of Object.entries(getQuery(event))) if (v != null) params[k] = String(v)
+
+  let data: unknown
+  try {
+    data = await syscomGet(path, params)
+  } catch (e) {
+    if (e instanceof SyscomHttpError) throw createError({ statusCode: e.status, data: e.data, message: e.message })
+    throw createError({ statusCode: 502, message: 'Error al conectar con SYSCOM' })
   }
 
-  const path   = '/' + segments.join('/')
-  const method = getMethod(event)
-  const qs     = getQuery(event)
-  const url    = new URL(`https://developers.syscom.mx/api/v1${path}`)
-  Object.entries(qs).forEach(([k, v]) => url.searchParams.set(k, String(v)))
-  const cacheKey = url.toString()
+  if (!isProduct) return data
 
-  if (method === 'GET') {
-    const hit = serverCache.get(cacheKey)
-    if (hit && hit.exp > Date.now()) return hit.data
-  }
+  const pricing  = await getPricing(session.userId)
+  const sanitize = (p: unknown) => sanitizeProductoPrecios(p as { precios?: unknown }, pricing)
 
-  const token = await getSyscomToken()
-  let reqBody: string | undefined
-  if (method !== 'GET' && method !== 'HEAD') {
-    const raw = await readBody(event).catch(() => null)
-    if (raw != null) reqBody = JSON.stringify(raw)
-  }
-
-  const upstream = await fetch(cacheKey, {
-    method,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type':  'application/json',
-      'Accept':        'application/json',
-    },
-    body: reqBody,
-  })
-
-  const text = await upstream.text()
-  let data: unknown = null
-  if (text) {
-    try { data = JSON.parse(text) } catch { data = { raw: text } }
-  }
-
-  setResponseStatus(event, upstream.status)
-
-  if (!upstream.ok) {
-    throw createError({ statusCode: upstream.status, data, message: (data as Record<string,unknown>)?.message as string ?? `SYSCOM ${upstream.status}` })
-  }
-
-  if (method === 'GET') {
-    if (serverCache.size > 600) {
-      const now = Date.now()
-      for (const [k, v] of serverCache) if (v.exp < now) serverCache.delete(k)
-    }
-    serverCache.set(cacheKey, { data, exp: Date.now() + ttlFor(path) })
-  }
-
-  return data
+  if (Array.isArray(data)) return data.map(sanitize)
+  const obj = data as Record<string, unknown>
+  if (Array.isArray(obj?.productos)) return { ...obj, productos: obj.productos.map(sanitize) }
+  return sanitize(obj)
 })

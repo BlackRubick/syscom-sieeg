@@ -28,8 +28,9 @@ function clearRateLimit(ip: string) {
 }
 
 export default defineEventHandler(async (event) => {
-  const ip = getHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim()
-    ?? getHeader(event, 'x-real-ip')
+  // X-Real-IP lo fija nginx con $remote_addr; X-Forwarded-For lo puede falsear el cliente
+  const ip = getHeader(event, 'x-real-ip')
+    ?? getHeader(event, 'x-forwarded-for')?.split(',').pop()?.trim()
     ?? 'unknown'
 
   checkRateLimit(ip)

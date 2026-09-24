@@ -2,6 +2,7 @@ import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { createCardCharge, createSpeiCharge, openpayErrorMessage } from '~/server/utils/openpay'
 import { approveOrder } from '~/server/utils/approveOrder'
+import { repriceItems } from '~/server/utils/pricing'
 import type { OrderItem } from '~/types'
 
 export default defineEventHandler(async (event) => {
@@ -41,7 +42,9 @@ export default defineEventHandler(async (event) => {
     '127.0.0.1'
 
   const user        = await prisma.user.findUniqueOrThrow({ where: { id: session.userId } })
-  const serverSubtotal = body.items.reduce((s, i) => s + i.price * i.quantity, 0)
+  // Precios recalculados en servidor con datos de SYSCOM; se ignora lo que manda el cliente
+  const items          = await repriceItems(session.userId, body.items)
+  const serverSubtotal = items.reduce((s, i) => s + i.price * i.quantity, 0)
   const total          = Math.round(serverSubtotal * 1.16 * 100) / 100
 
   const nameParts = user.name.trim().split(' ')
@@ -53,7 +56,7 @@ export default defineEventHandler(async (event) => {
     email:       user.email,
     phoneNumber: user.fiscalTelefono ?? undefined,
   }
-  const description = `Pedido SIEEG (${body.items.length} art.)`
+  const description = `Pedido SIEEG (${items.length} art.)`
 
   let paymentId:     string
   let paymentStatus: string
@@ -107,7 +110,7 @@ export default defineEventHandler(async (event) => {
   const order = await prisma.order.create({
     data: {
       userId:        session.userId,
-      items:         body.items,
+      items,
       total,
       priority:      body.priority ?? 'normal',
       notes:         body.notes ?? null,

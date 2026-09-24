@@ -1,5 +1,6 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
+import { repriceItems } from '~/server/utils/pricing'
 import type { OrderItem } from '~/types'
 
 export default defineEventHandler(async (event) => {
@@ -22,14 +23,15 @@ export default defineEventHandler(async (event) => {
     if (item.price === undefined || item.price < 0) throw createError({ statusCode: 400, message: `Precio inválido para "${item.name}"` })
   }
 
-  // #2 — Calcular total en servidor; ignorar lo que manda el cliente
-  const serverTotal = body.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  // #2 — Precios y total calculados en servidor con datos de SYSCOM; se ignora lo que manda el cliente
+  const items       = await repriceItems(session.userId, body.items)
+  const serverTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const total       = Math.round(serverTotal * 100) / 100
 
   const order = await prisma.order.create({
     data: {
       userId:   session.userId,
-      items:    body.items,
+      items,
       total,
       priority: body.priority ?? 'normal',
       notes:    body.notes ?? null,
@@ -48,7 +50,7 @@ export default defineEventHandler(async (event) => {
         userId:  a.id,
         type:    'order',
         title:   'Nuevo pedido recibido',
-        message: `${order.user.name} realizó un pedido por ${total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} (${body.items.length} art.)`,
+        message: `${order.user.name} realizó un pedido por ${total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} (${items.length} art.)`,
         orderId: order.id,
       })),
     })

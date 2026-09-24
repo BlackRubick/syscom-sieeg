@@ -71,3 +71,43 @@ export async function generateSyscomOrder(opts: SyscomCarritoOpts): Promise<Sysc
 
   return { folio, data }
 }
+
+/* ── GET a la API de SYSCOM con caché en memoria (compartida por todos los usuarios) ── */
+const getCache = new Map<string, { data: unknown; exp: number }>()
+
+function ttlFor(path: string): number {
+  if (path === '/categorias' || path === '/marcas' || path === '/tipocambio') return 30 * 60_000
+  if (/^\/productos\/\d+/.test(path)) return 5 * 60_000   // detalle + relacionados + accesorios
+  return 2 * 60_000                                         // listados / búsquedas
+}
+
+export class SyscomHttpError extends Error {
+  constructor(public status: number, public data: unknown, message: string) { super(message) }
+}
+
+export async function syscomGet<T = unknown>(path: string, params: Record<string, string> = {}): Promise<T> {
+  const url = new URL(`https://developers.syscom.mx/api/v1${path}`)
+  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v)
+  const key = url.toString()
+
+  const hit = getCache.get(key)
+  if (hit && hit.exp > Date.now()) return hit.data as T
+
+  const token = await getSyscomToken()
+  const res   = await fetch(key, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } })
+  const text  = await res.text()
+  let data: unknown = null
+  if (text) { try { data = JSON.parse(text) } catch { data = { raw: text } } }
+
+  if (!res.ok) {
+    const msg = (data as Record<string, unknown>)?.message
+    throw new SyscomHttpError(res.status, data, typeof msg === 'string' ? msg : `SYSCOM ${res.status}`)
+  }
+
+  if (getCache.size > 600) {
+    const now = Date.now()
+    for (const [k, v] of getCache) if (v.exp < now) getCache.delete(k)
+  }
+  getCache.set(key, { data, exp: Date.now() + ttlFor(path) })
+  return data as T
+}
