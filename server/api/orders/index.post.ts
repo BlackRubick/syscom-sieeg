@@ -2,6 +2,7 @@ import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { repriceItems } from '~/server/utils/pricing'
 import { totalDe } from '~/utils/orderTotals'
+import { formatClientNumber } from '~/utils/clientNumber'
 import type { OrderItem } from '~/types'
 
 export default defineEventHandler(async (event) => {
@@ -38,7 +39,7 @@ export default defineEventHandler(async (event) => {
       priority: body.priority ?? 'normal',
       notes:    body.notes ?? null,
     },
-    include: { user: { select: { id: true, name: true, email: true } } },
+    include: { user: { select: { id: true, name: true, email: true, clientNumber: true } } },
   })
 
   // Notificar a todos los admins que hay un nuevo pedido
@@ -52,7 +53,7 @@ export default defineEventHandler(async (event) => {
         userId:  a.id,
         type:    'order',
         title:   'Nuevo pedido recibido',
-        message: `${order.user.name} realizó un pedido por ${total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} IVA incl. (${items.length} art.)`,
+        message: `${order.user.name}${order.user.clientNumber ? ` (${formatClientNumber(order.user.clientNumber)})` : ''} realizó un pedido por ${total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} IVA incl. (${items.length} art.)`,
         orderId: order.id,
       })),
     })

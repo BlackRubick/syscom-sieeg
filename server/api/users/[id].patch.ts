@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   const user = await prisma.user.update({
     where: { id },
     data,
-    select: { id:true, name:true, email:true, role:true, status:true, createdAt:true, lastLogin:true, avatar:true, discountPct:true },
+    select: { id:true, name:true, email:true, role:true, status:true, createdAt:true, lastLogin:true, avatar:true, clientNumber:true, discountPct:true },
   })
 
   return { user }

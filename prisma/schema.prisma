@@ -35,6 +35,8 @@ model User {
   id            String         @id @default(cuid())
   name          String
   email         String         @unique
+  // Número de cliente consecutivo (se muestra como CL-0001); se asigna al crear el usuario
+  clientNumber  Int?           @unique @map("client_number")
   password      String
   role          UserRole       @default(buyer)
   status        UserStatus     @default(active)

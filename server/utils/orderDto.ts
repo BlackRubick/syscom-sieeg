@@ -5,7 +5,7 @@ import type { Prisma } from '@prisma/client'
 export const ORDER_INCLUDE = {
   user: {
     select: {
-      id: true, name: true, email: true,
+      id: true, name: true, email: true, clientNumber: true,
       fiscalRfc: true, fiscalRazonSocial: true, fiscalRegimen: true, fiscalUsocfdi: true,
       fiscalCalle: true, fiscalNumExt: true, fiscalNumInt: true, fiscalColonia: true,
       fiscalCiudad: true, fiscalEstado: true, fiscalCodpos: true, fiscalTelefono: true,
@@ -81,6 +81,7 @@ export function serializeOrder(o: OrderWithUser, isManager: boolean) {
     userId:        o.userId,
     userName:      u.name,
     userEmail:     u.email,
+    clientNumber:  u.clientNumber,
     status:        o.status,
     items:         o.items,
     total:         o.total,

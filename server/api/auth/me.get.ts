@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
     select: {
-      id:true, name:true, email:true, role:true, status:true, createdAt:true, lastLogin:true, avatar:true,
+      id:true, name:true, email:true, clientNumber:true, role:true, status:true, createdAt:true, lastLogin:true, avatar:true,
       fiscalCompleted:true, fiscalRfc:true, fiscalRazonSocial:true, fiscalCodpos:true, fiscalEmail:true,
       fiscalUsocfdi:true, fiscalRegimen:true, fiscalPais:true, fiscalCalle:true, fiscalNumExt:true,
       fiscalNumInt:true, fiscalColonia:true, fiscalCiudad:true, fiscalDelegacion:true, fiscalLocalidad:true,

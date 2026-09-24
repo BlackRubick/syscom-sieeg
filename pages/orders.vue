@@ -31,7 +31,7 @@
     <div style="border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
       <div style="position:relative;max-width:380px;">
         <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#0EA5E9':'rgba(100,118,142,0.7)'" />
-        <input v-model="search" placeholder="Buscar por ID o usuario…"
+        <input v-model="search" :placeholder="isManager ? 'Buscar por pedido, cliente o número CL-…' : 'Buscar por número de pedido…'"
           @focus="searchFocus=true" @blur="searchFocus=false"
           :style="{ width:'100%', height:'40px', background:searchFocus?'rgba(14,165,233,0.06)':'rgba(255,255,255,0.04)', border:`1px solid ${searchFocus?'rgba(14,165,233,0.45)':'rgba(255,255,255,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#E2EAF4', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
       </div>
@@ -92,6 +92,7 @@
                   <span style="color:rgba(100,118,142,0.5);font-size:11px;">·</span>
                   <User :size="11" color="rgba(100,118,142,0.5)" />
                   <span style="font-size:11px;color:rgba(100,118,142,0.8);">{{ order.userName }}</span>
+                  <span v-if="order.clientNumber" class="cl-num">{{ formatClientNumber(order.clientNumber) }}</span>
                 </template>
               </div>
             </div>
@@ -157,7 +158,7 @@
                 </div>
                 <div class="od-sub">
                   <Clock :size="12" /> {{ fmtDateLong(detail.createdAt) }}
-                  <template v-if="isManager && detail.userName"><span class="od-dot">·</span><User :size="12" /> {{ detail.userName }}</template>
+                  <template v-if="isManager && detail.userName"><span class="od-dot">·</span><User :size="12" /> {{ detail.userName }}<span v-if="detail.clientNumber" class="cl-num">{{ formatClientNumber(detail.clientNumber) }}</span></template>
                 </div>
               </div>
               <div class="od-head-right">
@@ -256,6 +257,7 @@
             <div class="od-grid2">
               <section class="od-card">
                 <div class="od-card-title" style="margin-bottom:10px;"><User :size="13" /> Cliente</div>
+                <div v-if="detail.clientNumber" class="od-kv"><span>No. de cliente</span><b class="od-mono" style="color:#7DD3FC;">{{ formatClientNumber(detail.clientNumber) }}</b></div>
                 <div class="od-kv"><span>Nombre</span><b>{{ detail.userName || '—' }}</b></div>
                 <div v-if="detail.userEmail" class="od-kv"><span>Correo</span><b class="od-break">{{ detail.userEmail }}</b></div>
                 <div class="od-kv"><span>RFC</span><b class="od-mono">{{ detail.cliente?.rfc || '—' }}</b></div>
@@ -516,7 +518,7 @@ async function load(resetPage = false) {
   loading.value = true; error.value = null
   try {
     const data = await $fetch<{ orders: Order[]; pagination: { total: number; page: number; perPage: number; totalPages: number } }>('/api/orders', {
-      query: { page: page.value, per_page: perPage.value },
+      query: { page: page.value, per_page: perPage.value, ...(search.value.trim() ? { search: search.value.trim() } : {}) },
     })
     orders.value    = data.orders
     totalPages.value = data.pagination.totalPages
@@ -530,6 +532,13 @@ function prevPage() { if (page.value > 1) { page.value--; load() } }
 function nextPage() { if (page.value < totalPages.value) { page.value++; load() } }
 
 onMounted(() => load())
+
+// Buscar en todos los pedidos (no solo en la página cargada)
+let searchTimer: ReturnType<typeof setTimeout> | undefined
+watch(search, () => {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => load(true), 350)
+})
 
 // #6 — Retry SYSCOM
 const retrying = ref<string|null>(null)
@@ -576,11 +585,12 @@ async function cancelOrder(order: Order) {
 
 // #16 — Exportar CSV
 function exportCSV() {
-  const headers = ['ID','Usuario','Email','Estado','Subtotal','IVA','Total con IVA','Artículos','Folio SYSCOM','Fecha']
+  const headers = ['ID','No. cliente','Usuario','Email','Estado','Subtotal','IVA','Total con IVA','Artículos','Folio SYSCOM','Fecha']
   const rows = orders.value.map(o => {
     const t = desgloseTotales(o.total)
     return [
     o.id,
+    formatClientNumber(o.clientNumber),
     o.userName ?? '',
     o.userEmail ?? '',
     o.status,
@@ -638,7 +648,11 @@ const filtered = computed(() => orders.value.filter(o => {
   if (activeTab.value !== 'all' && o.status !== activeTab.value) return false
   const q = search.value.toLowerCase()
   if (!q) return true
-  return o.id.toLowerCase().includes(q) || (o.userName ?? '').toLowerCase().includes(q)
+  const num = parseClientNumber(q)
+  return o.id.toLowerCase().includes(q)
+    || (o.userName ?? '').toLowerCase().includes(q)
+    || (o.userEmail ?? '').toLowerCase().includes(q)
+    || (num !== null && o.clientNumber === num)
 }))
 
 function tabCount(key: string) {
@@ -713,6 +727,8 @@ const fmtDateLong = (d: string) => new Intl.DateTimeFormat('es-MX', { day:'2-dig
 .modal-enter-from,.modal-leave-to { opacity:0; transform:scale(0.97) translateY(-6px); }
 .slide-down-enter-active,.slide-down-leave-active { transition: opacity 0.25s, max-height 0.3s ease; overflow:hidden; max-height:400px; }
 .slide-down-enter-from,.slide-down-leave-to { opacity:0; max-height:0; }
+
+.cl-num { display:inline-block; margin-left:6px; font-size:10px; font-weight:700; font-family:ui-monospace,'SF Mono',Menlo,monospace; padding:1px 7px; border-radius:6px; color:#7DD3FC; background:rgba(14,165,233,0.1); border:1px solid rgba(14,165,233,0.2); }
 
 /* ── Modal detalle de pedido ── */
 .od-backdrop { position:fixed; inset:0; background:rgba(2,6,14,0.82); backdrop-filter:blur(7px); z-index:1050; }

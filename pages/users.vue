@@ -31,7 +31,7 @@
     <div style="border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:12px;">
       <div style="position:relative;max-width:380px;">
         <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#0EA5E9':'rgba(100,118,142,0.7)'" />
-        <input v-model="search" placeholder="Buscar por nombre, email o área..."
+        <input v-model="search" placeholder="Buscar por nombre, correo o número CL-…"
           @focus="searchFocus=true" @blur="searchFocus=false"
           :style="{ width:'100%', height:'40px', background: searchFocus?'rgba(14,165,233,0.06)':'rgba(255,255,255,0.04)', border:`1px solid ${searchFocus?'rgba(14,165,233,0.45)':'rgba(255,255,255,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#E2EAF4', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
       </div>
@@ -87,6 +87,7 @@
           <div style="min-width:0;flex:1;">
             <div style="font-size:13px;font-weight:700;color:#E2EAF4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:36px;">{{ user.name }}</div>
             <div style="font-size:11px;color:rgba(100,118,142,0.8);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ user.email }}</div>
+            <div v-if="user.clientNumber" style="margin-top:5px;"><span style="font-size:10px;font-weight:700;font-family:ui-monospace,monospace;padding:1px 7px;border-radius:6px;color:#7DD3FC;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);">{{ formatClientNumber(user.clientNumber) }}</span></div>
           </div>
         </div>
 
@@ -256,7 +257,8 @@ const STATUSES = ['active','inactive','pending']       as const
 const filtered = computed(() => users.value.filter(u => {
   if (roleFilter.value !== 'all' && u.role !== roleFilter.value) return false
   const q = search.value.toLowerCase()
-  return !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+  const num = parseClientNumber(q)
+  return !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || (num !== null && u.clientNumber === num)
 }))
 
 const kpis = computed(() => [

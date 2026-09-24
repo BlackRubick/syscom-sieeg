@@ -2,6 +2,7 @@ export interface User {
   id: string
   name: string
   email: string
+  clientNumber?: number | null
   role: 'admin' | 'buyer' | 'approver' | 'viewer'
   status: 'active' | 'inactive' | 'pending'
   createdAt: string
@@ -74,6 +75,7 @@ export interface Order {
   userId: string
   userName?: string
   userEmail?: string
+  clientNumber?: number | null
   status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'processing' | 'shipped' | 'delivered'
   items: OrderItem[]
   total: number

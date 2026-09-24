@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     include: {
       user: {
         select: {
-          id: true, name: true, email: true,
+          id: true, name: true, email: true, clientNumber: true,
           facturaUid:        true,
           fiscalCompleted:   true,
           fiscalRfc:         true,
@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
       userId:                o.userId,
       userName:              o.user.name,
       userEmail:             o.user.email,
+      clientNumber:          o.user.clientNumber,
       userFacturaUid:        o.user.facturaUid,
       userFiscalCompleted:   o.user.fiscalCompleted,
       userFiscalRfc:         o.user.fiscalRfc,

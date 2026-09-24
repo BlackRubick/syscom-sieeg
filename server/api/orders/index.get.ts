@@ -1,6 +1,7 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { ORDER_INCLUDE, serializeOrder } from '~/server/utils/orderDto'
+import { parseClientNumber } from '~/utils/clientNumber'
 
 export default defineEventHandler(async (event) => {
   const session   = requireSession(event)
@@ -21,6 +22,7 @@ export default defineEventHandler(async (event) => {
         { user: { name:  { contains: search } } },
         { user: { email: { contains: search } } },
         { syscomFolio:     { contains: search } },
+        ...(parseClientNumber(search) ? [{ user: { clientNumber: parseClientNumber(search)! } }] : []),
       ],
     } : {}),
   }

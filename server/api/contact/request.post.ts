@@ -1,5 +1,7 @@
 import { createHash } from 'crypto'
 import prisma from '~/server/utils/prisma'
+import { createUserWithClientNumber } from '~/server/utils/clientNumber'
+import { formatClientNumber } from '~/utils/clientNumber'
 import { sendAccessRequestEmail } from '~/server/utils/email'
 
 // Límite por IP: el formulario es público y cada envío crea un usuario y manda correo
@@ -63,18 +65,16 @@ export default defineEventHandler(async (event) => {
 
   const today = new Date().toISOString().split('T')[0]
 
-  await prisma.user.create({
-    data: {
-      name: name.trim(),
-      email: email.toLowerCase().trim(),
-      password: tempPassword,
-      role: 'buyer',
-      status: 'pending',
-      createdAt: today,
-      avatar: name.trim().split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase(),
-      fiscalRazonSocial: company?.trim() || null,
-      fiscalTelefono: phone?.trim() || null,
-    },
+  const nuevo = await createUserWithClientNumber({
+    name: name.trim(),
+    email: email.toLowerCase().trim(),
+    password: tempPassword,
+    role: 'buyer',
+    status: 'pending',
+    createdAt: today,
+    avatar: name.trim().split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase(),
+    fiscalRazonSocial: company?.trim() || null,
+    fiscalTelefono: phone?.trim() || null,
   })
 
   // Notificar a todos los admins en la app
@@ -92,7 +92,7 @@ export default defineEventHandler(async (event) => {
         userId:  admin.id,
         type:    'alert',
         title:   '🙋 Nueva solicitud de acceso',
-        message: `${name.trim()}${companyPart} quiere ser cliente. Correo: ${email.toLowerCase().trim()}${phonePart}. Ve a Usuarios para activarlo.`,
+        message: `${name.trim()}${companyPart} (${formatClientNumber(nuevo.clientNumber)}) quiere ser cliente. Correo: ${email.toLowerCase().trim()}${phonePart}. Ve a Usuarios para activarlo.`,
         read:    false,
       })),
     })

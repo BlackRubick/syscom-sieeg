@@ -60,7 +60,7 @@
       <div style="border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:10px;">
         <div style="position:relative;max-width:360px;">
           <Search :size="13" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="orderSearchFocus?'#6366f1':'rgba(100,118,142,0.6)'" />
-          <input v-model="orderSearch" placeholder="Buscar por cliente, RFC o folio SYSCOM…"
+          <input v-model="orderSearch" placeholder="Buscar por cliente, número CL-…, RFC o folio SYSCOM…"
             @focus="orderSearchFocus=true" @blur="orderSearchFocus=false"
             :style="{ width:'100%', height:'38px', background: orderSearchFocus?'rgba(99,102,241,0.06)':'rgba(255,255,255,0.04)', border:`1px solid ${orderSearchFocus?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)'}`, borderRadius:'9px', paddingLeft:'36px', paddingRight:'12px', fontSize:'12px', color:'#E2EAF4', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
         </div>
@@ -99,7 +99,7 @@
           <!-- Cliente -->
           <div style="min-width:0;">
             <div style="font-size:12px;font-weight:600;color:#E2EAF4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ o.userName }}</div>
-            <div style="font-size:10px;font-weight:600;color:#7DD3FC;font-family:monospace;margin-top:2px;">{{ o.userFiscalRfc ?? 'Sin RFC' }}</div>
+            <div style="font-size:10px;font-weight:600;color:#7DD3FC;font-family:monospace;margin-top:2px;">{{ formatClientNumber(o.clientNumber) || '—' }} · {{ o.userFiscalRfc ?? 'Sin RFC' }}</div>
           </div>
 
           <!-- Artículos -->
@@ -301,6 +301,7 @@ interface BillingOrder {
   userId:                string
   userName:              string
   userEmail:             string
+  clientNumber?:         number | null
   userFacturaUid:        string | null
   userFiscalCompleted:   boolean
   userFiscalRfc:         string | null
@@ -385,6 +386,7 @@ const filteredOrders = computed(() => {
   if (!q) return list
   return list.filter(o =>
     o.userName.toLowerCase().includes(q)
+    || (parseClientNumber(q) !== null && o.clientNumber === parseClientNumber(q))
     || (o.userFiscalRfc ?? '').toLowerCase().includes(q)
     || (o.syscomFolio   ?? '').toLowerCase().includes(q)
     || o.id.toLowerCase().includes(q)

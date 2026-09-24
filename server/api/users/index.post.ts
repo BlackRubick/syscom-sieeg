@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
+import { createUserWithClientNumber } from '~/server/utils/clientNumber'
 import type { UserRole, UserStatus } from '@prisma/client'
 
 export default defineEventHandler(async (event) => {
@@ -28,18 +29,15 @@ export default defineEventHandler(async (event) => {
   const today  = new Date().toISOString().split('T')[0]
   const hash   = await bcrypt.hash(password, 12)  // #3 — bcrypt
 
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email:     email.toLowerCase(),
-      password:  hash,
-      role:      role as UserRole,
-      status:    status as UserStatus,
-      createdAt: today,
-      avatar,
-    },
-    select: { id:true, name:true, email:true, role:true, status:true, createdAt:true, lastLogin:true, avatar:true },
-  })
+  const user = await createUserWithClientNumber({
+    name,
+    email:     email.toLowerCase(),
+    password:  hash,
+    role:      role as UserRole,
+    status:    status as UserStatus,
+    createdAt: today,
+    avatar,
+  }, { id:true, name:true, email:true, role:true, status:true, createdAt:true, lastLogin:true, avatar:true, clientNumber:true })
 
   return { user }
 })
