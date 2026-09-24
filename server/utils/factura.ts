@@ -313,3 +313,87 @@ export async function listarCFDIs(opts: {
 
   return facturaFetch<CfdiListResponse>('v4', 'cfdi/list', { method: 'POST', body })
 }
+
+/* ── Helpers compartidos entre timbrado y vista previa ── */
+
+export function validarConceptos(conceptos: ConceptoInput[] | undefined) {
+  if (!conceptos?.length) throw createError({ statusCode: 400, message: 'Al menos un concepto es requerido' })
+  for (const [i, c] of conceptos.entries()) {
+    if (!c.descripcion?.trim())   throw createError({ statusCode: 400, message: `Concepto ${i + 1}: descripción requerida` })
+    if (!c.claveProdServ?.trim()) throw createError({ statusCode: 400, message: `Concepto ${i + 1}: clave de producto/servicio requerida` })
+    if (!c.claveUnidad?.trim())   throw createError({ statusCode: 400, message: `Concepto ${i + 1}: clave de unidad requerida` })
+    if (!c.unidad?.trim())        throw createError({ statusCode: 400, message: `Concepto ${i + 1}: unidad requerida` })
+    if (!c.cantidad || c.cantidad <= 0)           throw createError({ statusCode: 400, message: `Concepto ${i + 1}: cantidad debe ser mayor a 0` })
+    if (!c.valorUnitario || c.valorUnitario <= 0) throw createError({ statusCode: 400, message: `Concepto ${i + 1}: valor unitario debe ser mayor a 0` })
+  }
+}
+
+/** Convierte los artículos de varios pedidos en conceptos (factura global). */
+export function conceptosDePedidos(orders: Array<{ items: unknown }>): ConceptoInput[] {
+  const conceptos: ConceptoInput[] = []
+  for (const order of orders) {
+    for (const item of order.items as Array<{ name: string; sku?: string; satKey?: string; quantity: number; price: number }>) {
+      conceptos.push({
+        descripcion:   item.sku ? `${item.name} (${item.sku})` : item.name,
+        claveProdServ: item.satKey ?? '43211500',
+        claveUnidad:   'H87',
+        unidad:        'Pieza',
+        cantidad:      item.quantity,
+        valorUnitario: item.price,
+      })
+    }
+  }
+  return conceptos
+}
+
+/* ── Datos del emisor (cuenta de Factura.com) ── */
+
+export interface FacturaEmisor {
+  razonSocial: string
+  rfc:         string
+  regimen:     string
+  regimenId:   string
+  codpos:      string
+  calle:       string
+  exterior:    string
+  interior:    string
+  colonia:     string
+  ciudad:      string
+  estado:      string
+  email:       string
+}
+
+let emisorCache: { env: string; data: FacturaEmisor; expiresAt: number } | null = null
+
+export async function obtenerEmisor(): Promise<FacturaEmisor> {
+  const env = getFacturaEnv()
+  if (emisorCache && emisorCache.env === env && emisorCache.expiresAt > Date.now()) return emisorCache.data
+
+  const res = await facturaFetch<{ data: Record<string, unknown> }>('v1', 'current/account')
+  const d   = res.data ?? {}
+  const s   = (k: string) => (d[k] == null ? '' : String(d[k]))
+  // Solo copiamos campos públicos — la respuesta incluye las llaves de la API
+  const data: FacturaEmisor = {
+    razonSocial: s('razon_social'),
+    rfc:         s('rfc'),
+    regimen:     s('regimen_fiscal'),
+    regimenId:   s('acco_regimen_33'),
+    codpos:      s('codpos'),
+    calle:       s('calle'),
+    exterior:    s('exterior'),
+    interior:    s('interior'),
+    colonia:     s('colonia'),
+    ciudad:      s('ciudad'),
+    estado:      s('estado'),
+    email:       s('email'),
+  }
+  emisorCache = { env, data, expiresAt: Date.now() + 10 * 60_000 }
+  return data
+}
+
+export async function obtenerNombreSerie(serieId: number): Promise<string> {
+  try {
+    const res = await facturaFetch<{ data: Array<{ SerieID: number; SerieName: string }> }>('v4', 'series')
+    return res.data?.find(s => s.SerieID === serieId)?.SerieName ?? ''
+  } catch { return '' }
+}

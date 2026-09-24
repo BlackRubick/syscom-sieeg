@@ -149,6 +149,12 @@
                 <button @click="emit('close')" style="height:38px;padding:0 18px;border-radius:9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;font-size:13px;cursor:pointer;font-family:inherit;">
                   Cancelar
                 </button>
+                <button @click="preview" :disabled="previewing || loading || !pendingOrders.length" title="Ver cómo quedará la factura sin timbrar ni usar folio"
+                  :style="{ height:'38px', padding:'0 18px', borderRadius:'9px', background:'rgba(99,102,241,0.1)', border:'1px solid rgba(99,102,241,0.3)', color:'#a5b4fc', fontSize:'13px', fontWeight:600, cursor:previewing||loading||!pendingOrders.length?'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'7px', opacity:!pendingOrders.length?0.4:previewing?0.7:1 }">
+                  <svg v-if="previewing" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                  <Eye v-else :size="13" />
+                  {{ previewing ? 'Generando…' : 'Vista previa' }}
+                </button>
                 <button @click="submit" :disabled="loading || !pendingOrders.length"
                   :style="{ height:'38px', padding:'0 22px', borderRadius:'9px', border:'none', fontSize:'13px', fontWeight:700, cursor:loading||!pendingOrders.length?'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'7px', opacity:!pendingOrders.length?0.4:1,
                     background: loading?'rgba(245,158,11,0.4)':'linear-gradient(135deg,#F59E0B,#D97706)',
@@ -167,7 +173,7 @@
 </template>
 
 <script setup lang="ts">
-import { X, CheckCircle, FileDown } from '@lucide/vue'
+import { X, CheckCircle, FileDown, Eye } from '@lucide/vue'
 
 interface PendingOrder { id: string; total: number }
 interface GlobalResult {
@@ -205,27 +211,46 @@ watch(() => props.open, (v) => {
 // Reset meses cuando cambia periodicidad
 watch(() => form.value.periodicidad, () => { form.value.meses = '' })
 
-async function submit() {
+function validate(): boolean {
   error.value = ''
   const { periodicidad, meses, año, formaPago, metodoPago, usoCfdi } = form.value
-  if (!periodicidad) { error.value = 'Selecciona la periodicidad'; return }
-  if (!meses)        { error.value = 'Selecciona el mes'; return }
-  if (!año || año.length !== 4) { error.value = 'Ingresa el año en 4 dígitos'; return }
-  if (!formaPago)    { error.value = 'Selecciona la forma de pago'; return }
-  if (!metodoPago)   { error.value = 'Selecciona el método de pago'; return }
-  if (!usoCfdi)      { error.value = 'Selecciona el uso de CFDI'; return }
+  if (!periodicidad) { error.value = 'Selecciona la periodicidad'; return false }
+  if (!meses)        { error.value = 'Selecciona el mes'; return false }
+  if (!año || año.length !== 4) { error.value = 'Ingresa el año en 4 dígitos'; return false }
+  if (!formaPago)    { error.value = 'Selecciona la forma de pago'; return false }
+  if (!metodoPago)   { error.value = 'Selecciona el método de pago'; return false }
+  if (!usoCfdi)      { error.value = 'Selecciona el uso de CFDI'; return false }
+  return true
+}
+
+function buildBody() {
+  const { periodicidad, meses, año, formaPago, metodoPago, usoCfdi, moneda } = form.value
+  return {
+    periodicidad, meses, año,
+    formaPago, metodoPago,
+    usoCfdi,
+    moneda,
+    orderIds: props.pendingOrders.map(o => o.id),
+  }
+}
+
+/* ── Vista previa (plantilla propia, no consume folio) ── */
+const { previewing, previewError, openPreview } = useCfdiPreview()
+watch(previewError, (msg) => { if (msg) error.value = msg })
+
+function preview() {
+  if (!validate()) return
+  openPreview({ tipo: 'global', ...buildBody() })
+}
+
+async function submit() {
+  if (!validate()) return
 
   loading.value = true
   try {
     const res = await $fetch<GlobalResult>('/api/factura/cfdi/global', {
       method: 'POST',
-      body: {
-        periodicidad, meses, año,
-        formaPago, metodoPago,
-        usoCfdi,
-        moneda:   form.value.moneda,
-        orderIds: props.pendingOrders.map(o => o.id),
-      },
+      body: buildBody(),
     })
     result.value = res
     emit('created')

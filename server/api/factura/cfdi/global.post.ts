@@ -1,8 +1,7 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
-import { buildCfdiConcepto, crearCFDI, obtenerCliente, crearCliente } from '~/server/utils/factura'
-import type { CfdiPayload, ConceptoInput } from '~/server/utils/factura'
-import type { OrderItem } from '~/types'
+import { buildCfdiConcepto, crearCFDI, obtenerCliente, crearCliente, conceptosDePedidos } from '~/server/utils/factura'
+import type { CfdiPayload } from '~/server/utils/factura'
 
 const RFC_PUBLICO = 'XAXX010101000'
 
@@ -63,20 +62,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Agrupar todos los items de todos los pedidos en conceptos
-  const conceptos: ConceptoInput[] = []
-  for (const order of orders) {
-    const items = order.items as OrderItem[]
-    for (const item of items) {
-      conceptos.push({
-        descripcion:   item.sku ? `${item.name} (${item.sku})` : item.name,
-        claveProdServ: item.satKey ?? '43211500',
-        claveUnidad:   'H87',
-        unidad:        'Pieza',
-        cantidad:      item.quantity,
-        valorUnitario: item.price,
-      })
-    }
-  }
+  const conceptos = conceptosDePedidos(orders)
 
   // Obtener o crear el receptor "PUBLICO EN GENERAL" en Factura.com
   const receptorUid = await getOrCreatePublicoUid()

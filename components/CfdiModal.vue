@@ -180,6 +180,12 @@
                     <button @click="emit('close')" style="height:38px;padding:0 18px;border-radius:9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;">
                       Cancelar
                     </button>
+                    <button @click="preview" :disabled="previewing || loading" title="Ver cómo quedará la factura sin timbrar ni usar folio"
+                      :style="{ height:'38px', padding:'0 18px', borderRadius:'9px', background:'rgba(245,158,11,0.1)', border:'1px solid rgba(245,158,11,0.3)', color:'#fbbf24', fontSize:'13px', fontWeight:600, cursor: previewing||loading ? 'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'7px', opacity: previewing ? 0.7 : 1 }">
+                      <svg v-if="previewing" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                      <Eye v-else :size="13" />
+                      {{ previewing ? 'Generando…' : 'Vista previa' }}
+                    </button>
                     <button @click="submit" :disabled="loading"
                       :style="{ height:'38px', padding:'0 22px', borderRadius:'9px', background: loading ? 'rgba(99,102,241,0.4)' : 'linear-gradient(135deg,#6366f1,#4f46e5)', border:'none', color:'#fff', fontSize:'13px', fontWeight:700, cursor: loading ? 'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'7px', opacity: loading ? 0.8 : 1 }">
                       <svg v-if="loading" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
@@ -199,7 +205,7 @@
 </template>
 
 <script setup lang="ts">
-import { X, Plus, CheckCircle, FileCheck, FileDown } from '@lucide/vue'
+import { X, Plus, CheckCircle, FileCheck, FileDown, Eye } from '@lucide/vue'
 
 interface FiscalUser {
   id:               string
@@ -294,39 +300,58 @@ const subtotal = computed(() =>
 const totalIva = computed(() => subtotal.value * 0.16)
 const total    = computed(() => subtotal.value + totalIva.value)
 
-/* ── Submit ── */
-async function submit() {
+/* ── Validación y payload (compartidos entre vista previa y timbrado) ── */
+function validate(): boolean {
   error.value = ''
-  if (!formaPago.value) { error.value = 'Selecciona la forma de pago'; return }
+  if (!formaPago.value) { error.value = 'Selecciona la forma de pago'; return false }
 
   for (const [i, c] of conceptos.value.entries()) {
-    if (!c.descripcion.trim())    { error.value = `Concepto ${i + 1}: escribe una descripción`; return }
-    if (!c.claveProdServ.trim())  { error.value = `Concepto ${i + 1}: escribe la clave SAT`; return }
-    if ((c.cantidad || 0) <= 0)   { error.value = `Concepto ${i + 1}: cantidad debe ser mayor a 0`; return }
-    if ((c.valorUnitario || 0) <= 0) { error.value = `Concepto ${i + 1}: precio debe ser mayor a 0`; return }
+    if (!c.descripcion.trim())    { error.value = `Concepto ${i + 1}: escribe una descripción`; return false }
+    if (!c.claveProdServ.trim())  { error.value = `Concepto ${i + 1}: escribe la clave SAT`; return false }
+    if ((c.cantidad || 0) <= 0)   { error.value = `Concepto ${i + 1}: cantidad debe ser mayor a 0`; return false }
+    if ((c.valorUnitario || 0) <= 0) { error.value = `Concepto ${i + 1}: precio debe ser mayor a 0`; return false }
   }
+  return true
+}
+
+function buildBody() {
+  return {
+    userId:      props.user.id,
+    orderId:     props.orderId,
+    conceptos:   conceptos.value.map(c => ({
+      descripcion:    c.descripcion.trim(),
+      claveProdServ:  c.claveProdServ.trim(),
+      claveUnidad:    c.claveUnidad.trim(),
+      unidad:         c.unidad.trim(),
+      cantidad:       c.cantidad,
+      valorUnitario:  c.valorUnitario,
+    })),
+    formaPago:    formaPago.value,
+    metodoPago:   metodoPago.value,
+    moneda:       moneda.value,
+    comentarios:  comentarios.value.trim() || undefined,
+    enviarCorreo: enviarCorreo.value,
+  }
+}
+
+/* ── Vista previa (plantilla propia, no consume folio) ── */
+const { previewing, previewError, openPreview } = useCfdiPreview()
+watch(previewError, (msg) => { if (msg) error.value = msg })
+
+function preview() {
+  if (!validate()) return
+  openPreview({ tipo: 'individual', ...buildBody() })
+}
+
+/* ── Submit ── */
+async function submit() {
+  if (!validate()) return
 
   loading.value = true
   try {
     const res = await $fetch<CfdiResult>('/api/factura/cfdi/create', {
       method: 'POST',
-      body: {
-        userId:      props.user.id,
-        orderId:     props.orderId,
-        conceptos:   conceptos.value.map(c => ({
-          descripcion:    c.descripcion.trim(),
-          claveProdServ:  c.claveProdServ.trim(),
-          claveUnidad:    c.claveUnidad.trim(),
-          unidad:         c.unidad.trim(),
-          cantidad:       c.cantidad,
-          valorUnitario:  c.valorUnitario,
-        })),
-        formaPago:    formaPago.value,
-        metodoPago:   metodoPago.value,
-        moneda:       moneda.value,
-        comentarios:  comentarios.value.trim() || undefined,
-        enviarCorreo: enviarCorreo.value,
-      },
+      body: buildBody(),
     })
     result.value = res
     emit('created', res)
