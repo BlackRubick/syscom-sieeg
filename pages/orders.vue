@@ -29,11 +29,18 @@
 
     <!-- Filters -->
     <div style="border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
-      <div style="position:relative;max-width:380px;">
+      <div class="of-row">
+      <div style="position:relative;flex:1;min-width:220px;max-width:380px;">
         <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#0EA5E9':'rgba(100,118,142,0.7)'" />
         <input v-model="search" :placeholder="isManager ? 'Buscar por pedido, cliente o número CL-…' : 'Buscar por número de pedido…'"
           @focus="searchFocus=true" @blur="searchFocus=false"
           :style="{ width:'100%', height:'40px', background:searchFocus?'rgba(14,165,233,0.06)':'rgba(255,255,255,0.04)', border:`1px solid ${searchFocus?'rgba(14,165,233,0.45)':'rgba(255,255,255,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#E2EAF4', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
+      </div>
+      <template v-if="isManager">
+        <FilterCombo v-model="filtroCliente" label="Cliente" placeholder="Nombre, CL-…, correo o empresa" :options="opcionesClientes" />
+        <FilterCombo v-model="filtroEmpresa" label="Empresa" placeholder="Razón social o RFC" :options="opcionesEmpresas" />
+        <button v-if="filtroCliente || filtroEmpresa" type="button" class="of-clear" @click="filtroCliente = ''; filtroEmpresa = ''">Quitar filtros</button>
+      </template>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <button v-for="tab in tabs" :key="tab.key" @click="activeTab=tab.key"
@@ -538,7 +545,12 @@ async function load(resetPage = false) {
   loading.value = true; error.value = null
   try {
     const data = await $fetch<{ orders: Order[]; pagination: { total: number; page: number; perPage: number; totalPages: number } }>('/api/orders', {
-      query: { page: page.value, per_page: perPage.value, ...(search.value.trim() ? { search: search.value.trim() } : {}) },
+      query: {
+        page: page.value, per_page: perPage.value,
+        ...(search.value.trim() ? { search: search.value.trim() } : {}),
+        ...(filtroCliente.value ? { cliente: filtroCliente.value } : {}),
+        ...(filtroEmpresa.value ? { empresa: filtroEmpresa.value } : {}),
+      },
     })
     orders.value    = data.orders
     totalPages.value = data.pagination.totalPages
@@ -552,6 +564,40 @@ function prevPage() { if (page.value > 1) { page.value--; load() } }
 function nextPage() { if (page.value < totalPages.value) { page.value++; load() } }
 
 onMounted(() => load())
+
+/* ── Filtros por cliente y empresa (admin/approver) ── */
+const route  = useRoute()
+const router = useRouter()
+const filtroCliente = ref(typeof route.query.cliente === 'string' ? route.query.cliente : '')
+const filtroEmpresa = ref(typeof route.query.empresa === 'string' ? route.query.empresa : '')
+
+interface FiltrosResp {
+  clientes: Array<{ id: string; nombre: string; email: string; clientNumber: number | null; empresa: string | null; pedidos: number }>
+  empresas: Array<{ nombre: string; rfc: string; usuarios: number; pedidos: number }>
+}
+const filtros = ref<FiltrosResp>({ clientes: [], empresas: [] })
+const opcionesClientes = computed(() => filtros.value.clientes
+  .filter(c => !filtroEmpresa.value || c.empresa === filtroEmpresa.value)
+  .map(c => ({ value: c.id, label: c.nombre, badge: formatClientNumber(c.clientNumber), sub: c.empresa ?? c.email, count: c.pedidos, search: c.email })))
+const opcionesEmpresas = computed(() => filtros.value.empresas.map(e => ({
+  value: e.nombre, label: e.nombre, sub: [e.rfc, `${e.usuarios} usuario${e.usuarios !== 1 ? 's' : ''}`].filter(Boolean).join(' · '), count: e.pedidos,
+})))
+
+onMounted(async () => {
+  if (!isManager.value) return
+  try { filtros.value = await $fetch<FiltrosResp>('/api/orders/filters') } catch { /* los filtros son opcionales */ }
+})
+
+watch([filtroCliente, filtroEmpresa], ([c, e], [cAntes]) => {
+  // Cliente y empresa incompatibles: se conserva el que se acaba de elegir
+  if (c && e && filtros.value.clientes.find(x => x.id === c)?.empresa !== e) {
+    if (c !== cAntes) filtroEmpresa.value = ''
+    else filtroCliente.value = ''
+    return
+  }
+  router.replace({ query: { ...route.query, cliente: c || undefined, empresa: e || undefined } })
+  load(true)
+})
 
 // Buscar en todos los pedidos (no solo en la página cargada)
 let searchTimer: ReturnType<typeof setTimeout> | undefined
@@ -749,6 +795,10 @@ const fmtDateLong = (d: string) => new Intl.DateTimeFormat('es-MX', { day:'2-dig
 .modal-enter-from,.modal-leave-to { opacity:0; transform:scale(0.97) translateY(-6px); }
 .slide-down-enter-active,.slide-down-leave-active { transition: opacity 0.25s, max-height 0.3s ease; overflow:hidden; max-height:400px; }
 .slide-down-enter-from,.slide-down-leave-to { opacity:0; max-height:0; }
+
+.of-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.of-clear { height:40px; padding:0 14px; border-radius:10px; border:1px solid rgba(239,68,68,0.25); background:rgba(239,68,68,0.06); color:#f87171; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
+.of-clear:hover { background:rgba(239,68,68,0.12); }
 
 .sy-row { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:5px; }
 .sy-folio { font-size:10.5px; font-weight:700; font-family:ui-monospace,'SF Mono',Menlo,monospace; color:#6ee7b7; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.22); padding:1px 8px; border-radius:6px; }
