@@ -265,6 +265,7 @@
                 </div>
               </div>
               <div class="od-totals">
+                <div v-if="detail.shippingFee" class="od-kv"><span>Envío (IVA incluido)</span><span>{{ fmtCurrency(detail.shippingFee) }}</span></div>
                 <div class="od-kv"><span>Subtotal (sin IVA)</span><span>{{ fmtCurrency(detailTotals.subtotal) }}</span></div>
                 <div class="od-kv"><span>IVA (16%)</span><span>{{ fmtCurrency(detailTotals.iva) }}</span></div>
                 <div class="od-kv od-kv-total"><span>Total (IVA incluido)</span><span>{{ fmtCurrency(detailTotals.total) }}</span></div>

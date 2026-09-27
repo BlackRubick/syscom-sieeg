@@ -311,6 +311,7 @@ interface BillingOrder {
   status:                string
   items:                 OrderItem[]
   total:                 number
+  shippingFee?:          number
   priority:              string
   notes:                 string | null
   syscomFolio:           string | null
@@ -559,6 +560,7 @@ async function openCfdiFromOrder(o: BillingOrder) {
     cantidad:      item.quantity,
     valorUnitario: precioSinIva(item.price), // el precio del pedido ya incluye IVA
   }))
+  if (o.shippingFee && o.shippingFee > 0) cfdiConceptos.value.push(conceptoEnvio(o.shippingFee))
   cfdiOrderId.value = o.id
   await nextTick()
   cfdiOpen.value = true

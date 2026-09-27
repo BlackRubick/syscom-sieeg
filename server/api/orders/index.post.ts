@@ -1,7 +1,8 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { repriceItems } from '~/server/utils/pricing'
-import { totalDe } from '~/utils/orderTotals'
+import { totalDe, envioDe } from '~/utils/orderTotals'
+import { getShippingConfig } from '~/server/utils/shipping'
 import { formatClientNumber } from '~/utils/clientNumber'
 import type { OrderItem } from '~/types'
 
@@ -27,15 +28,17 @@ export default defineEventHandler(async (event) => {
   }
 
   // #2 — Precios y total calculados en servidor con datos de SYSCOM; se ignora lo que manda el cliente
-  // Los precios ya incluyen IVA: el total es la suma de los artículos
-  const items = await repriceItems(session.userId, body.items)
-  const total = totalDe(items)
+  // Los precios ya incluyen IVA: el total es la suma de los artículos + envío si no llega al mínimo
+  const items       = await repriceItems(session.userId, body.items)
+  const shippingFee = envioDe(totalDe(items), await getShippingConfig())
+  const total       = Math.round((totalDe(items) + shippingFee) * 100) / 100
 
   const order = await prisma.order.create({
     data: {
       userId:   session.userId,
       items,
       total,
+      shippingFee,
       priority: body.priority ?? 'normal',
       notes:    body.notes ?? null,
     },
@@ -68,6 +71,7 @@ export default defineEventHandler(async (event) => {
       status:    order.status,
       items:     order.items,
       total:     order.total,
+      shippingFee: order.shippingFee,
       priority:  order.priority,
       notes:     order.notes,
       createdAt: order.createdAt.toISOString(),

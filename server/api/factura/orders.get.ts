@@ -38,6 +38,7 @@ export default defineEventHandler(async (event) => {
       status:                o.status,
       items:                 o.items,
       total:                 o.total,
+      shippingFee:           o.shippingFee,
       priority:              o.priority,
       notes:                 o.notes,
       syscomFolio:           o.syscomFolio,

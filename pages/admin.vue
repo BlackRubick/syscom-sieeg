@@ -110,6 +110,53 @@
         <p v-if="error" style="font-size:12px;color:#EF4444;margin-top:10px;text-align:center;">{{ error }}</p>
       </div>
 
+      <!-- Envío -->
+      <div style="margin-top:20px;border-radius:18px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);padding:28px;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+          <div style="width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,rgba(245,158,11,0.18),rgba(245,158,11,0.08));border:1px solid rgba(245,158,11,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>
+            </svg>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:#E2EAF4;">Envío</div>
+            <div style="font-size:12px;color:rgba(100,118,142,0.8);margin-top:2px;">Compras menores al mínimo pagan el cargo de envío. El pedido a SYSCOM se envía igual.</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+          <label style="display:block;">
+            <span style="display:block;font-size:12px;font-weight:600;color:rgba(123,146,176,0.9);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Envío sin costo desde ($, sin IVA)</span>
+            <input v-model.number="inputMin" type="number" min="0" step="50" class="adm-input" />
+          </label>
+          <label style="display:block;">
+            <span style="display:block;font-size:12px;font-weight:600;color:rgba(123,146,176,0.9);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Cargo de envío ($, IVA incl.)</span>
+            <input v-model.number="inputFee" type="number" min="0" step="10" class="adm-input" />
+          </label>
+        </div>
+
+        <div style="font-size:12px;color:rgba(100,118,142,0.8);margin-bottom:16px;line-height:1.6;">
+          Compras menores a <strong style="color:#E2EAF4;">{{ money(inputMin) }} + IVA</strong> ({{ money(inputMin * 1.16) }} con IVA) pagan <strong style="color:#fbbf24;">{{ money(inputFee) }}</strong> de envío; desde ahí el envío es sin costo.
+        </div>
+
+        <button
+          @click="saveShipping"
+          :disabled="savingShip || !shipDirty"
+          :style="{
+            width:'100%', height:'44px', borderRadius:'12px', border:'none',
+            background: savingShip || !shipDirty ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg,#0EA5E9,#0284C7)',
+            color: savingShip || !shipDirty ? 'rgba(100,118,142,0.6)' : 'white',
+            fontSize:'14px', fontWeight:600, cursor: savingShip || !shipDirty ? 'not-allowed' : 'pointer',
+            fontFamily:'inherit', transition:'all 0.2s',
+          }"
+        >
+          <span v-if="savingShip">Guardando...</span>
+          <span v-else-if="savedShip">✓ Guardado</span>
+          <span v-else>Guardar envío</span>
+        </button>
+        <p v-if="shipError" style="font-size:12px;color:#EF4444;margin-top:10px;text-align:center;">{{ shipError }}</p>
+      </div>
+
     </div>
   </div>
 </template>
@@ -132,11 +179,46 @@ const previewPrice = computed(() =>
   (1000 * (1 + inputPct.value / 100) * 1.16).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 )
 
+// Envío
+const currentMin = ref(1000)
+const currentFee = ref(200)
+const inputMin   = ref(1000)
+const inputFee   = ref(200)
+const savingShip = ref(false)
+const savedShip  = ref(false)
+const shipError  = ref('')
+const shipDirty  = computed(() => inputMin.value !== currentMin.value || inputFee.value !== currentFee.value)
+const money = (n: number) => (Number(n) || 0).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })
+
+type SiteCfg = { markupPct: number; freeShippingMin: number; shippingFee: number }
+function applyShipping(d: SiteCfg) {
+  currentMin.value = inputMin.value = d.freeShippingMin
+  currentFee.value = inputFee.value = d.shippingFee
+}
+
+async function saveShipping() {
+  savingShip.value = true
+  shipError.value  = ''
+  savedShip.value  = false
+  try {
+    applyShipping(await $fetch<SiteCfg>('/api/admin/config', {
+      method: 'PATCH',
+      body: { freeShippingMin: inputMin.value, shippingFee: inputFee.value },
+    }))
+    savedShip.value = true
+    setTimeout(() => { savedShip.value = false }, 3000)
+  } catch (e: any) {
+    shipError.value = e?.data?.message ?? 'Error al guardar'
+  }
+  savingShip.value = false
+}
+
 onMounted(async () => {
   try {
-    const data = await $fetch<{ markupPct: number }>('/api/admin/config')
+    const data = await $fetch<SiteCfg>('/api/admin/config')
     currentPct.value = data.markupPct
     inputPct.value   = data.markupPct
+    applyShipping(data)
   } catch { /* sin config previa */ }
   loading.value = false
 })
@@ -160,3 +242,13 @@ async function save() {
   saving.value = false
 }
 </script>
+
+<style scoped>
+.adm-input {
+  width: 100%; height: 44px; background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09); border-radius: 12px; padding: 0 14px;
+  font-size: 16px; font-weight: 700; color: #E2EAF4; outline: none;
+  font-family: inherit; box-sizing: border-box; transition: border-color 0.2s;
+}
+.adm-input:focus { border-color: rgba(14,165,233,0.5); }
+</style>

@@ -332,6 +332,13 @@
           </div>
           <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(100,118,142,0.8);">
+              <span>Envío</span>
+              <span :style="{ color: envio > 0 ? '#E2EAF4' : '#22C55E', fontWeight: 600 }">{{ envio > 0 ? fmt(envio) : 'Sin costo' }}</span>
+            </div>
+            <div v-if="envio > 0" style="padding:8px 10px;border-radius:8px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);font-size:11px;color:#fbbf24;line-height:1.5;">
+              Agrega {{ fmt(faltaEnvio) }} más para envío sin costo (compras desde {{ fmt(shippingCfg.freeShippingMin) }} + IVA).
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(100,118,142,0.8);">
               <span>Subtotal (sin IVA)</span><span>{{ fmt(subtotal) }}</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(100,118,142,0.8);">
@@ -568,6 +575,7 @@
 
 <script setup lang="ts">
 import { ShoppingCart, Package, Trash2, Plus, Minus, CreditCard, X, Lock } from '@lucide/vue'
+import type { ShippingConfig } from '~/utils/orderTotals'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -614,8 +622,12 @@ const priorities = [
 
 const activePri     = computed(() => priorities.find(p => p.key === priority.value)!)
 const priorityLabel = computed(() => ({ urgent:'Urgente — notificación inmediata', high:'Alta — procesamiento en 4h', normal:'Normal — procesamiento en 24h', low:'Baja — sin urgencia' }[priority.value] ?? ''))
-// Los precios ya incluyen IVA: el total es la suma y el IVA solo se desglosa
-const totales       = computed(() => desgloseTotales(cart.total))
+// Envío: si la compra no llega al mínimo se cobra nuestro cargo (el servidor lo vuelve a calcular)
+const { data: shippingCfg } = useFetch<ShippingConfig>('/api/config/shipping', { default: () => ({ freeShippingMin: 1000, shippingFee: 200 }) })
+const envio         = computed(() => envioDe(cart.total, shippingCfg.value))
+const faltaEnvio    = computed(() => Math.max(0, minimoEnvioConIva(shippingCfg.value) - cart.total))
+// Los precios ya incluyen IVA: el total es la suma + envío y el IVA solo se desglosa
+const totales       = computed(() => desgloseTotales(cart.total + envio.value))
 const subtotal      = computed(() => totales.value.subtotal)
 const iva           = computed(() => totales.value.iva)
 const totalUnits    = computed(() => cart.items.reduce((s, i) => s + i.quantity, 0))

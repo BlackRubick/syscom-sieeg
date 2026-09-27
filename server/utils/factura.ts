@@ -1,4 +1,4 @@
-import { precioSinIva } from '~/utils/orderTotals'
+import { precioSinIva, conceptoEnvio } from '~/utils/orderTotals'
 const HOSTS = {
   sandbox:    'https://sandbox.factura.com/api',
   production: 'https://api.factura.com',
@@ -330,7 +330,7 @@ export function validarConceptos(conceptos: ConceptoInput[] | undefined) {
 }
 
 /** Convierte los artículos de varios pedidos en conceptos (factura global). */
-export function conceptosDePedidos(orders: Array<{ items: unknown }>): ConceptoInput[] {
+export function conceptosDePedidos(orders: Array<{ items: unknown; shippingFee?: number }>): ConceptoInput[] {
   const conceptos: ConceptoInput[] = []
   for (const order of orders) {
     for (const item of order.items as Array<{ name: string; sku?: string; satKey?: string; quantity: number; price: number }>) {
@@ -343,6 +343,7 @@ export function conceptosDePedidos(orders: Array<{ items: unknown }>): ConceptoI
         valorUnitario: precioSinIva(item.price), // el precio del pedido ya incluye IVA
       })
     }
+    if (order.shippingFee && order.shippingFee > 0) conceptos.push(conceptoEnvio(order.shippingFee))
   }
   return conceptos
 }

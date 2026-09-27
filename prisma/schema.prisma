@@ -81,6 +81,8 @@ model Order {
   status        OrderStatus @default(pending)
   items         Json
   total         Float
+  // Cargo de envío cobrado al cliente (IVA incluido, ya sumado en total); 0 = envío sin costo
+  shippingFee   Float       @default(0) @map("shipping_fee")
   priority      String      @default("normal")
   notes         String?
   syscomFolio   String?     @map("syscom_folio")
@@ -103,6 +105,9 @@ model Order {
 model SiteConfig {
   id        Int   @id @default(1)
   markupPct Float @default(0) @map("markup_pct")
+  // Compras menores a freeShippingMin + IVA pagan shippingFee (IVA incl.); a SYSCOM se pide igual
+  freeShippingMin Float @default(1000) @map("free_shipping_min")
+  shippingFee     Float @default(200)  @map("shipping_fee")
 
   @@map("site_config")
 }

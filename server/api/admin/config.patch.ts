@@ -7,11 +7,15 @@ export default defineEventHandler(async (event) => {
   if (user?.role !== 'admin') throw createError({ statusCode: 403, message: 'Forbidden' })
 
   const body = await readBody(event)
-  const markupPct = Math.max(0, Math.min(500, parseFloat(body.markupPct) || 0))
+  const clamp = (v: unknown, max: number) => Math.max(0, Math.min(max, Math.round((parseFloat(String(v)) || 0) * 100) / 100))
+  const data: { markupPct?: number; freeShippingMin?: number; shippingFee?: number } = {}
+  if (body.markupPct       !== undefined) data.markupPct       = clamp(body.markupPct, 500)
+  if (body.freeShippingMin !== undefined) data.freeShippingMin = clamp(body.freeShippingMin, 1_000_000)
+  if (body.shippingFee     !== undefined) data.shippingFee     = clamp(body.shippingFee, 100_000)
 
   return prisma.siteConfig.upsert({
     where:  { id: 1 },
-    create: { id: 1, markupPct },
-    update: { markupPct },
+    create: { id: 1, ...data },
+    update: data,
   })
 })

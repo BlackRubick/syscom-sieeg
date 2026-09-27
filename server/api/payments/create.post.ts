@@ -3,7 +3,8 @@ import prisma from '~/server/utils/prisma'
 import { createCardCharge, createSpeiCharge, openpayErrorMessage } from '~/server/utils/openpay'
 import { approveOrder } from '~/server/utils/approveOrder'
 import { repriceItems } from '~/server/utils/pricing'
-import { totalDe } from '~/utils/orderTotals'
+import { totalDe, envioDe } from '~/utils/orderTotals'
+import { getShippingConfig } from '~/server/utils/shipping'
 import type { OrderItem } from '~/types'
 
 export default defineEventHandler(async (event) => {
@@ -46,7 +47,9 @@ export default defineEventHandler(async (event) => {
   const user        = await prisma.user.findUniqueOrThrow({ where: { id: session.userId } })
   // Precios recalculados en servidor con datos de SYSCOM; se ignora lo que manda el cliente
   const items          = await repriceItems(session.userId, body.items)
-  const total          = totalDe(items)
+  // Envío cobrado por nosotros si la compra no llega al mínimo; a SYSCOM se le pide igual
+  const shippingFee    = envioDe(totalDe(items), await getShippingConfig())
+  const total          = Math.round((totalDe(items) + shippingFee) * 100) / 100
 
   const nameParts = user.name.trim().split(' ')
   const firstName = user.fiscalNombre ?? nameParts[0]
@@ -113,6 +116,7 @@ export default defineEventHandler(async (event) => {
       userId:        session.userId,
       items,
       total,
+      shippingFee,
       priority:      body.priority ?? 'normal',
       notes:         body.notes ?? null,
       paymentId,
@@ -162,6 +166,7 @@ export default defineEventHandler(async (event) => {
     order: {
       id:            order.id,
       total:         order.total,
+      shippingFee:   order.shippingFee,
       paymentId,
       paymentStatus: order.paymentStatus,
       authorization,

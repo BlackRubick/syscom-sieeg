@@ -79,6 +79,7 @@ export interface Order {
   status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'processing' | 'shipped' | 'delivered'
   items: OrderItem[]
   total: number
+  shippingFee?: number
   priority: string
   notes?: string
   syscomFolio?: string | null
