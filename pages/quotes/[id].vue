@@ -19,6 +19,13 @@
         <div class="qd-folio-box">
           <span class="qd-doc">Cotización</span>
           <span class="qd-folio">{{ quote.folio }}</span>
+          <span v-if="quote.name && !editandoNombre" class="qd-name">{{ quote.name }}</span>
+          <button v-if="!editandoNombre && puedeCotizar" type="button" class="qd-rename no-print" @click="editarNombre">{{ quote.name ? 'Cambiar nombre' : '+ Ponerle nombre' }}</button>
+          <form v-if="editandoNombre" class="qd-rename-form no-print" @submit.prevent="guardarNombre">
+            <input ref="nombreInput" v-model="nombre" maxlength="120" placeholder="Ej. Casa de Fulanito" aria-label="Nombre de la cotización" />
+            <button type="submit" :disabled="guardandoNombre">{{ guardandoNombre ? '…' : 'Guardar' }}</button>
+            <button type="button" class="ghost" @click="editandoNombre = false">Cancelar</button>
+          </form>
           <span class="qd-pill no-print" :class="quote.status">{{ ESTADOS[quote.status] }}</span>
           <span class="qd-date">{{ fechaLarga(quote.createdAt) }}</span>
         </div>
@@ -107,7 +114,7 @@ definePageMeta({ middleware: 'auth' })
 
 interface ItemPrecio extends OrderItem { disponible: boolean }
 interface Quote {
-  id: string; folio: string; status: 'open' | 'converted' | 'cancelled'; items: OrderItem[]; total: number; notes: string | null
+  id: string; folio: string; name: string | null; status: 'open' | 'converted' | 'cancelled'; items: OrderItem[]; total: number; notes: string | null
   orderId: string | null; createdAt: string
   cliente: { id: string; name: string; email: string; clientNumber: number | null; razonSocial: string | null; rfc: string | null; telefono: string | null }
   vendedor: { id: string; name: string; email: string } | null
@@ -194,11 +201,33 @@ async function alCarrito() {
 
 function imprimir() { window.print() }
 
+// ── Nombre de la cotización ──
+const editandoNombre  = ref(false)
+const guardandoNombre = ref(false)
+const nombre          = ref('')
+const nombreInput     = ref<HTMLInputElement | null>(null)
+function editarNombre() {
+  nombre.value = quote.value?.name ?? ''
+  editandoNombre.value = true
+  nextTick(() => nombreInput.value?.focus())
+}
+async function guardarNombre() {
+  if (!quote.value) return
+  guardandoNombre.value = true; accionError.value = ''
+  try {
+    const r = await $fetch<{ quote: Quote }>(`/api/quotes/${quote.value.id}`, { method: 'PATCH', body: { name: nombre.value } })
+    quote.value = { ...quote.value, name: r.quote.name }
+    editandoNombre.value = false
+  } catch (e: any) {
+    accionError.value = e?.data?.message ?? 'No se pudo guardar el nombre'
+  } finally { guardandoNombre.value = false }
+}
+
 const fmt        = (n: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(n)
 const fechaLarga = (iso: string) => new Date(iso).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })
 const fechaCorta = (iso: string) => new Date(iso).toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' })
 
-useHead(() => ({ title: quote.value ? `${quote.value.folio} — ${quote.value.cliente.name}` : 'Cotización' }))
+useHead(() => ({ title: quote.value ? `${quote.value.name ?? quote.value.folio} — ${quote.value.cliente.name}` : 'Cotización' }))
 </script>
 
 <style scoped>
@@ -216,6 +245,12 @@ useHead(() => ({ title: quote.value ? `${quote.value.folio} — ${quote.value.cl
 .qd-doc { font-size: 11px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #1570EF; }
 .qd-folio { font-size: 26px; font-weight: 800; font-family: ui-monospace, 'SF Mono', Menlo, monospace; letter-spacing: .5px; }
 .qd-date { font-size: 12.5px; color: #5B6B82; }
+.qd-name { font-size: 15px; font-weight: 700; color: #13294B; text-align: right; max-width: 320px; }
+.qd-rename { border: none; background: none; padding: 0; color: #0B5BD3; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.qd-rename-form { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.qd-rename-form input { height: 34px; width: 220px; max-width: 100%; padding: 0 10px; border-radius: 8px; border: 1px solid #1570EF; font-size: 13px; font-family: inherit; outline: none; }
+.qd-rename-form button { height: 34px; padding: 0 12px; border-radius: 8px; border: none; background: #1570EF; color: #fff; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.qd-rename-form button.ghost { background: #fff; color: #5B6B82; border: 1px solid #D5DEEA; }
 .qd-pill { font-size: 11.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
 .qd-pill.open { background: #EAF2FF; color: #0B5BD3; }
 .qd-pill.converted { background: #ECFDF3; color: #15803D; }

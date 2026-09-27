@@ -1,6 +1,7 @@
 import { requireSession } from '~/server/utils/session'
 import { crearPedido } from '~/server/utils/crearPedido'
 import { resolverCliente } from '~/server/utils/roles'
+import { reservarCotizacion, liberarCotizacion, ligarCotizacion } from '~/server/utils/cotizacion'
 import type { OrderItem } from '~/types'
 
 /* Pedido sin pago en línea (queda pendiente para aprobación manual).
@@ -15,6 +16,7 @@ export default defineEventHandler(async (event) => {
     priority?: string
     notes?:    string
     clientId?: string
+    quoteId?:  string
   }>(event)
 
   if (!body.items?.length) {
@@ -26,7 +28,19 @@ export default defineEventHandler(async (event) => {
   }
 
   const { clientId, sellerId } = await resolverCliente(session, body.clientId)
-  const order = await crearPedido({ clientId, sellerId, items: body.items, priority: body.priority, notes: body.notes })
+  // Si el carrito viene de una cotización, el pedido queda ligado a ella y a su vendedor
+  const cot = await reservarCotizacion(body.quoteId, clientId)
+  let order
+  try {
+    order = await crearPedido({
+      clientId, sellerId: sellerId ?? cot?.sellerId ?? null, items: body.items, priority: body.priority, notes: body.notes,
+      quoteNumber: cot?.number ?? null,
+    })
+  } catch (e) {
+    if (cot) await liberarCotizacion(cot.id)
+    throw e
+  }
+  if (cot) await ligarCotizacion(cot, order.id, order.user.name)
 
   return {
     order: {

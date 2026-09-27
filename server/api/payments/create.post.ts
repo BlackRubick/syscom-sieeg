@@ -6,6 +6,7 @@ import { repriceItems } from '~/server/utils/pricing'
 import { totalDe, envioDe } from '~/utils/orderTotals'
 import { getShippingConfig } from '~/server/utils/shipping'
 import type { OrderItem } from '~/types'
+import { reservarCotizacion, liberarCotizacion, ligarCotizacion } from '~/server/utils/cotizacion'
 
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
@@ -19,6 +20,7 @@ export default defineEventHandler(async (event) => {
     items:            OrderItem[]
     priority?:        string
     notes?:           string
+    quoteId?:         string
   }>(event)
 
   if (!body.method || !['card', 'spei'].includes(body.method)) {
@@ -111,9 +113,13 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // Carrito que viene de una cotización: el pedido queda ligado a ella y a su vendedor
+  const cot = await reservarCotizacion(body.quoteId, session.userId)
   const order = await prisma.order.create({
     data: {
       userId:        session.userId,
+      sellerId:      cot?.sellerId ?? null,
+      quoteNumber:   cot?.number ?? null,
       items,
       total,
       shippingFee,
@@ -125,7 +131,8 @@ export default defineEventHandler(async (event) => {
       paymentData,
     },
     include: { user: { select: { id: true, name: true, email: true } } },
-  })
+  }).catch(async (e) => { if (cot) await liberarCotizacion(cot.id); throw e })
+  if (cot) await ligarCotizacion(cot, order.id, order.user.name)
 
   // Auto-approve when card payment is immediately confirmed
   if (paymentStatus === 'paid') {

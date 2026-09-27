@@ -1,7 +1,7 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { resolverCliente } from '~/server/utils/roles'
-import { normalizarItems, preciosDelDia, crearCotizacion, QUOTE_INCLUDE, serializeQuote } from '~/server/utils/cotizacion'
+import { normalizarItems, preciosDelDia, crearCotizacion, limpiarNombre, QUOTE_INCLUDE, serializeQuote } from '~/server/utils/cotizacion'
 import { formatQuoteNumber } from '~/utils/quoteNumber'
 
 /* Guarda el carrito como cotización (pedido previo) con folio COT-0001. */
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const session = requireSession(event)
   if (session.role === 'viewer') throw createError({ statusCode: 403, message: 'Tu cuenta es de solo consulta' })
 
-  const body = await readBody<{ items?: unknown; clientId?: string; notes?: string }>(event)
+  const body = await readBody<{ items?: unknown; clientId?: string; notes?: string; name?: string }>(event)
   const items = normalizarItems(body.items)
   const { clientId, sellerId } = await resolverCliente(session, body.clientId)
 
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   const guardados = cot.items.map(({ disponible: _d, existencia: _e, ...i }) => i)
   const notes = typeof body.notes === 'string' && body.notes.trim() ? body.notes.trim().slice(0, 1000) : null
 
-  const nueva = await crearCotizacion({ userId: clientId, sellerId, items: guardados, total: cot.total, notes })
+  const nueva = await crearCotizacion({ userId: clientId, sellerId, name: limpiarNombre(body.name), items: guardados, total: cot.total, notes })
   const quote = await prisma.quote.findUniqueOrThrow({ where: { id: nueva.id }, include: QUOTE_INCLUDE })
 
   if (sellerId) {
@@ -26,8 +26,8 @@ export default defineEventHandler(async (event) => {
       data: {
         userId:  clientId,
         type:    'system',
-        title:   `Nueva cotización ${formatQuoteNumber(quote.number)}`,
-        message: `${quote.seller?.name ?? 'Tu vendedor'} te preparó una cotización. Revísala en Cotizaciones y acéptala para convertirla en pedido.`,
+        title:   `Nueva cotización ${quote.name ? `«${quote.name}»` : formatQuoteNumber(quote.number)}`,
+        message: `${quote.seller?.name ?? 'Tu vendedor'} te preparó una cotización. Ya la tienes en tu carrito: entra, revísala y haz tu pedido.`,
       },
     })
   }

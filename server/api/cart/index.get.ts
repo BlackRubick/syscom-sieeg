@@ -3,12 +3,13 @@ import prisma from '~/server/utils/prisma'
 import { syscomGet } from '~/server/utils/syscom'
 import { getPricing, precioVenta } from '~/server/utils/pricing'
 import type { SyscomProducto } from '~/types'
+import { formatQuoteNumber } from '~/utils/quoteNumber'
 
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
-    select: { cartItems: true },
+    select: { cartItems: true, cartQuoteId: true },
   })
   const items = JSON.parse(JSON.stringify((user?.cartItems as any[]) ?? [])) as Array<{ product: { id: string; price: number }; quantity: number }>
 
@@ -25,5 +26,16 @@ export default defineEventHandler(async (event) => {
     }))
   }
 
-  return { items }
+  // Cotización que está comprando (si sigue abierta)
+  let quote = null
+  if (user?.cartQuoteId) {
+    const q = await prisma.quote.findUnique({ where: { id: user.cartQuoteId }, include: { seller: { select: { name: true } } } })
+    if (q && q.userId === session.userId && q.status === 'open') {
+      quote = { id: q.id, folio: formatQuoteNumber(q.number), name: q.name, vendedor: q.seller?.name ?? null }
+    } else {
+      await prisma.user.update({ where: { id: session.userId }, data: { cartQuoteId: null } })
+    }
+  }
+
+  return { items, quote }
 })

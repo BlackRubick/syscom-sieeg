@@ -55,7 +55,7 @@ export async function preciosDelDia(clientId: string, items: OrderItem[]) {
 }
 
 /** Guarda la cotización con el siguiente folio (reintenta si dos se guardan al mismo tiempo). */
-export async function crearCotizacion(data: { userId: string; sellerId: string | null; items: OrderItem[]; total: number; notes: string | null }) {
+export async function crearCotizacion(data: { userId: string; sellerId: string | null; name: string | null; items: OrderItem[]; total: number; notes: string | null }) {
   for (let intento = 0; intento < 5; intento++) {
     const { _max } = await prisma.quote.aggregate({ _max: { number: true } })
     try {
@@ -86,6 +86,7 @@ export function serializeQuote(q: QuoteRow) {
     id:        q.id,
     number:    q.number,
     folio:     formatQuoteNumber(q.number),
+    name:      q.name,
     status:    q.status,
     items:     q.items as unknown as OrderItem[],
     total:     q.total,
@@ -103,5 +104,41 @@ export function serializeQuote(q: QuoteRow) {
       telefono:     q.user.fiscalTelefono,
     },
     vendedor: q.seller ? { id: q.seller.id, name: q.seller.name, email: q.seller.email } : null,
+  }
+}
+
+/** Nombre de la cotización tal como lo escribió el usuario (vacío = sin nombre). */
+export function limpiarNombre(v: unknown): string | null {
+  return typeof v === 'string' && v.trim() ? v.trim().replace(/\s+/g, ' ').slice(0, 120) : null
+}
+
+/** El cliente compra una cotización desde su carrito: se valida y se reserva para que no se use dos veces.
+    Si ya no aplica (es de otro cliente, ya se convirtió o se canceló) se ignora y el pedido sale normal. */
+export async function reservarCotizacion(quoteId: unknown, clientId: string) {
+  if (typeof quoteId !== 'string' || !quoteId) return null
+  const q = await prisma.quote.findUnique({ where: { id: quoteId }, select: { id: true, userId: true, sellerId: true, number: true, name: true, status: true } })
+  if (!q || q.userId !== clientId || q.status !== 'open') return null
+  const r = await prisma.quote.updateMany({ where: { id: quoteId, status: 'open' }, data: { status: 'converted' } })
+  return r.count ? q : null
+}
+
+export async function liberarCotizacion(quoteId: string) {
+  await prisma.quote.update({ where: { id: quoteId }, data: { status: 'open' } })
+}
+
+/** Liga el pedido a la cotización, la saca del carrito del cliente y avisa al vendedor. */
+export async function ligarCotizacion(q: { id: string; userId: string; sellerId: string | null; number: number; name: string | null }, orderId: string, clienteNombre: string) {
+  await prisma.quote.update({ where: { id: q.id }, data: { orderId } })
+  await prisma.user.updateMany({ where: { id: q.userId, cartQuoteId: q.id }, data: { cartQuoteId: null } })
+  if (q.sellerId) {
+    await prisma.notification.create({
+      data: {
+        userId:  q.sellerId,
+        type:    'approval',
+        title:   `${formatQuoteNumber(q.number)} comprada`,
+        message: `${clienteNombre} hizo el pedido de la cotización${q.name ? ` «${q.name}»` : ''} desde su carrito.`,
+        orderId,
+      },
+    })
   }
 }

@@ -176,8 +176,21 @@
       </div>
     </div>
 
+    <!-- ── Pedido confirmado (sin pago en línea) ── -->
+    <div v-else-if="pedidoConfirmado" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 16px;">
+      <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#16A34A,#059669);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 0 40px rgba(34,197,94,0.3);">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <div style="font-size:22px;font-weight:800;color:#0B1B33;margin-bottom:8px;">¡Recibimos tu pedido!</div>
+      <div style="font-size:14px;color:#5B6B82;max-width:420px;line-height:1.6;margin-bottom:22px;">Te contactaremos para confirmar el pago por transferencia y la entrega. Puedes ver cómo va en <b>Mis órdenes</b>.</div>
+      <a href="/orders" style="height:42px;padding:0 24px;border-radius:11px;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;font-size:13px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;box-shadow:0 4px 16px rgba(21,112,239,0.3);">
+        Ver mis órdenes
+      </a>
+    </div>
+
     <!-- ── Carrito vacío ── -->
     <div v-else-if="!cart.items.length" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+      <CartQuotesForYou />
       <div style="width:72px;height:72px;border-radius:20px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.08);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
         <ShoppingCart :size="28" color="rgba(91,107,130,0.45)" :stroke-width="1.5" />
       </div>
@@ -201,6 +214,17 @@
           <Trash2 :size="12" /> Vaciar todo
         </button>
       </div>
+
+      <!-- Cotización que está comprando -->
+      <div v-if="cart.quote" class="ct-quote">
+        <FileText :size="16" />
+        <div>
+          Estás comprando <b>{{ cart.quote.name ? `«${cart.quote.name}»` : 'la cotización' }}</b> <span class="ct-quote-folio">{{ cart.quote.folio }}</span>
+          <span v-if="cart.quote.vendedor"> · preparada por {{ cart.quote.vendedor }}</span>
+        </div>
+        <button type="button" @click="cart.quitarCotizacion()">Ya no es de esta cotización</button>
+      </div>
+      <CartQuotesForYou v-else-if="!vende" />
 
 
       <!-- Cliente (vendedor / admin): el pedido o la cotización quedan a su nombre, con su precio -->
@@ -373,10 +397,16 @@
             <button v-if="clienteId" class="ct-btn ct-btn-primary" :disabled="!!accion || preview.loading" @click="generarPedidoCliente">
               <Package :size="15" /> {{ accion === 'pedido' ? 'Generando…' : `Generar pedido para ${clienteSel?.name.split(' ')[0] ?? 'el cliente'}` }}
             </button>
-            <button v-else-if="!esVendedor" @click="openPaymentModal"
+            <button v-else-if="!esVendedor && !pagoEnLinea" class="ct-btn ct-btn-primary" :disabled="!!accion" @click="confirmarPedido">
+              <Package :size="15" /> {{ accion === 'confirmar' ? 'Enviando…' : 'Confirmar pedido' }}
+            </button>
+            <div v-if="!esVendedor && !clienteId && !pagoEnLinea" class="ct-note">Te contactamos para el pago por transferencia y la entrega.</div>
+            <button v-else-if="!esVendedor && !clienteId" @click="openPaymentModal"
               style="width:100%;height:44px;border-radius:11px;border:none;cursor:pointer;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;font-weight:700;font-size:13px;font-family:inherit;box-shadow:0 4px 18px rgba(21,112,239,0.32);display:flex;align-items:center;justify-content:center;gap:8px;">
               <CreditCard :size="15" /> Elegir método de pago
             </button>
+            <div class="ct-sep"><span>o guárdalo para después</span></div>
+            <input v-model="nombreCotizacion" class="ct-name" maxlength="120" :placeholder="clienteSel ? `Nombre de la cotización (ej. Casa de ${clienteSel.name.split(' ')[0]})` : 'Nombre de la cotización (ej. Casa de Fulanito)'" aria-label="Nombre de la cotización" />
             <button class="ct-btn ct-btn-ghost" :disabled="!!accion || (esVendedor && !clienteId)" @click="guardarCotizacion">
               <FileText :size="15" /> {{ accion === 'cotizacion' ? 'Guardando…' : 'Guardar como cotización' }}
             </button>
@@ -612,6 +642,15 @@
 .ct-btn-ghost { border:1px solid rgba(11,27,51,0.14); background:#fff; color:#0B1B33; }
 .ct-btn-ghost:hover:not(:disabled) { background:#F5F8FC; }
 .ct-note { font-size:11.5px; color:#7A889C; line-height:1.5; text-align:center; }
+.ct-sep { display:flex; align-items:center; gap:8px; margin:4px 0 -2px; font-size:11px; color:#7A889C; }
+.ct-sep::before, .ct-sep::after { content:''; flex:1; height:1px; background:rgba(11,27,51,0.1); }
+.ct-name { width:100%; height:40px; padding:0 12px; border-radius:10px; border:1px solid rgba(11,27,51,0.14); background:#F5F8FC; font-size:12.5px; color:#0B1B33; font-family:inherit; outline:none; box-sizing:border-box; }
+.ct-name:focus { border-color:#1570EF; background:#fff; }
+.ct-quote { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px; padding:12px 16px; border-radius:14px; background:#EAF2FF; border:1px solid rgba(21,112,239,0.25); color:#0B1B33; font-size:13.5px; }
+.ct-quote > div { flex:1; min-width:220px; }
+.ct-quote svg { color:#0B5BD3; flex-shrink:0; }
+.ct-quote-folio { font-size:11px; font-weight:700; padding:1px 6px; border-radius:5px; background:#fff; color:#0B5BD3; font-family:ui-monospace,Menlo,monospace; }
+.ct-quote button { border:none; background:none; color:#5B6B82; font-size:12px; text-decoration:underline; cursor:pointer; font-family:inherit; }
 .ct-error { padding:9px 11px; border-radius:9px; background:#FEF2F2; color:#B91C1C; font-size:12.5px; }
 </style>
 
@@ -710,16 +749,36 @@ const faltaEnvio    = computed(() => Math.max(0, minimoEnvioConIva(shippingCfg.v
 const totales       = computed(() => desgloseTotales(totalCarrito.value + envio.value))
 
 // ── Cotización y pedido a nombre del cliente ──
-const accion      = ref<'' | 'cotizacion' | 'pedido'>('')
+const accion      = ref<'' | 'cotizacion' | 'pedido' | 'confirmar'>('')
+const nombreCotizacion = ref('')
+const pedidoConfirmado = ref(false)
+// Sin llaves de OpenPay no hay cobro en línea: el cliente confirma y se coordina el pago por transferencia
+const pagoEnLinea = computed(() => !!(config.public.openpayMerchantId && config.public.openpayPublicKey))
+
+async function confirmarPedido() {
+  if (!confirm(`¿Confirmar tu pedido por ${fmt(totales.value.total)}? Te contactaremos para el pago.`)) return
+  accion.value = 'confirmar'; accionError.value = ''
+  try {
+    await $fetch('/api/orders', {
+      method: 'POST', body: { items: cartItems(), priority: priority.value, notes: notes.value || undefined, quoteId: cart.quote?.id },
+    })
+    await cart.clearCart()
+    notes.value = ''
+    pedidoConfirmado.value = true
+  } catch (e: any) {
+    accionError.value = e?.data?.message ?? 'No se pudo enviar tu pedido'
+  } finally { accion.value = '' }
+}
 const accionError = ref('')
 async function guardarCotizacion() {
   accion.value = 'cotizacion'; accionError.value = ''
   try {
     const r = await $fetch<{ quote: { id: string } }>('/api/quotes', {
-      method: 'POST', body: { items: cartItems(), clientId: clienteId.value || undefined, notes: notes.value || undefined },
+      method: 'POST', body: { items: cartItems(), clientId: clienteId.value || undefined, notes: notes.value || undefined, name: nombreCotizacion.value || undefined },
     })
     await cart.clearCart()
     notes.value = ''
+    nombreCotizacion.value = ''
     clienteId.value = ''
     await navigateTo(`/quotes/${r.quote.id}`)
   } catch (e: any) {
@@ -922,6 +981,7 @@ async function handlePayCard() {
               items:           cartItems(),
               priority:        priority.value,
               notes:           notes.value || undefined,
+              quoteId:         cart.quote?.id,
             },
           })
           cart.clearCart()
@@ -991,6 +1051,7 @@ async function handlePaySpei() {
         items:    cartItems(),
         priority: priority.value,
         notes:    notes.value || undefined,
+        quoteId:  cart.quote?.id,
       },
     })
     cart.clearCart()

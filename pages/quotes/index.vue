@@ -13,7 +13,7 @@
     <div class="qt-card qt-filters">
       <div class="qt-search">
         <Search :size="15" />
-        <input v-model="search" :placeholder="veTodas ? 'Buscar por folio COT-, cliente, empresa o vendedor…' : 'Buscar por folio COT-…'" />
+        <input v-model="search" :placeholder="veTodas ? 'Buscar por nombre, folio COT-, cliente o vendedor…' : 'Buscar por nombre o folio COT-…'" />
       </div>
       <div class="qt-tabs">
         <button v-for="t in TABS" :key="t.key" type="button" :class="{ active: estado === t.key }" @click="estado = t.key">{{ t.label }}</button>
@@ -36,7 +36,8 @@
       <NuxtLink v-for="q in quotes" :key="q.id" :to="`/quotes/${q.id}`" class="qt-row">
         <div class="qt-row-main">
           <div class="qt-row-top">
-            <span class="qt-folio">{{ q.folio }}</span>
+            <span v-if="q.name" class="qt-name">{{ q.name }}</span>
+            <span :class="q.name ? 'qt-cl' : 'qt-folio'">{{ q.folio }}</span>
             <span class="qt-pill" :class="q.status">{{ ESTADOS[q.status] }}</span>
           </div>
           <div class="qt-row-sub">
@@ -69,7 +70,7 @@ import type { OrderItem } from '~/types'
 definePageMeta({ middleware: 'auth' })
 
 interface QuoteRow {
-  id: string; folio: string; status: 'open' | 'converted' | 'cancelled'; total: number; items: OrderItem[]; createdAt: string
+  id: string; folio: string; name: string | null; status: 'open' | 'converted' | 'cancelled'; total: number; items: OrderItem[]; createdAt: string
   cliente: { name: string; clientNumber: number | null; razonSocial: string | null }
   vendedor: { name: string } | null
 }
@@ -145,6 +146,7 @@ const fecha = (iso: string) => new Date(iso).toLocaleDateString('es-MX', { day: 
 .qt-row:hover { border-color: rgba(21,112,239,0.35); box-shadow: 0 8px 22px rgba(11,27,51,0.07); }
 .qt-row-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .qt-folio { font-size: 15px; font-weight: 800; font-family: ui-monospace, 'SF Mono', Menlo, monospace; letter-spacing: .3px; }
+.qt-name { font-size: 15px; font-weight: 800; }
 .qt-pill { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
 .qt-pill.open { background: #EAF2FF; color: #0B5BD3; }
 .qt-pill.converted { background: #ECFDF3; color: #15803D; }

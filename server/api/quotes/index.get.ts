@@ -25,6 +25,7 @@ export default defineEventHandler(async (event) => {
       OR: [
         ...(folio ? [{ number: folio }] : []),
         ...(cl ? [{ user: { clientNumber: cl } }] : []),
+        { name: { contains: search } },
         { user: { name: { contains: search } } },
         { user: { email: { contains: search } } },
         { user: { fiscalRazonSocial: { contains: search } } },

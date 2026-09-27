@@ -80,6 +80,8 @@ model User {
   facturaUid         String? @map("factura_uid")
   discountPct        Float   @default(0) @map("discount_pct")
   cartItems          Json?   @map("cart_items")
+  // Cotización que el cliente cargó en su carrito para comprarla
+  cartQuoteId        String? @map("cart_quote_id")
 
   @@map("users")
 }
@@ -122,6 +124,8 @@ model Quote {
   id        String      @id @default(cuid())
   // Folio consecutivo (se muestra como COT-0001)
   number    Int         @unique
+  // Nombre libre para identificarla (ej. "Casa de Fulanito")
+  name      String?     @db.VarChar(120)
   userId    String      @map("user_id")
   user      User        @relation("QuoteClient", fields: [userId], references: [id], onDelete: Cascade)
   sellerId  String?     @map("seller_id")
