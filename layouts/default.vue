@@ -38,7 +38,8 @@ import { AlertTriangle } from '@lucide/vue'
 const auth = useAuthStore()
 const ui   = useUIStore()
 
-const needsFiscal = (user: typeof auth.user) => !!user && user.role !== 'admin' && !user.fiscalCompleted
+// Admin y vendedor no compran a su nombre: no se les piden datos fiscales propios
+const needsFiscal = (user: typeof auth.user) => !!user && user.role !== 'admin' && user.role !== 'seller' && !user.fiscalCompleted
 
 onMounted(async () => {
   if (!auth.loaded) await auth.init()

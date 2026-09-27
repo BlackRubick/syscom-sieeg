@@ -3,8 +3,8 @@ import prisma from '~/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
-  if (session.role !== 'admin') {
-    throw createError({ statusCode: 403, message: 'Solo administradores pueden editar datos fiscales de otros usuarios' })
+  if (session.role !== 'admin' && session.role !== 'seller') {
+    throw createError({ statusCode: 403, message: 'Solo administradores y vendedores pueden editar datos fiscales de otros usuarios' })
   }
 
   const id = getRouterParam(event, 'id')
@@ -19,6 +19,7 @@ export default defineEventHandler(async (event) => {
 
   const existing = await prisma.user.findUnique({ where: { id } })
   if (!existing) throw createError({ statusCode: 404, message: 'Usuario no encontrado' })
+  if (session.role === 'seller' && existing.role !== 'buyer') throw createError({ statusCode: 403, message: 'Solo puedes editar datos fiscales de clientes' })
 
   const user = await prisma.user.update({
     where: { id },

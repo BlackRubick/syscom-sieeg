@@ -11,6 +11,7 @@ export const ORDER_INCLUDE = {
       fiscalCiudad: true, fiscalEstado: true, fiscalCodpos: true, fiscalTelefono: true,
     },
   },
+  seller: { select: { id: true, name: true } },
 } satisfies Prisma.OrderInclude
 
 type OrderWithUser = Prisma.OrderGetPayload<{ include: typeof ORDER_INCLUDE }>
@@ -96,6 +97,8 @@ export function serializeOrder(o: OrderWithUser, isManager: boolean) {
     userName:      u.name,
     userEmail:     u.email,
     clientNumber:  u.clientNumber,
+    vendedor:      o.seller ? { id: o.seller.id, name: o.seller.name } : null,
+    quoteNumber:   o.quoteNumber,
     status:        o.status,
     items:         o.items,
     total:         o.total,

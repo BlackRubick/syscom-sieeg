@@ -1,6 +1,7 @@
 import type { User } from '~/types'
 
-const BUYER_ALLOWED  = ['/catalog', '/cart', '/orders', '/perfil', '/fiscal']
+const BUYER_ALLOWED  = ['/catalog', '/cart', '/orders', '/quotes', '/perfil', '/fiscal']
+const SELLER_ALLOWED = ['/catalog', '/cart', '/orders', '/quotes', '/clientes', '/fiscal', '/perfil']
 const VIEWER_ALLOWED = ['/catalog', '/orders', '/perfil', '/dashboard']
 
 export default defineNuxtRouteMiddleware(async (to) => {
@@ -22,6 +23,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // #8 — Viewer solo puede ver catálogo, órdenes y perfil (sin crear ni administrar)
   if (auth.user.role === 'viewer') {
     const allowed = VIEWER_ALLOWED.some(p => to.path === p || to.path.startsWith(p + '/'))
+    if (!allowed) return navigateTo('/catalog')
+  }
+
+  if (auth.user.role === 'seller') {
+    const allowed = SELLER_ALLOWED.some(p => to.path === p || to.path.startsWith(p + '/'))
     if (!allowed) return navigateTo('/catalog')
   }
 

@@ -3,10 +3,10 @@ import prisma from '~/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
-  if (session.role !== 'admin') throw createError({ statusCode: 403, message: 'Solo administradores' })
+  if (session.role !== 'admin' && session.role !== 'seller') throw createError({ statusCode: 403, message: 'Sin autorización' })
 
   const users = await prisma.user.findMany({
-    where: { role: { not: 'admin' } },
+    where: session.role === 'seller' ? { role: 'buyer' } : { role: { not: 'admin' } },
     orderBy: { createdAt: 'asc' },
     select: {
       id: true, name: true, email: true, role: true, status: true, createdAt: true,

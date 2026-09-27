@@ -3,7 +3,7 @@ export interface User {
   name: string
   email: string
   clientNumber?: number | null
-  role: 'admin' | 'buyer' | 'approver' | 'viewer'
+  role: 'admin' | 'buyer' | 'approver' | 'viewer' | 'seller'
   status: 'active' | 'inactive' | 'pending'
   createdAt: string
   lastLogin?: string
@@ -76,6 +76,8 @@ export interface Order {
   userName?: string
   userEmail?: string
   clientNumber?: number | null
+  vendedor?: { id: string; name: string } | null
+  quoteNumber?: number | null
   status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'processing' | 'shipped' | 'delivered'
   items: OrderItem[]
   total: number

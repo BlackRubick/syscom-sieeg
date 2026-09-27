@@ -2,7 +2,7 @@
   <div ref="root" class="fc" :class="{ open, active: !!modelValue }">
     <button type="button" class="fc-trigger" :aria-expanded="open" aria-haspopup="listbox" @click="toggle">
       <span class="fc-label">{{ label }}</span>
-      <span class="fc-value">{{ seleccionado?.label ?? 'Todos' }}</span>
+      <span class="fc-value">{{ seleccionado?.label ?? (emptyLabel ?? 'Todos') }}</span>
       <span v-if="modelValue" class="fc-clear" role="button" :aria-label="`Quitar filtro de ${label.toLowerCase()}`" @click.stop="elegir('')">×</span>
       <svg v-else width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
@@ -19,7 +19,7 @@
           </div>
           <div v-if="o.sub || o.count != null" class="fc-opt-sub">
             <span>{{ o.sub }}</span>
-            <span v-if="o.count != null">{{ o.count }} pedido{{ o.count !== 1 ? 's' : '' }}</span>
+            <span v-if="o.count != null">{{ o.count }} {{ countLabel ?? 'pedido' }}{{ o.count !== 1 ? 's' : '' }}</span>
           </div>
         </li>
         <li v-if="!filtradas.length" class="fc-empty">Sin resultados</li>
@@ -31,7 +31,7 @@
 <script setup lang="ts">
 export interface ComboOption { value: string; label: string; sub?: string; badge?: string; count?: number; search?: string }
 
-const props = defineProps<{ modelValue: string; options: ComboOption[]; label: string; placeholder?: string }>()
+const props = defineProps<{ modelValue: string; options: ComboOption[]; label: string; placeholder?: string; emptyLabel?: string; countLabel?: string }>()
 const emit  = defineEmits<{ (e: 'update:modelValue', v: string): void }>()
 
 const open   = ref(false)

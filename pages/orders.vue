@@ -4,7 +4,7 @@
     <!-- Header -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
       <div>
-        <h1 style="font-size:22px;font-weight:800;color:#0B1B33;margin:0;">{{ isManager ? 'Todas las órdenes' : 'Mis órdenes' }}</h1>
+        <h1 style="font-size:22px;font-weight:800;color:#0B1B33;margin:0;">{{ veTodos ? 'Todas las órdenes' : 'Mis órdenes' }}</h1>
         <p style="font-size:13px;color:#5B6B82;margin-top:4px;">
           {{ loading ? 'Cargando…' : `${orders.length} orden${orders.length!==1?'es':''}` }}
         </p>
@@ -32,11 +32,11 @@
       <div class="of-row">
       <div style="position:relative;flex:1;min-width:220px;max-width:380px;">
         <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#1570EF':'#7A889C'" />
-        <input v-model="search" :placeholder="isManager ? 'Buscar por pedido, cliente o número CL-…' : 'Buscar por número de pedido…'"
+        <input v-model="search" :placeholder="veTodos ? 'Buscar por pedido, cliente o número CL-…' : 'Buscar por número de pedido…'"
           @focus="searchFocus=true" @blur="searchFocus=false"
           :style="{ width:'100%', height:'40px', background:searchFocus?'rgba(21,112,239,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${searchFocus?'rgba(21,112,239,0.45)':'rgba(11,27,51,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
       </div>
-      <template v-if="isManager">
+      <template v-if="veTodos">
         <FilterCombo v-model="filtroCliente" label="Cliente" placeholder="Nombre, CL-…, correo o empresa" :options="opcionesClientes" />
         <FilterCombo v-model="filtroEmpresa" label="Empresa" placeholder="Razón social o RFC" :options="opcionesEmpresas" />
         <button v-if="filtroCliente || filtroEmpresa" type="button" class="of-clear" @click="filtroCliente = ''; filtroEmpresa = ''">Quitar filtros</button>
@@ -106,12 +106,14 @@
               <div style="display:flex;align-items:center;gap:6px;">
                 <Clock :size="11" color="#7A889C" />
                 <span style="font-size:11px;color:#5B6B82;">{{ fmtDate(order.createdAt) }}</span>
-                <template v-if="isManager && order.userName">
+                <template v-if="veTodos && order.userName">
                   <span style="color:#7A889C;font-size:11px;">·</span>
                   <User :size="11" color="#7A889C" />
                   <span style="font-size:11px;color:#5B6B82;">{{ order.userName }}</span>
                   <span v-if="order.clientNumber" class="cl-num">{{ formatClientNumber(order.clientNumber) }}</span>
                 </template>
+                <span v-if="order.quoteNumber" class="cl-num" title="Salió de esta cotización">{{ formatQuoteNumber(order.quoteNumber) }}</span>
+                <span v-if="order.vendedor" style="font-size:11px;color:#5B6B82;">· Vendedor: {{ order.vendedor.name }}</span>
               </div>
             </div>
 
@@ -176,7 +178,9 @@
                 </div>
                 <div class="od-sub">
                   <Clock :size="12" /> {{ fmtDateLong(detail.createdAt) }}
-                  <template v-if="isManager && detail.userName"><span class="od-dot">·</span><User :size="12" /> {{ detail.userName }}<span v-if="detail.clientNumber" class="cl-num">{{ formatClientNumber(detail.clientNumber) }}</span></template>
+                  <template v-if="veTodos && detail.userName"><span class="od-dot">·</span><User :size="12" /> {{ detail.userName }}<span v-if="detail.clientNumber" class="cl-num">{{ formatClientNumber(detail.clientNumber) }}</span></template>
+                  <template v-if="detail.vendedor"><span class="od-dot">·</span>Vendedor: {{ detail.vendedor.name }}</template>
+                  <template v-if="detail.quoteNumber"><span class="od-dot">·</span><NuxtLink :to="`/quotes?search=${formatQuoteNumber(detail.quoteNumber)}`" class="cl-num">{{ formatQuoteNumber(detail.quoteNumber) }}</NuxtLink></template>
                 </div>
               </div>
               <div class="od-head-right">
@@ -392,7 +396,7 @@
             </section>
 
             <!-- Cancelar -->
-            <section v-if="detail.status==='pending' || detail.status==='approved'" class="od-cancel">
+            <section v-if="(detail.status==='pending' || detail.status==='approved') && (isManager || detail.userId === auth.user?.id || detail.vendedor?.id === auth.user?.id)" class="od-cancel">
               <p v-if="detail.syscomFolio && isManager" class="od-muted" style="margin:0 0 8px;">Cancelar aquí <b>no</b> cancela el pedido en SYSCOM ({{ detail.syscomFolio }}); cancélalo también con tu ejecutivo.</p>
               <button class="od-btn od-btn-ghost" :disabled="cancelling" @click="cancelOrder(detail)">{{ cancelling ? 'Cancelando…' : 'Cancelar pedido' }}</button>
             </section>
@@ -416,6 +420,8 @@ definePageMeta({ middleware: 'auth' })
 
 const auth      = useAuthStore()
 const isManager = computed(() => auth.user?.role === 'admin' || auth.user?.role === 'approver')
+// El vendedor ve los pedidos de todos los clientes (sin costos ni aprobación)
+const veTodos   = computed(() => isManager.value || auth.user?.role === 'seller')
 
 const orders        = ref<Order[]>([])
 const loading       = ref(true)
@@ -564,7 +570,14 @@ async function load(resetPage = false) {
 function prevPage() { if (page.value > 1) { page.value--; load() } }
 function nextPage() { if (page.value < totalPages.value) { page.value++; load() } }
 
-onMounted(() => load())
+// Enlace directo a un pedido (desde una cotización): /orders?pedido=<id>
+onMounted(async () => {
+  const pedido = typeof useRoute().query.pedido === 'string' ? useRoute().query.pedido as string : ''
+  if (pedido) search.value = pedido
+  await load()
+  const o = pedido ? orders.value.find(x => x.id === pedido) : undefined
+  if (o) openDetail(o)
+})
 
 /* ── Filtros por cliente y empresa (admin/approver) ── */
 const route  = useRoute()
@@ -585,7 +598,7 @@ const opcionesEmpresas = computed(() => filtros.value.empresas.map(e => ({
 })))
 
 onMounted(async () => {
-  if (!isManager.value) return
+  if (!veTodos.value) return
   try { filtros.value = await $fetch<FiltrosResp>('/api/orders/filters') } catch { /* los filtros son opcionales */ }
 })
 

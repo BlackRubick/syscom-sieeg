@@ -6,6 +6,7 @@ import { parseClientNumber } from '~/utils/clientNumber'
 export default defineEventHandler(async (event) => {
   const session   = requireSession(event)
   const isManager = session.role === 'admin' || session.role === 'approver'
+  const veTodos   = isManager || session.role === 'seller'
 
   const q       = getQuery(event)
   const page    = Math.max(1, Number(q.page    ?? 1))
@@ -13,8 +14,8 @@ export default defineEventHandler(async (event) => {
   const status  = q.status ? String(q.status) : undefined
   const search  = q.search ? String(q.search) : undefined
   // Filtros por cliente y empresa (solo admin/approver)
-  const cliente = isManager && typeof q.cliente === 'string' && q.cliente ? q.cliente : undefined
-  const empresa = isManager && typeof q.empresa === 'string' && q.empresa ? q.empresa : undefined
+  const cliente = veTodos && typeof q.cliente === 'string' && q.cliente ? q.cliente : undefined
+  const empresa = veTodos && typeof q.empresa === 'string' && q.empresa ? q.empresa : undefined
 
   // Empresa → usuarios con esa razón social (se compara sin espacios sobrantes)
   const idsEmpresa = empresa
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
     : undefined
 
   const where = {
-    ...(isManager ? {} : { userId: session.userId }),
+    ...(veTodos ? {} : { userId: session.userId }),
     ...(cliente ? { userId: cliente } : {}),
     ...(idsEmpresa ? { userId: { in: cliente ? idsEmpresa.filter(id => id === cliente) : idsEmpresa } } : {}),
     ...(status ? { status: status as never } : {}),
@@ -34,6 +35,7 @@ export default defineEventHandler(async (event) => {
         { user: { email: { contains: search } } },
         { user: { fiscalRazonSocial: { contains: search } } },
         { syscomFolio:     { contains: search } },
+        { seller: { name: { contains: search } } },
         ...(parseClientNumber(search) ? [{ user: { clientNumber: parseClientNumber(search)! } }] : []),
       ],
     } : {}),

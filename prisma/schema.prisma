@@ -13,6 +13,13 @@ enum UserRole {
   buyer
   approver
   viewer
+  seller
+}
+
+enum QuoteStatus {
+  open
+  converted
+  cancelled
 }
 
 enum UserStatus {
@@ -43,7 +50,10 @@ model User {
   createdAt     String         @map("created_at")
   lastLogin     String?        @map("last_login")
   avatar        String?
-  orders        Order[]
+  orders        Order[]        @relation("OrderClient")
+  sellerOrders  Order[]        @relation("OrderSeller")
+  quotes        Quote[]        @relation("QuoteClient")
+  sellerQuotes  Quote[]        @relation("QuoteSeller")
   notifications Notification[]
 
   // Datos fiscales
@@ -75,39 +85,67 @@ model User {
 }
 
 model Order {
-  id            String      @id @default(cuid())
-  userId        String      @map("user_id")
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status        OrderStatus @default(pending)
-  items         Json
-  total         Float
+  id             String      @id @default(cuid())
+  userId         String      @map("user_id")
+  user           User        @relation("OrderClient", fields: [userId], references: [id], onDelete: Cascade)
+  // Vendedor (o admin) que levantó el pedido a nombre del cliente; null = lo hizo el propio cliente
+  sellerId       String?     @map("seller_id")
+  seller         User?       @relation("OrderSeller", fields: [sellerId], references: [id], onDelete: SetNull)
+  // Cotización de la que salió el pedido (COT-0001)
+  quoteNumber    Int?        @map("quote_number")
+  status         OrderStatus @default(pending)
+  items          Json
+  total          Float
   // Cargo de envío cobrado al cliente (IVA incluido, ya sumado en total); 0 = envío sin costo
-  shippingFee   Float       @default(0) @map("shipping_fee")
-  priority      String      @default("normal")
-  notes         String?
-  syscomFolio   String?     @map("syscom_folio")
-  syscomData    Json?       @map("syscom_data")
+  shippingFee    Float       @default(0) @map("shipping_fee")
+  priority       String      @default("normal")
+  notes          String?
+  syscomFolio    String?     @map("syscom_folio")
+  syscomData     Json?       @map("syscom_data")
   // Último estado consultado en SYSCOM (facturación / entrega) y cuándo se consultó
-  syscomTracking Json?      @map("syscom_tracking")
-  syscomStatusAt DateTime?  @map("syscom_status_at")
-  cfdiUid       String?     @map("cfdi_uid")
-  auditLog      Json?       @map("audit_log")
-  paymentId     String?     @map("payment_id")
-  paymentStatus String      @default("unpaid") @map("payment_status")
-  paymentMethod String?     @map("payment_method")
-  paymentData   Json?       @map("payment_data")
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
+  syscomTracking Json?       @map("syscom_tracking")
+  syscomStatusAt DateTime?   @map("syscom_status_at")
+  cfdiUid        String?     @map("cfdi_uid")
+  auditLog       Json?       @map("audit_log")
+  paymentId      String?     @map("payment_id")
+  paymentStatus  String      @default("unpaid") @map("payment_status")
+  paymentMethod  String?     @map("payment_method")
+  paymentData    Json?       @map("payment_data")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
 
   @@map("orders")
 }
 
+// Cotización (pedido previo). Guarda productos y cantidades; el precio siempre se recalcula al del día.
+model Quote {
+  id        String      @id @default(cuid())
+  // Folio consecutivo (se muestra como COT-0001)
+  number    Int         @unique
+  userId    String      @map("user_id")
+  user      User        @relation("QuoteClient", fields: [userId], references: [id], onDelete: Cascade)
+  sellerId  String?     @map("seller_id")
+  seller    User?       @relation("QuoteSeller", fields: [sellerId], references: [id], onDelete: SetNull)
+  items     Json
+  // Total (IVA incl.) al momento de guardarla; solo de referencia
+  total     Float
+  notes     String?     @db.Text
+  status    QuoteStatus @default(open)
+  orderId   String?     @map("order_id")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([sellerId])
+  @@map("quotes")
+}
+
 model SiteConfig {
-  id        Int   @id @default(1)
-  markupPct Float @default(0) @map("markup_pct")
+  id              Int   @id @default(1)
+  markupPct       Float @default(0) @map("markup_pct")
   // Compras menores a freeShippingMin + IVA pagan shippingFee (IVA incl.); a SYSCOM se pide igual
   freeShippingMin Float @default(1000) @map("free_shipping_min")
-  shippingFee     Float @default(200)  @map("shipping_fee")
+  shippingFee     Float @default(200) @map("shipping_fee")
 
   @@map("site_config")
 }

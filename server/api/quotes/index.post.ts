@@ -1,0 +1,36 @@
+import { requireSession } from '~/server/utils/session'
+import prisma from '~/server/utils/prisma'
+import { resolverCliente } from '~/server/utils/roles'
+import { normalizarItems, preciosDelDia, crearCotizacion, QUOTE_INCLUDE, serializeQuote } from '~/server/utils/cotizacion'
+import { formatQuoteNumber } from '~/utils/quoteNumber'
+
+/* Guarda el carrito como cotización (pedido previo) con folio COT-0001. */
+export default defineEventHandler(async (event) => {
+  const session = requireSession(event)
+  if (session.role === 'viewer') throw createError({ statusCode: 403, message: 'Tu cuenta es de solo consulta' })
+
+  const body = await readBody<{ items?: unknown; clientId?: string; notes?: string }>(event)
+  const items = normalizarItems(body.items)
+  const { clientId, sellerId } = await resolverCliente(session, body.clientId)
+
+  // Se guarda el total del día como referencia; al verla o aceptarla se recalcula
+  const cot = await preciosDelDia(clientId, items)
+  const guardados = cot.items.map(({ disponible: _d, existencia: _e, ...i }) => i)
+  const notes = typeof body.notes === 'string' && body.notes.trim() ? body.notes.trim().slice(0, 1000) : null
+
+  const nueva = await crearCotizacion({ userId: clientId, sellerId, items: guardados, total: cot.total, notes })
+  const quote = await prisma.quote.findUniqueOrThrow({ where: { id: nueva.id }, include: QUOTE_INCLUDE })
+
+  if (sellerId) {
+    await prisma.notification.create({
+      data: {
+        userId:  clientId,
+        type:    'system',
+        title:   `Nueva cotización ${formatQuoteNumber(quote.number)}`,
+        message: `${quote.seller?.name ?? 'Tu vendedor'} te preparó una cotización. Revísala en Cotizaciones y acéptala para convertirla en pedido.`,
+      },
+    })
+  }
+
+  return { quote: serializeQuote(quote) }
+})

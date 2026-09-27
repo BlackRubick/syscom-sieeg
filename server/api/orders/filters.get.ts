@@ -4,7 +4,7 @@ import prisma from '~/server/utils/prisma'
 /* Opciones para los filtros de Órdenes: clientes y empresas que tienen pedidos. */
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
-  if (session.role !== 'admin' && session.role !== 'approver') throw createError({ statusCode: 403, message: 'Sin autorización' })
+  if (!['admin', 'approver', 'seller'].includes(session.role)) throw createError({ statusCode: 403, message: 'Sin autorización' })
 
   const porUsuario = await prisma.order.groupBy({ by: ['userId'], _count: { _all: true } })
   const users = await prisma.user.findMany({

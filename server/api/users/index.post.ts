@@ -2,18 +2,23 @@ import bcrypt from 'bcryptjs'
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { createUserWithClientNumber } from '~/server/utils/clientNumber'
+import { vendeAClientes } from '~/server/utils/roles'
 import type { UserRole, UserStatus } from '@prisma/client'
 
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
-  if (session.role !== 'admin') throw createError({ statusCode: 403, message: 'Solo administradores' })
+  if (!vendeAClientes(session.role)) throw createError({ statusCode: 403, message: 'Sin autorización' })
 
   const body = await readBody<{
     name?: string; email?: string; password?: string
     role?: string; status?: string
   }>(event)
 
-  const { name, email, password, role, status } = body
+  const { name, email, password } = body
+  // Un vendedor solo da de alta clientes (compradores) y quedan activos de inmediato
+  const esVendedor = session.role === 'seller'
+  const role   = esVendedor ? 'buyer'  : body.role
+  const status = esVendedor ? 'active' : body.status
 
   if (!name || !email || !password || !role || !status) {
     throw createError({ statusCode: 400, message: 'Faltan campos requeridos' })

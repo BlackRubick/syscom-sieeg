@@ -26,7 +26,8 @@ export default defineEventHandler(async (event) => {
 
   // Compradores solo pueden cancelar sus propios pedidos en estado pendiente/aprobado
   if (!isManager) {
-    if (existing.userId !== session.userId) {
+    // El cliente cancela los suyos; el vendedor, los que levantó él
+    if (existing.userId !== session.userId && existing.sellerId !== session.userId) {
       throw createError({ statusCode: 403, message: 'Sin autorización' })
     }
     if (body.status !== 'cancelled') {

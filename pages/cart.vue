@@ -202,6 +202,24 @@
         </button>
       </div>
 
+
+      <!-- Cliente (vendedor / admin): el pedido o la cotización quedan a su nombre, con su precio -->
+      <div v-if="vende" class="ct-client">
+        <div class="ct-client-text">
+          <div class="ct-client-title">¿Para qué cliente es?</div>
+          <div class="ct-client-sub">
+            <template v-if="clienteSel">Precios con el descuento de <b>{{ clienteSel.name }}</b>{{ clienteSel.discountPct ? ` (${clienteSel.discountPct}%)` : '' }}. El pedido se envía a su dirección fiscal.</template>
+            <template v-else-if="esVendedor">Elige el cliente para ver sus precios, guardar la cotización o generar el pedido.</template>
+            <template v-else>Opcional: elige un cliente para cotizar o levantar el pedido a su nombre.</template>
+          </div>
+          <div v-if="clienteSel && !clienteSel.fiscalCompleted" class="ct-client-warn">Este cliente no tiene datos fiscales: captúralos en Datos Fiscales antes de aprobar el pedido.</div>
+        </div>
+        <div class="ct-client-pick">
+          <FilterCombo v-model="clienteId" :options="opcionesClientes" label="Cliente" empty-label="Sin elegir" count-label="pedido" placeholder="Buscar por nombre, empresa o CL-…" />
+          <NuxtLink to="/clientes?nuevo=1" class="ct-client-new">+ Nuevo cliente</NuxtLink>
+        </div>
+      </div>
+
       <!-- Tabla de productos -->
       <div style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);margin-bottom:16px;overflow:hidden;">
         <div style="display:grid;grid-template-columns:1fr 100px 120px 110px 40px;gap:12px;padding:10px 20px;border-bottom:1px solid rgba(11,27,51,0.06);">
@@ -231,7 +249,7 @@
               </div>
             </div>
             <div style="text-align:center;font-size:12px;font-weight:600;color:#5B6B82;">
-              {{ item.product?.price > 0 ? fmt(item.product.price) : '—' }}
+              {{ precioDe(item) > 0 ? fmt(precioDe(item)) : '—' }}
             </div>
             <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
               <button @click="cart.updateQuantity(item.product.id, item.quantity - 1)"
@@ -247,7 +265,7 @@
               </button>
             </div>
             <div style="text-align:right;font-size:14px;font-weight:700;color:#0B1B33;">
-              {{ item.product?.price > 0 ? fmt(item.product.price * item.quantity) : '—' }}
+              {{ precioDe(item) > 0 ? fmt(precioDe(item) * item.quantity) : '—' }}
             </div>
             <div style="display:flex;justify-content:center;">
               <button @click="cart.removeItem(item.product.id)"
@@ -325,7 +343,7 @@
                   <span style="color:#7A889C;"> ×{{ item.quantity }}</span>
                 </span>
                 <span style="font-size:12px;color:#5B6B82;font-weight:500;flex-shrink:0;">
-                  {{ item.product?.price > 0 ? fmt(item.product.price * item.quantity) : '—' }}
+                  {{ precioDe(item) > 0 ? fmt(precioDe(item) * item.quantity) : '—' }}
                 </span>
               </div>
             </div>
@@ -350,10 +368,20 @@
             <span style="font-size:18px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,#1570EF,#0B5BD3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">{{ fmt(totales.total) }}</span>
           </div>
           <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;">
-            <button @click="openPaymentModal"
+            <div v-if="accionError" class="ct-error">{{ accionError }}</div>
+            <div v-if="preview.loading" class="ct-note">Calculando precios del cliente…</div>
+            <button v-if="clienteId" class="ct-btn ct-btn-primary" :disabled="!!accion || preview.loading" @click="generarPedidoCliente">
+              <Package :size="15" /> {{ accion === 'pedido' ? 'Generando…' : `Generar pedido para ${clienteSel?.name.split(' ')[0] ?? 'el cliente'}` }}
+            </button>
+            <button v-else-if="!esVendedor" @click="openPaymentModal"
               style="width:100%;height:44px;border-radius:11px;border:none;cursor:pointer;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;font-weight:700;font-size:13px;font-family:inherit;box-shadow:0 4px 18px rgba(21,112,239,0.32);display:flex;align-items:center;justify-content:center;gap:8px;">
               <CreditCard :size="15" /> Elegir método de pago
             </button>
+            <button class="ct-btn ct-btn-ghost" :disabled="!!accion || (esVendedor && !clienteId)" @click="guardarCotizacion">
+              <FileText :size="15" /> {{ accion === 'cotizacion' ? 'Guardando…' : 'Guardar como cotización' }}
+            </button>
+            <div v-if="esVendedor && !clienteId" class="ct-note">Elige un cliente arriba para cotizar o generar el pedido.</div>
+            <div v-else class="ct-note">La cotización guarda los productos con un folio COT-; el precio se actualiza al del día cuando se acepta.</div>
           </div>
         </div>
       </div>
@@ -571,10 +599,24 @@
 
 <style>
 @keyframes spin { to { transform: rotate(360deg) } }
+.ct-client { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:16px; padding:16px 20px; border-radius:16px; background:#fff; border:1px solid rgba(21,112,239,0.22); box-shadow:0 6px 18px rgba(21,112,239,0.06); }
+.ct-client-text { flex:1; min-width:240px; }
+.ct-client-title { font-size:14px; font-weight:700; color:#0B1B33; }
+.ct-client-sub { font-size:12.5px; color:#5B6B82; margin-top:3px; line-height:1.5; }
+.ct-client-warn { margin-top:8px; padding:7px 10px; border-radius:8px; background:rgba(245,158,11,0.1); color:#92400E; font-size:12px; }
+.ct-client-pick { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.ct-client-new { font-size:12.5px; font-weight:600; color:#0B5BD3; white-space:nowrap; }
+.ct-btn { width:100%; height:44px; border-radius:11px; font-weight:700; font-size:13px; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; transition:background .2s, opacity .2s; }
+.ct-btn:disabled { opacity:.55; cursor:not-allowed; }
+.ct-btn-primary { border:none; background:linear-gradient(135deg,#1570EF,#0B5BD3); color:#fff; box-shadow:0 4px 18px rgba(21,112,239,0.32); }
+.ct-btn-ghost { border:1px solid rgba(11,27,51,0.14); background:#fff; color:#0B1B33; }
+.ct-btn-ghost:hover:not(:disabled) { background:#F5F8FC; }
+.ct-note { font-size:11.5px; color:#7A889C; line-height:1.5; text-align:center; }
+.ct-error { padding:9px 11px; border-radius:9px; background:#FEF2F2; color:#B91C1C; font-size:12.5px; }
 </style>
 
 <script setup lang="ts">
-import { ShoppingCart, Package, Trash2, Plus, Minus, CreditCard, X, Lock } from '@lucide/vue'
+import { ShoppingCart, Package, Trash2, Plus, Minus, CreditCard, X, Lock, FileText } from '@lucide/vue'
 import type { ShippingConfig } from '~/utils/orderTotals'
 
 definePageMeta({ middleware: 'auth' })
@@ -624,10 +666,82 @@ const activePri     = computed(() => priorities.find(p => p.key === priority.val
 const priorityLabel = computed(() => ({ urgent:'Urgente — notificación inmediata', high:'Alta — procesamiento en 4h', normal:'Normal — procesamiento en 24h', low:'Baja — sin urgencia' }[priority.value] ?? ''))
 // Envío: si la compra no llega al mínimo se cobra nuestro cargo (el servidor lo vuelve a calcular)
 const { data: shippingCfg } = useFetch<ShippingConfig>('/api/config/shipping', { default: () => ({ freeShippingMin: 1000, shippingFee: 200 }) })
-const envio         = computed(() => envioDe(cart.total, shippingCfg.value))
-const faltaEnvio    = computed(() => Math.max(0, minimoEnvioConIva(shippingCfg.value) - cart.total))
+// ── Cliente (vendedor / admin) ──
+const auth       = useAuthStore()
+const esVendedor = computed(() => auth.user?.role === 'seller')
+const vende      = computed(() => esVendedor.value || auth.user?.role === 'admin')
+interface ClienteOpt { id: string; name: string; email: string; clientNumber: number | null; razonSocial: string | null; fiscalCompleted: boolean; discountPct: number; pedidos: number; status: string }
+const clientes   = ref<ClienteOpt[]>([])
+// Se conserva el cliente elegido mientras navega entre catálogo y carrito
+const clienteId  = useClienteCarrito()
+const clienteSel = computed(() => clientes.value.find(c => c.id === clienteId.value) ?? null)
+const opcionesClientes = computed(() => clientes.value.filter(c => c.status === 'active').map(c => ({
+  value: c.id, label: c.name, badge: formatClientNumber(c.clientNumber), sub: c.razonSocial ?? c.email, count: c.pedidos,
+  search: `${c.email} ${c.razonSocial ?? ''}`,
+})))
+onMounted(async () => {
+  if (!vende.value) return
+  try { clientes.value = (await $fetch<{ clientes: ClienteOpt[] }>('/api/clients')).clientes } catch { /* sin lista, sin selector */ }
+})
+
+// Precios del cliente elegido (su descuento); sin cliente se usan los del catálogo
+const preview = reactive({ loading: false, precios: {} as Record<string, number> })
+let previewId = 0
+async function cargarPreview() {
+  const id = ++previewId
+  if (!clienteId.value || !cart.items.length) { preview.precios = {}; return }
+  preview.loading = true
+  try {
+    const r = await $fetch<{ items: Array<{ productId: string; price: number }> }>('/api/pricing/preview', {
+      method: 'POST', body: { clientId: clienteId.value, items: cartItems() },
+    })
+    if (id === previewId) preview.precios = Object.fromEntries(r.items.map(i => [i.productId, i.price]))
+  } catch { if (id === previewId) preview.precios = {} } finally { if (id === previewId) preview.loading = false }
+}
+onMounted(() => watch([clienteId, () => cart.items.map(i => `${i.product.id}:${i.quantity}`).join()], cargarPreview, { immediate: true }))
+
+function precioDe(item: { product: { id: string; price: number } }) {
+  return clienteId.value && preview.precios[item.product.id] != null ? preview.precios[item.product.id] : (item.product?.price ?? 0)
+}
+const totalCarrito  = computed(() => cart.items.reduce((s, i) => s + precioDe(i) * i.quantity, 0))
+const envio         = computed(() => envioDe(totalCarrito.value, shippingCfg.value))
+const faltaEnvio    = computed(() => Math.max(0, minimoEnvioConIva(shippingCfg.value) - totalCarrito.value))
 // Los precios ya incluyen IVA: el total es la suma + envío y el IVA solo se desglosa
-const totales       = computed(() => desgloseTotales(cart.total + envio.value))
+const totales       = computed(() => desgloseTotales(totalCarrito.value + envio.value))
+
+// ── Cotización y pedido a nombre del cliente ──
+const accion      = ref<'' | 'cotizacion' | 'pedido'>('')
+const accionError = ref('')
+async function guardarCotizacion() {
+  accion.value = 'cotizacion'; accionError.value = ''
+  try {
+    const r = await $fetch<{ quote: { id: string } }>('/api/quotes', {
+      method: 'POST', body: { items: cartItems(), clientId: clienteId.value || undefined, notes: notes.value || undefined },
+    })
+    await cart.clearCart()
+    notes.value = ''
+    clienteId.value = ''
+    await navigateTo(`/quotes/${r.quote.id}`)
+  } catch (e: any) {
+    accionError.value = e?.data?.message ?? 'No se pudo guardar la cotización'
+  } finally { accion.value = '' }
+}
+async function generarPedidoCliente() {
+  if (!clienteSel.value) return
+  if (!confirm(`¿Generar el pedido a nombre de ${clienteSel.value.name}? Quedará pendiente de aprobación.`)) return
+  accion.value = 'pedido'; accionError.value = ''
+  try {
+    await $fetch('/api/orders', {
+      method: 'POST', body: { items: cartItems(), clientId: clienteId.value, priority: priority.value, notes: notes.value || undefined },
+    })
+    await cart.clearCart()
+    notes.value = ''
+    clienteId.value = ''
+    await navigateTo('/orders')
+  } catch (e: any) {
+    accionError.value = e?.data?.message ?? 'No se pudo generar el pedido'
+  } finally { accion.value = '' }
+}
 const subtotal      = computed(() => totales.value.subtotal)
 const iva           = computed(() => totales.value.iva)
 const totalUnits    = computed(() => cart.items.reduce((s, i) => s + i.quantity, 0))

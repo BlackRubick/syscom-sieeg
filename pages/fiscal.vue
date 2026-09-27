@@ -168,8 +168,8 @@
                     Este usuario aún no ha completado sus datos fiscales.
                   </div>
 
-                  <!-- Estado Factura.com -->
-                  <div style="padding:14px 16px;border-radius:12px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;"
+                  <!-- Estado Factura.com (solo admin) -->
+                  <div v-if="esAdmin" style="padding:14px 16px;border-radius:12px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;"
                     :style="detail.facturaUid ? 'background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2)' : 'background:rgba(91,107,130,0.06);border:1px solid rgba(91,107,130,0.15)'">
                     <div style="display:flex;align-items:center;gap:10px;min-width:0;">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" :stroke="detail.facturaUid ? '#F59E0B' : '#7A889C'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="14" height="17" x="5" y="2" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
@@ -188,7 +188,7 @@
                   <div v-if="syncError" style="font-size:11px;color:#EF4444;margin-bottom:12px;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);">{{ syncError }}</div>
 
                   <!-- Generar CFDI -->
-                  <button v-if="detail.facturaUid && detail.fiscalCompleted && detail.fiscalUsocfdi"
+                  <button v-if="esAdmin && detail.facturaUid && detail.fiscalCompleted && detail.fiscalUsocfdi"
                     @click="openCfdi(detail)"
                     style="width:100%;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(79,70,229,0.1));border:1px solid rgba(99,102,241,0.3);color:#F59E0B;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:18px;transition:all 0.2s;"
                     @mouseenter="e => (e.currentTarget as HTMLButtonElement).style.background='linear-gradient(135deg,rgba(99,102,241,0.25),rgba(79,70,229,0.18))'"
@@ -352,8 +352,11 @@ interface FiscalUser {
   fiscalTelefono?: string | null; facturaUid?: string | null
 }
 
-const auth = useAuthStore()
-if (auth.user?.role !== 'admin') navigateTo('/catalog')
+const auth  = useAuthStore()
+const route = useRoute()
+// El vendedor captura datos fiscales de sus clientes; Factura.com y CFDI son solo de admin
+const esAdmin = computed(() => auth.user?.role === 'admin')
+if (!['admin', 'seller'].includes(auth.user?.role ?? '')) navigateTo('/catalog')
 
 const users    = ref<FiscalUser[]>([])
 const loading  = ref(true)
@@ -369,7 +372,7 @@ onMounted(async () => {
 })
 
 /* ── filtros ── */
-const search       = ref('')
+const search       = ref(typeof route.query.buscar === 'string' ? route.query.buscar : '')
 const statusFilter = ref<'all' | 'complete' | 'pending'>('all')
 const searchFocus  = ref(false)
 const hoveredRow   = ref<string | null>(null)

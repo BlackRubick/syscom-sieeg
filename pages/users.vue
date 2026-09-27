@@ -249,9 +249,9 @@ onUnmounted(() => document.removeEventListener('click', _closeMenu))
 
 const roleFilters = [
   { key:'all', label:'Todos' }, { key:'admin', label:'Admin' },
-  { key:'approver', label:'Aprobador' }, { key:'buyer', label:'Comprador' }, { key:'viewer', label:'Visor' },
+  { key:'approver', label:'Aprobador' }, { key:'seller', label:'Vendedor' }, { key:'buyer', label:'Comprador' }, { key:'viewer', label:'Visor' },
 ]
-const ROLES    = ['admin','approver','buyer','viewer'] as const
+const ROLES    = ['admin','approver','seller','buyer','viewer'] as const
 const STATUSES = ['active','inactive','pending']       as const
 
 const filtered = computed(() => users.value.filter(u => {
@@ -272,6 +272,7 @@ const kpis = computed(() => [
 const roleCfg: Record<string, { label:string; color:string; bg:string; border:string }> = {
   admin:    { label:'Admin',     color:'#7C3AED', bg:'rgba(21,112,239,0.12)', border:'rgba(21,112,239,0.25)' },
   approver: { label:'Aprobador', color:'#B45309', bg:'rgba(245,158,11,0.12)', border:'rgba(245,158,11,0.25)' },
+  seller:   { label:'Vendedor',  color:'#047857', bg:'rgba(16,185,129,0.12)', border:'rgba(16,185,129,0.28)' },
   buyer:    { label:'Comprador', color:'#0B5BD3', bg:'rgba(21,112,239,0.12)', border:'rgba(21,112,239,0.25)' },
   viewer:   { label:'Visor',     color:'#5B6B82', bg:'rgba(91,107,130,0.1)', border:'rgba(91,107,130,0.2)' },
 }
