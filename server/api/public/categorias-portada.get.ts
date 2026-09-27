@@ -16,7 +16,7 @@ const CATEGORIAS = [
   { id: '38',    nombre: 'Detección de Fuego',               busqueda: 'detector humo',     tipo: /^detector de humo/i },
   { id: '25',    nombre: 'Radiocomunicación',                busqueda: 'radio portatil',    tipo: /^radio port/i },
   { id: '27',    nombre: 'GPS y Equipamiento Vehicular',     busqueda: 'dashcam',           tipo: /^dashcam/i },
-  { id: '66523', nombre: 'Audio y Video Profesional',        busqueda: 'bocina',            tipo: /bocina|altavoz/i },
+  { id: '66523', nombre: 'Audio y Video Profesional',        busqueda: 'bafle',             tipo: /^bafle/i },
   { id: '42',    nombre: 'Herramientas y Material Eléctrico', busqueda: 'pinza',            tipo: /^pinzas? ponchadora/i },
   { id: '66630', nombre: 'Industria, BMS y Robots',          busqueda: 'robot',             tipo: /^robot/i },
   { id: '67040', nombre: 'Retail y Punto de Venta',          busqueda: 'impresora tickets', tipo: /^impresora/i },
