@@ -1,5 +1,6 @@
 import { syscomGet } from '~/server/utils/syscom'
 import { rateLimit } from '~/server/utils/rateLimit'
+import { categoriaNombre } from '~/utils/categoriaNombre'
 
 /* Categorías principales para el catálogo público (sin sesión). */
 export default defineEventHandler(async (event) => {
@@ -8,7 +9,7 @@ export default defineEventHandler(async (event) => {
   try {
     const cats = await syscomGet<Array<{ id: string; nombre: string }>>('/categorias')
     return (Array.isArray(cats) ? cats : [])
-      .map(c => ({ id: String(c.id), nombre: String(c.nombre).replace(/\s+/g, ' ').trim() }))
+      .map(c => ({ id: String(c.id), nombre: categoriaNombre(String(c.id), String(c.nombre).replace(/\s+/g, ' ').trim()) }))
       .filter(c => c.nombre.toLowerCase() !== 'marketing')
   } catch {
     throw createError({ statusCode: 502, message: 'Catálogo no disponible por el momento' })

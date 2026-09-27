@@ -7,20 +7,20 @@
     <section class="lp-hero">
       <div class="lp-wrap lp-hero-grid">
         <div class="lp-hero-text">
-          <span class="lp-eyebrow"><span class="lp-dot" /> Distribuidor B2B en Chiapas</span>
-          <h1>Equipa tu proyecto con <em>tecnología profesional</em></h1>
-          <p>Videovigilancia, redes, control de acceso y energía de las mejores marcas. Precios de distribuidor para integradores y empresas, con factura CFDI en cada compra.</p>
+          <span class="lp-eyebrow"><span class="lp-dot" /> Tecnología para negocios en Chiapas</span>
+          <h1>La tecnología que tu negocio necesita, <em>en un solo lugar</em></h1>
+          <p>Cámaras de seguridad, internet, control de acceso, energía y mucho más, de las marcas que conoces. Si compras para tu negocio, te damos precio especial y te facturamos cada compra.</p>
           <div class="lp-hero-ctas">
             <a href="#contacto" class="lp-btn lp-btn-primary" @click.prevent="scrollTo('contacto')">
-              Solicitar acceso
+              Quiero precios especiales
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
-            <NuxtLink to="/productos" class="lp-btn lp-btn-ghost">Explorar catálogo</NuxtLink>
+            <NuxtLink to="/productos" class="lp-btn lp-btn-ghost">Ver productos</NuxtLink>
           </div>
           <dl class="lp-hero-stats">
             <div><dt>{{ categorias.length }}</dt><dd>categorías</dd></div>
-            <div v-if="marcas.length"><dt>{{ marcas.length }}+</dt><dd>marcas líderes</dd></div>
-            <div><dt>CFDI 4.0</dt><dd>factura inmediata</dd></div>
+            <div v-if="marcas.length"><dt>{{ marcas.length }}+</dt><dd>marcas reconocidas</dd></div>
+            <div><dt>24 h</dt><dd>para atenderte</dd></div>
           </dl>
         </div>
 
@@ -51,7 +51,7 @@
       <div class="lp-section-head">
         <div>
           <span class="lp-kicker">Catálogo</span>
-          <h2>Explora por categoría</h2>
+          <h2>¿Qué estás buscando?</h2>
         </div>
         <NuxtLink to="/productos" class="lp-more">Ver todo el catálogo →</NuxtLink>
       </div>
@@ -83,7 +83,7 @@
       <div class="lp-wrap">
         <div class="lp-section-head">
           <div>
-            <span class="lp-kicker">En existencia</span>
+            <span class="lp-kicker">Listos para entrega</span>
             <h2>Productos destacados</h2>
           </div>
           <div class="lp-tabs" role="tablist" aria-label="Filtrar productos">
@@ -108,7 +108,7 @@
               <div class="lp-card-foot">
                 <span class="lp-card-lock">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  Precio para clientes
+                  Precio al registrarte
                 </span>
                 <NuxtLink to="/login" class="lp-card-go" :aria-label="`Ver precio de ${p.modelo}`">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -122,7 +122,7 @@
 
     <!-- ───────────── MARCAS ───────────── -->
     <section v-if="marcas.length" class="lp-wrap lp-section lp-brands-section">
-      <p class="lp-brands-title">Distribuimos las marcas que usan los integradores</p>
+      <p class="lp-brands-title">Trabajamos con las marcas en las que confías</p>
       <div class="lp-brands" aria-label="Marcas que manejamos">
         <div class="lp-brands-track" :style="{ animationDuration: `${marcas.length * 3.5}s` }">
           <img v-for="(m, i) in [...marcas, ...marcas]" :key="`${m.nombre}-${i}`" :src="m.logo" :alt="i < marcas.length ? m.nombre : ''" :aria-hidden="i >= marcas.length"
@@ -135,14 +135,14 @@
     <section id="contacto" class="lp-wrap lp-section lp-contact-section">
       <div class="lp-contact">
         <div class="lp-contact-text">
-          <span class="lp-kicker lp-kicker-light">Quiero ser cliente</span>
-          <h2>Obtén tus precios de distribuidor</h2>
-          <p>Déjanos tus datos y un ejecutivo te contacta en menos de 24 horas para activar tu cuenta.</p>
+          <span class="lp-kicker lp-kicker-light">Hablemos</span>
+          <h2>Recibe precios especiales para tu negocio</h2>
+          <p>Déjanos tus datos y alguien de nuestro equipo te llama en menos de 24 horas. Sin compromiso.</p>
           <ul>
-            <li>Precios preferenciales según tu volumen</li>
-            <li>Factura CFDI de cada pedido</li>
-            <li>Envío a tu empresa o a tu obra</li>
-            <li>Seguimiento de pedidos en línea</li>
+            <li>Mejores precios mientras más compras</li>
+            <li>Factura en cada pedido</li>
+            <li>Te lo llevamos a tu negocio o a tu obra</li>
+            <li>Revisa en línea cómo va tu pedido</li>
           </ul>
         </div>
 
@@ -164,7 +164,7 @@
               <label>Teléfono<input v-model="form.phone" type="tel" placeholder="961 000 0000" /></label>
             </div>
             <p v-if="reqError" class="lp-form-error">{{ reqError }}</p>
-            <button type="submit" class="lp-btn lp-btn-primary lp-btn-block" :disabled="reqLoading">{{ reqLoading ? 'Enviando…' : 'Solicitar acceso' }}</button>
+            <button type="submit" class="lp-btn lp-btn-primary lp-btn-block" :disabled="reqLoading">{{ reqLoading ? 'Enviando…' : 'Quiero que me contacten' }}</button>
           </form>
         </div>
       </div>
@@ -175,7 +175,7 @@
       <div class="lp-wrap lp-footer-grid">
         <div class="lp-footer-brand">
           <img src="/logosieeg.jpg" alt="SIEEG" />
-          <p>Distribuidores especializados en tecnología para empresas e integradores, con precios preferenciales y facturación CFDI inmediata.</p>
+          <p>Somos una empresa chiapaneca que vende tecnología para negocios: cámaras, redes, control de acceso y más, con precios especiales y factura en cada compra.</p>
         </div>
         <div>
           <h3>Categorías</h3>
@@ -219,9 +219,9 @@ interface ProductoPublico { id: string; nombre: string; modelo: string; marca: s
 interface CategoriaPortada { id: string; nombre: string; imagen: string; imagen2?: string }
 
 const TABS = [
-  { id: '22', nombre: 'Videovigilancia' },
-  { id: '26', nombre: 'Redes e IT' },
-  { id: '37', nombre: 'Control de Acceso' },
+  { id: '22', nombre: 'Cámaras' },
+  { id: '26', nombre: 'Internet y redes' },
+  { id: '37', nombre: 'Control de acceso' },
   { id: '30', nombre: 'Energía' },
 ]
 const POR_PESTANA = 8
@@ -257,21 +257,8 @@ const { data: catalogo } = await useAsyncData('landing-catalogo', async () => {
 })
 
 // Nombres fijos por si SYSCOM no responde; las fotos llegan de /api/public/categorias-portada
-const CATEGORIAS_BASE: CategoriaPortada[] = [
-  { id: '22', nombre: 'Videovigilancia', imagen: '' },
-  { id: '26', nombre: 'Redes e IT', imagen: '' },
-  { id: '37', nombre: 'Control de Acceso', imagen: '' },
-  { id: '30', nombre: 'Energía y Climatización', imagen: '' },
-  { id: '65811', nombre: 'Cableado Estructurado', imagen: '' },
-  { id: '32', nombre: 'Automatización e Intrusión', imagen: '' },
-  { id: '38', nombre: 'Detección de Fuego', imagen: '' },
-  { id: '25', nombre: 'Radiocomunicación', imagen: '' },
-  { id: '27', nombre: 'GPS y Equipamiento Vehicular', imagen: '' },
-  { id: '66523', nombre: 'Audio y Video Profesional', imagen: '' },
-  { id: '42', nombre: 'Herramientas y Material Eléctrico', imagen: '' },
-  { id: '66630', nombre: 'Industria, BMS y Robots', imagen: '' },
-  { id: '67040', nombre: 'Retail y Punto de Venta', imagen: '' },
-]
+const CATEGORIAS_BASE: CategoriaPortada[] = ['22', '26', '37', '30', '65811', '32', '38', '25', '27', '66523', '42', '66630', '67040']
+  .map(id => ({ id, nombre: categoriaNombre(id), imagen: '' }))
 const categorias = computed(() => catalogo.value?.portadas?.length ? catalogo.value.portadas : CATEGORIAS_BASE)
 const heroFotos  = computed(() => categorias.value.filter(c => c.imagen).slice(0, 4))
 const marcas     = computed(() => catalogo.value?.marcas ?? [])
@@ -309,10 +296,10 @@ async function copiar(p: ProductoPublico) {
 
 const ico = (paths: string) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`
 const beneficios = [
-  { titulo: 'Precios de distribuidor', texto: 'Tarifas preferenciales para tu empresa', icon: ico('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>') },
-  { titulo: 'Factura CFDI',            texto: 'Al momento, 100% digital',               icon: ico('<rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/>') },
+  { titulo: 'Precios especiales',      texto: 'Mejores precios si compras para tu negocio', icon: ico('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>') },
+  { titulo: 'Facturamos todo',         texto: 'Recibe tu factura en cada compra',               icon: ico('<rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/>') },
   { titulo: 'Envío a domicilio',       texto: 'A tu empresa, sucursal u obra',          icon: ico('<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>') },
-  { titulo: 'Ejecutivo dedicado',      texto: 'Cotizaciones y soporte personalizado',   icon: ico('<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>') },
+  { titulo: 'Te atiende una persona',  texto: 'Te asesoramos y cotizamos sin compromiso',   icon: ico('<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>') },
 ]
 
 function scrollTo(id: string) {

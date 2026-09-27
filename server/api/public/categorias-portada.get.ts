@@ -1,6 +1,7 @@
 import { syscomGet } from '~/server/utils/syscom'
 import { rateLimit } from '~/server/utils/rateLimit'
 import type { SyscomProducto } from '~/types'
+import { categoriaNombre } from '~/utils/categoriaNombre'
 
 /* Categorías de la landing con una foto representativa (sin precios).
    Se busca un producto típico de cada categoría para que la foto se entienda
@@ -52,7 +53,7 @@ export default defineEventHandler(async (event) => {
   for (let i = 0; i < CATEGORIAS.length; i += 4) {
     const lote = CATEGORIAS.slice(i, i + 4)
     const fotos = await Promise.all(lote.map(portada))
-    lote.forEach((c, j) => data.push({ id: c.id, nombre: c.nombre, imagen: fotos[j][0], imagen2: fotos[j][1] }))
+    lote.forEach((c, j) => data.push({ id: c.id, nombre: categoriaNombre(c.id, c.nombre), imagen: fotos[j][0], imagen2: fotos[j][1] }))
   }
   // Solo se guarda en caché si SYSCOM respondió (al menos la mitad con foto)
   if (data.filter(c => c.imagen).length >= CATEGORIAS.length / 2) cache = { data, exp: Date.now() + TTL }

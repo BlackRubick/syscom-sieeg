@@ -31,7 +31,7 @@
 
         <form class="sn-search" role="search" @submit.prevent="buscar">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input v-model="texto" type="search" :placeholder="app ? 'Buscar en el catálogo: producto, marca o modelo…' : '¿Qué necesitas? Cámaras, switches, cable…'" aria-label="Buscar productos" maxlength="80" />
+          <input v-model="texto" type="search" :placeholder="app ? 'Buscar en el catálogo: producto, marca o modelo…' : '¿Qué buscas? Cámaras, alarmas, cable…'" aria-label="Buscar productos" maxlength="80" />
           <button type="submit">Buscar</button>
         </form>
 
@@ -139,16 +139,7 @@ const auth   = useAuthStore()
 const ui     = useUIStore()
 const cart   = useCartStore()
 
-const CATEGORIAS = [
-  { id: '22', nombre: 'Videovigilancia' },
-  { id: '26', nombre: 'Redes e IT' },
-  { id: '37', nombre: 'Control de Acceso' },
-  { id: '30', nombre: 'Energía y Climatización' },
-  { id: '65811', nombre: 'Cableado Estructurado' },
-  { id: '32', nombre: 'Automatización e Intrusión' },
-  { id: '38', nombre: 'Detección de Fuego' },
-  { id: '25', nombre: 'Radiocomunicación' },
-]
+const CATEGORIAS = ['22', '26', '37', '30', '65811', '32', '38', '25'].map(id => ({ id, nombre: categoriaNombre(id) }))
 
 const ALL_NAV = [
   { href: '/dashboard', label: 'Dashboard',      roles: ['admin', 'approver', 'viewer'], svg: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>' },

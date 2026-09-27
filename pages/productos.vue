@@ -6,8 +6,8 @@
     <header class="pc-hero">
       <div class="pc-container">
         <div class="pc-eyebrow">Catálogo</div>
-        <h1>Productos para seguridad, redes y energía</h1>
-        <p>Explora miles de productos de las mejores marcas. Los <b>precios de distribuidor</b> están disponibles para clientes registrados.</p>
+        <h1>Cámaras, redes, energía y mucho más</h1>
+        <p>Miles de productos de las marcas que conoces. <b>Regístrate como cliente</b> para ver tus precios y comprar en línea.</p>
 
         <form class="pc-search" role="search" @submit.prevent="buscar">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -66,7 +66,7 @@
               <div class="pc-card-foot">
                 <span class="pc-price-lock">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  Precio para clientes
+                  Precio al registrarte
                 </span>
                 <NuxtLink to="/#contacto" class="pc-btn pc-btn-small">Cotizar</NuxtLink>
               </div>
@@ -85,10 +85,10 @@
       <section class="pc-cta">
         <div>
           <h2>¿Quieres ver precios y comprar en línea?</h2>
-          <p>Regístrate como cliente y accede a precios de distribuidor, pedidos en línea y factura CFDI.</p>
+          <p>Hazte cliente y obtén precios especiales, haz tus pedidos en línea y recibe factura en cada compra.</p>
         </div>
         <div class="pc-cta-actions">
-          <NuxtLink to="/#contacto" class="pc-btn pc-btn-primary">Solicitar acceso</NuxtLink>
+          <NuxtLink to="/#contacto" class="pc-btn pc-btn-primary">Quiero ser cliente</NuxtLink>
           <NuxtLink to="/login" class="pc-btn pc-btn-ghost">Ya soy cliente</NuxtLink>
         </div>
       </section>
@@ -109,7 +109,7 @@ definePageMeta({ layout: 'landing', middleware: 'redirect-authenticated' })
 
 useSeoMeta({
   title:       'Catálogo de productos · SIEEG Integradores',
-  description: 'Catálogo de productos de videovigilancia, redes, control de acceso, energía y más. Precios de distribuidor para clientes registrados.',
+  description: 'Cámaras de seguridad, redes, control de acceso, energía y más en Chiapas. Precios especiales para negocios y factura en cada compra.',
 })
 
 interface ProductoPublico {
