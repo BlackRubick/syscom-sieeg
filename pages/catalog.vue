@@ -378,8 +378,12 @@ definePageMeta({ middleware: 'auth' })
 const cart = useCartStore()
 const { isMobile } = useBreakpoint()
 
-const search           = ref('')
-const dSearch          = ref('')
+// La búsqueda puede llegar desde el navbar (?q=...)
+const route            = useRoute()
+const qInicial         = typeof route.query.q === 'string' ? route.query.q : ''
+const search           = ref(qInicial)
+const dSearch          = ref(qInicial)
+watch(() => route.query.q, q => { if (typeof q === 'string' && q !== search.value) { search.value = q; dSearch.value = q; pagina.value = 1 } })
 const searchFocused    = ref(false)
 const sortBy           = ref('relevancia')
 const pagina           = ref(1)
@@ -430,6 +434,7 @@ watch(search, (v) => {
 let loadId = 0
 
 onMounted(async () => {
+  if (dSearch.value) loadProducts()
   const cats = await fetchCategorias()
   categories.value = cats
   loadingCats.value = false

@@ -4,23 +4,7 @@
     <!-- Fondo -->
     <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 10% 0%,rgba(21,112,239,0.05) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 90% 100%,rgba(21,112,239,0.04) 0%,transparent 60%)" />
 
-    <!-- NAVBAR -->
-    <nav style="position:sticky;top:0;z-index:100;height:64px;display:flex;align-items:center;background:rgba(255,255,255,0.9);backdrop-filter:blur(16px);border-bottom:1px solid rgba(11,27,51,0.06);padding:0 24px;">
-      <div style="width:100%;max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;">
-        <NuxtLink to="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
-          <img src="/logosieeg.jpg" alt="SIEEG" style="height:28px;width:28px;object-fit:contain;border-radius:6px;" />
-          <span style="font-size:15px;font-weight:700;color:#0B1B33;letter-spacing:-0.3px;">SIEEG <span style="color:#1570EF;">INTEGRADORES</span></span>
-        </NuxtLink>
-        <NuxtLink to="/" style="display:flex;align-items:center;gap:6px;font-size:13px;color:#5B6B82;text-decoration:none;transition:color 0.2s;"
-          @mouseenter="e => (e.currentTarget as HTMLElement).style.color='#0B1B33'"
-          @mouseleave="e => (e.currentTarget as HTMLElement).style.color='#5B6B82'">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
-          </svg>
-          Volver al inicio
-        </NuxtLink>
-      </div>
-    </nav>
+    <SiteNavbar />
 
     <!-- CONTENIDO -->
     <main style="position:relative;z-index:1;max-width:800px;margin:0 auto;padding:64px 24px 100px;">

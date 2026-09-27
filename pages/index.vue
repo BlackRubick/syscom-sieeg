@@ -1,62 +1,7 @@
 <template>
   <div class="lp">
 
-    <!-- ───────────── BARRA SUPERIOR ───────────── -->
-    <div class="lp-topbar">
-      <div class="lp-wrap lp-topbar-row">
-        <span class="lp-topbar-item lp-hide-sm">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-          Tuxtla Gutiérrez, Chiapas
-        </span>
-        <span class="lp-topbar-item lp-hide-sm">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Lun – Vie 07:00 – 20:00 · Sáb 07:00 – 17:00
-        </span>
-        <a href="tel:9611180157" class="lp-topbar-item">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          961 118 0157
-        </a>
-        <a href="mailto:contacto@sieeg.com.mx" class="lp-topbar-item lp-hide-xs">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-          contacto@sieeg.com.mx
-        </a>
-      </div>
-    </div>
-
-    <!-- ───────────── HEADER ───────────── -->
-    <header class="lp-header">
-      <div class="lp-wrap lp-header-row">
-        <NuxtLink to="/" class="lp-logo" aria-label="SIEEG Integradores — inicio">
-          <img src="/logosieeg.jpg" alt="SIEEG" />
-        </NuxtLink>
-
-        <form class="lp-search" role="search" @submit.prevent="buscar">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input v-model="texto" type="search" placeholder="¿Qué necesitas? Cámaras, switches, cable…" aria-label="Buscar productos" maxlength="80" />
-          <button type="submit">Buscar</button>
-        </form>
-
-        <nav class="lp-header-actions">
-          <NuxtLink to="/productos" class="lp-link lp-hide-md">Catálogo</NuxtLink>
-          <a href="#contacto" class="lp-link lp-hide-md" @click.prevent="scrollTo('contacto')">Quiero ser cliente</a>
-          <NuxtLink to="/login" class="lp-btn lp-btn-primary lp-btn-sm">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            Iniciar sesión
-          </NuxtLink>
-        </nav>
-      </div>
-
-      <!-- Categorías rápidas -->
-      <div class="lp-catbar">
-        <div class="lp-wrap lp-catbar-row">
-          <NuxtLink to="/productos" class="lp-catbar-all">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
-            Todas las categorías
-          </NuxtLink>
-          <NuxtLink v-for="c in categorias.slice(0, 8)" :key="c.id" :to="`/productos?categoria=${c.id}`">{{ c.nombre }}</NuxtLink>
-        </div>
-      </div>
-    </header>
+    <SiteNavbar />
 
     <!-- ───────────── HERO ───────────── -->
     <section class="lp-hero">
@@ -352,13 +297,6 @@ const todos = computed(() => {
 })
 const visibles = computed(() => tab.value === 'todos' ? todos.value : (catalogo.value?.porCategoria[tab.value] ?? []))
 
-// ── Búsqueda → catálogo público ──
-const texto = ref('')
-function buscar() {
-  const q = texto.value.trim()
-  navigateTo(q ? { path: '/productos', query: { q } } : '/productos')
-}
-
 // ── Copiar modelo ──
 const copiado = ref('')
 async function copiar(p: ProductoPublico) {
@@ -440,35 +378,6 @@ async function handleRequest() {
 .lp-btn-primary:disabled { opacity: .75; cursor: not-allowed; }
 .lp-btn-ghost { background: #fff; color: var(--ink); border-color: var(--line); }
 .lp-btn-ghost:hover { border-color: #C5D2E4; background: var(--bg-soft); }
-
-/* ── Barra superior ── */
-.lp-topbar { background: var(--ink); color: rgba(255,255,255,0.78); font-size: 13px; }
-.lp-topbar-row { height: 38px; display: flex; align-items: center; gap: 24px; justify-content: flex-end; }
-.lp-topbar-item { display: inline-flex; align-items: center; gap: 7px; color: inherit; text-decoration: none; white-space: nowrap; }
-.lp-topbar-item:first-child { margin-right: auto; }
-a.lp-topbar-item:hover { color: #fff; }
-
-/* ── Header ── */
-.lp-header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.96); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
-.lp-header-row { height: 76px; display: flex; align-items: center; gap: 28px; }
-.lp-logo { flex-shrink: 0; display: flex; }
-.lp-logo img { height: 50px; width: auto; }
-.lp-search { flex: 1; min-width: 0; max-width: 560px; height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 5px 0 16px; border-radius: 12px; background: var(--bg-soft); border: 1px solid var(--line); color: #8A97AB; transition: border-color .2s, box-shadow .2s, background .2s; }
-.lp-search svg { flex-shrink: 0; }
-.lp-search:focus-within { background: #fff; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(21,112,239,0.12); }
-.lp-search input { flex: 1; min-width: 0; height: 100%; border: none; outline: none; background: transparent; font-size: 15px; color: var(--ink); font-family: inherit; text-overflow: ellipsis; }
-.lp-search button { flex-shrink: 0; height: 38px; padding: 0 18px; border: none; border-radius: 9px; background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
-.lp-search button:hover { background: var(--ink-2); }
-.lp-header-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-.lp-link { padding: 9px 12px; border-radius: 9px; color: var(--ink); font-size: 14.5px; font-weight: 500; text-decoration: none; white-space: nowrap; }
-.lp-link:hover { background: var(--bg-soft); color: var(--brand-d); }
-
-.lp-catbar { border-top: 1px solid var(--line); }
-.lp-catbar-row { height: 46px; display: flex; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; }
-.lp-catbar-row::-webkit-scrollbar { display: none; }
-.lp-catbar-row a { flex-shrink: 0; padding: 7px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: var(--muted); text-decoration: none; white-space: nowrap; }
-.lp-catbar-row a:hover { color: var(--brand-d); background: var(--brand-soft); }
-.lp-catbar-row .lp-catbar-all { display: inline-flex; align-items: center; gap: 8px; color: var(--brand-d); font-weight: 600; background: var(--brand-soft); margin-right: 8px; }
 
 /* ── Hero ── */
 .lp-hero { background: radial-gradient(900px 480px at 85% 10%, #DCEBFF 0%, transparent 60%), linear-gradient(180deg, #F3F8FF 0%, #fff 100%); padding-top: 56px; }
@@ -613,7 +522,6 @@ a.lp-topbar-item:hover { color: #fff; }
 
 /* Laptops chicas */
 @media (max-width: 1180px) {
-  .lp-hide-md { display: none; }
   .lp-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .lp-cats { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .lp-perks { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 18px; }
@@ -625,10 +533,6 @@ a.lp-topbar-item:hover { color: #fff; }
 /* Tablets */
 @media (max-width: 900px) {
   .lp { --gutter: 20px; }
-  .lp-hide-sm { display: none; }
-  .lp-topbar-row { justify-content: center; }
-  .lp-topbar-item:first-child { margin-right: 0; }
-  .lp-header-row { gap: 16px; }
   .lp-hero-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .lp-hero-mosaic { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 0; max-width: none; margin: 0; }
   .lp-hero-blob { display: none; }
@@ -643,12 +547,6 @@ a.lp-topbar-item:hover { color: #fff; }
 /* Celulares */
 @media (max-width: 640px) {
   .lp { --gutter: 16px; }
-  .lp-hide-xs { display: none; }
-  .lp-header-row { flex-wrap: wrap; height: auto; padding-top: 10px; padding-bottom: 12px; gap: 10px; }
-  .lp-logo img { height: 40px; }
-  .lp-search { order: 3; flex: none; width: 100%; max-width: none; height: 46px; }
-  .lp-search button { padding: 0 14px; }
-  .lp-catbar-row { height: 42px; }
   .lp-hero { padding-top: 32px; }
   .lp-hero h1 { letter-spacing: -1px; }
   .lp-hero-ctas .lp-btn { flex: 1 1 200px; }
@@ -687,9 +585,6 @@ a.lp-topbar-item:hover { color: #fff; }
 
 /* Celulares muy angostos (320–380 px) */
 @media (max-width: 380px) {
-  .lp-btn-sm { padding: 0 12px; font-size: 13px; }
-  .lp-logo img { height: 36px; }
-  .lp-search input { font-size: 14px; }
   .lp-grid { grid-template-columns: minmax(0, 1fr); }
   .lp-card-img { aspect-ratio: 1 / 0.7; }
   .lp-card-lock { font-size: 13px; }

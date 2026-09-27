@@ -1,24 +1,10 @@
 <template>
-  <div style="display:flex; height:100vh; background:#F5F8FC; position:relative; overflow:hidden;">
-    <!-- Fondo -->
-    <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 70% 50% at 0% 0%,rgba(21,112,239,0.09) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 100% 100%,rgba(21,112,239,0.06) 0%,transparent 60%)" />
-    <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(11,27,51,0.016) 1px,transparent 1px),linear-gradient(90deg,rgba(11,27,51,0.016) 1px,transparent 1px);background-size:64px 64px" />
+  <div class="app-shell">
+    <SiteNavbar app />
 
-    <!-- Backdrop mobile -->
-    <Transition name="fade">
-      <div v-if="isMobile && ui.mobileSidebarOpen"
-        style="position:fixed;inset:0;background:rgba(11,27,51,0.45);z-index:150;backdrop-filter:blur(2px);"
-        @click="ui.closeMobileSidebar()" />
-    </Transition>
-
-    <AppSidebar />
-
-    <div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;position:relative;z-index:1;">
-      <AppHeader />
-
-      <!-- Alerta datos fiscales pendientes -->
+    <!-- Alerta datos fiscales pendientes -->
       <Transition name="slide-down">
-        <div v-if="showFiscalBanner" :style="{ flexShrink:0, padding: isMobile ? '0 16px' : '0 28px' }">
+        <div v-if="showFiscalBanner" :style="{ flexShrink:0 }" class="app-wrap">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px;border-radius:12px;background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.06));border:1px solid rgba(245,158,11,0.3);margin-top:12px;flex-wrap:wrap;gap:10px;">
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="width:32px;height:32px;border-radius:9px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -26,7 +12,7 @@
               </div>
               <div>
                 <div style="font-size:13px;font-weight:600;color:#B45309;">Datos fiscales incompletos</div>
-                <div style="font-size:12px;color:rgba(245,158,11,0.8);margin-top:1px;">Completa tu información fiscal para poder recibir facturas (CFDI).</div>
+                <div style="font-size:12px;color:#92400E;margin-top:1px;">Completa tu información fiscal para poder recibir facturas (CFDI).</div>
               </div>
             </div>
             <button @click="showFiscalModal=true"
@@ -37,10 +23,9 @@
         </div>
       </Transition>
 
-      <main :style="{ flex:1, overflowY:'auto', padding: isMobile ? '16px 16px 32px' : '28px 28px 40px' }">
-        <slot />
-      </main>
-    </div>
+    <main class="app-wrap app-main">
+      <slot />
+    </main>
   </div>
 
   <!-- Modal datos fiscales -->
@@ -52,12 +37,8 @@ import { AlertTriangle } from '@lucide/vue'
 
 const auth = useAuthStore()
 const ui   = useUIStore()
-const { isMobile } = useBreakpoint()
 
 const needsFiscal = (user: typeof auth.user) => !!user && user.role !== 'admin' && !user.fiscalCompleted
-
-const route = useRoute()
-watch(() => route.path, () => { if (isMobile.value) ui.closeMobileSidebar() })
 
 onMounted(async () => {
   if (!auth.loaded) await auth.init()
@@ -71,6 +52,12 @@ const showFiscalBanner    = computed(() => auth.loaded && needsFiscal(auth.user)
 </script>
 
 <style>
+.app-shell { min-height: 100vh; background: #F5F8FC; }
+.app-wrap { width: 100%; max-width: calc(1280px + 64px); margin: 0 auto; padding-left: 32px; padding-right: 32px; box-sizing: border-box; }
+.app-main { padding-top: 28px; padding-bottom: 48px; }
+@media (min-width: 1680px) { .app-wrap { max-width: calc(1520px + 96px); padding-left: 48px; padding-right: 48px; } }
+@media (max-width: 900px)  { .app-wrap { padding-left: 20px; padding-right: 20px; } }
+@media (max-width: 640px)  { .app-wrap { padding-left: 16px; padding-right: 16px; } .app-main { padding-top: 18px; padding-bottom: 32px; } }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.25s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>

@@ -1,17 +1,6 @@
 <template>
   <div class="pc">
-    <!-- ── Navbar ── -->
-    <nav class="pc-nav">
-      <div class="pc-container pc-nav-row">
-        <NuxtLink to="/" class="pc-brand">SIEEG <span>INTEGRADORES</span></NuxtLink>
-        <div class="pc-nav-links">
-          <NuxtLink to="/">Inicio</NuxtLink>
-          <NuxtLink to="/productos" class="active">Catálogo</NuxtLink>
-          <NuxtLink to="/#contacto">Contacto</NuxtLink>
-        </div>
-        <NuxtLink to="/login" class="pc-btn pc-btn-primary pc-nav-login">Iniciar sesión</NuxtLink>
-      </div>
-    </nav>
+    <SiteNavbar />
 
     <!-- ── Encabezado ── -->
     <header class="pc-hero">
@@ -181,6 +170,15 @@ async function cargar(reset: boolean) {
   }
 }
 
+// El buscador y las categorías del navbar cambian la URL sin salir de la página
+watch(() => [route.query.q, route.query.categoria], ([q, cat]) => {
+  const nuevaBusqueda  = typeof q === 'string' ? q : ''
+  const nuevaCategoria = typeof cat === 'string' ? cat : categoria.value
+  if (nuevaBusqueda === busqueda.value && nuevaCategoria === categoria.value) return
+  busqueda.value = nuevaBusqueda; texto.value = nuevaBusqueda; categoria.value = nuevaCategoria
+  cargar(true)
+})
+
 function syncUrl() {
   router.replace({ query: busqueda.value ? { q: busqueda.value } : { categoria: categoria.value } })
 }
@@ -206,14 +204,8 @@ const cargarMas = () => cargar(false)
   min-height:100vh; background:var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; overflow-x:hidden; }
 .pc-container { width:100%; max-width:1200px; margin:0 auto; padding:0 24px; box-sizing:border-box; }
 
-.pc-nav { position:sticky; top:0; z-index:20; background:rgba(255,255,255,0.9); backdrop-filter:blur(12px); border-bottom:1px solid var(--line); }
-.pc-nav-row { display:flex; align-items:center; gap:24px; height:64px; }
 .pc-brand { font-size:15px; font-weight:700; color:var(--text); text-decoration:none; letter-spacing:-0.3px; white-space:nowrap; }
 .pc-brand span { color:var(--accent); }
-.pc-nav-links { display:flex; gap:4px; }
-.pc-nav-links a { padding:7px 14px; border-radius:8px; font-size:13px; font-weight:500; color:var(--muted); text-decoration:none; transition:all .2s; }
-.pc-nav-links a:hover, .pc-nav-links a.active { color:var(--text); background:rgba(11,27,51,0.06); }
-.pc-nav-login { margin-left:auto; }
 
 .pc-btn { display:inline-flex; align-items:center; justify-content:center; gap:7px; height:40px; padding:0 18px; border-radius:10px; font-size:13px; font-weight:600; font-family:inherit; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:all .2s; white-space:nowrap; }
 .pc-btn:disabled { opacity:.6; cursor:not-allowed; }
@@ -286,8 +278,7 @@ const cargarMas = () => cargar(false)
 
 @media (max-width: 720px) {
   .pc-container { padding:0 16px; }
-  .pc-nav-links { display:none; }
-  .pc-hero { padding-top:36px; }
+    .pc-hero { padding-top:36px; }
   .pc-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
   .pc-card-body { padding:10px 12px 12px; }
   .pc-name { font-size:12.5px; }
