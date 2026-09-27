@@ -1,198 +1,225 @@
 <template>
   <div class="lp">
 
+    <!-- ───────────── BARRA SUPERIOR ───────────── -->
+    <div class="lp-topbar">
+      <div class="lp-wrap lp-topbar-row">
+        <span class="lp-topbar-item lp-hide-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          Tuxtla Gutiérrez, Chiapas
+        </span>
+        <span class="lp-topbar-item lp-hide-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Lun – Vie 07:00 – 20:00 · Sáb 07:00 – 17:00
+        </span>
+        <a href="tel:9611180157" class="lp-topbar-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          961 118 0157
+        </a>
+        <a href="mailto:contacto@sieeg.com.mx" class="lp-topbar-item lp-hide-xs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+          contacto@sieeg.com.mx
+        </a>
+      </div>
+    </div>
+
     <!-- ───────────── HEADER ───────────── -->
     <header class="lp-header">
       <div class="lp-wrap lp-header-row">
         <NuxtLink to="/" class="lp-logo" aria-label="SIEEG Integradores — inicio">
           <img src="/logosieeg.jpg" alt="SIEEG" />
-          <span class="lp-logo-text">SIEEG<small>INTEGRADORES</small></span>
         </NuxtLink>
 
-        <div class="lp-menu-wrap">
-          <button type="button" class="lp-icon-btn" aria-label="Categorías" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
-          </button>
-          <Transition name="lp-drop">
-            <nav v-if="menuOpen" class="lp-menu" aria-label="Categorías">
-              <div class="lp-menu-title">Categorías</div>
-              <NuxtLink v-for="c in categorias" :key="c.id" :to="`/productos?categoria=${c.id}`" @click="menuOpen = false">{{ c.nombre }}</NuxtLink>
-              <div class="lp-menu-sep" />
-              <a href="#contacto" @click.prevent="menuOpen = false; scrollTo('contacto')">Contacto</a>
-            </nav>
-          </Transition>
-        </div>
-
         <form class="lp-search" role="search" @submit.prevent="buscar">
-          <input v-model="texto" type="search" placeholder="Busca productos..." aria-label="Buscar productos" maxlength="80" />
-          <svg class="lp-search-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input v-model="texto" type="search" placeholder="¿Qué necesitas? Cámaras, switches, cable…" aria-label="Buscar productos" maxlength="80" />
           <button type="submit">Buscar</button>
         </form>
 
-        <div class="lp-header-actions">
-          <a href="tel:9611180157" class="lp-hdr-link lp-hide-md">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            961 118 0157
-          </a>
-          <NuxtLink to="/login" class="lp-hdr-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
-            Entrar
+        <nav class="lp-header-actions">
+          <NuxtLink to="/productos" class="lp-link lp-hide-md">Catálogo</NuxtLink>
+          <a href="#contacto" class="lp-link lp-hide-md" @click.prevent="scrollTo('contacto')">Quiero ser cliente</a>
+          <NuxtLink to="/login" class="lp-btn lp-btn-primary lp-btn-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Iniciar sesión
           </NuxtLink>
-          <a href="#contacto" class="lp-hdr-cta" @click.prevent="scrollTo('contacto')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
-            Registro
-          </a>
+        </nav>
+      </div>
+
+      <!-- Categorías rápidas -->
+      <div class="lp-catbar">
+        <div class="lp-wrap lp-catbar-row">
+          <NuxtLink to="/productos" class="lp-catbar-all">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+            Todas las categorías
+          </NuxtLink>
+          <NuxtLink v-for="c in categorias.slice(0, 8)" :key="c.id" :to="`/productos?categoria=${c.id}`">{{ c.nombre }}</NuxtLink>
         </div>
       </div>
     </header>
 
-    <!-- ───────────── PROMOCIONES (slider) ───────────── -->
-    <section class="lp-wrap lp-promos">
-      <h1 class="lp-promos-title">PROMOCIONES Y EVENTOS</h1>
-      <p class="lp-promos-sub">Tecnología para tu empresa con precios de distribuidor</p>
+    <!-- ───────────── HERO ───────────── -->
+    <section class="lp-hero">
+      <div class="lp-wrap lp-hero-grid">
+        <div class="lp-hero-text">
+          <span class="lp-eyebrow"><span class="lp-dot" /> Distribuidor B2B en Chiapas</span>
+          <h1>Equipa tu proyecto con <em>tecnología profesional</em></h1>
+          <p>Videovigilancia, redes, control de acceso y energía de las mejores marcas. Precios de distribuidor para integradores y empresas, con factura CFDI en cada compra.</p>
+          <div class="lp-hero-ctas">
+            <a href="#contacto" class="lp-btn lp-btn-primary" @click.prevent="scrollTo('contacto')">
+              Solicitar acceso
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <NuxtLink to="/productos" class="lp-btn lp-btn-ghost">Explorar catálogo</NuxtLink>
+          </div>
+          <dl class="lp-hero-stats">
+            <div><dt>{{ categorias.length }}</dt><dd>categorías</dd></div>
+            <div v-if="marcas.length"><dt>{{ marcas.length }}+</dt><dd>marcas líderes</dd></div>
+            <div><dt>CFDI 4.0</dt><dd>factura inmediata</dd></div>
+          </dl>
+        </div>
 
-      <div class="lp-slider" @mouseenter="sliderPausado = true" @mouseleave="sliderPausado = false">
-        <TransitionGroup name="lp-fade">
-          <div v-for="(s, i) in slides" v-show="i === slide" :key="s.titulo" class="lp-slide" :style="{ background: s.fondo }">
-            <div class="lp-slide-text">
-              <span class="lp-slide-badge">{{ s.badge }}</span>
-              <h2>{{ s.titulo }}</h2>
-              <p>{{ s.texto }}</p>
-              <NuxtLink v-if="s.to" :to="s.to" class="lp-slide-btn">{{ s.cta }}</NuxtLink>
-              <a v-else href="#contacto" class="lp-slide-btn" @click.prevent="scrollTo('contacto')">{{ s.cta }}</a>
-            </div>
-
-            <!-- Visual del slide: productos reales o logotipos de marcas -->
-            <div class="lp-slide-visual" aria-hidden="true">
-              <div v-if="s.visual === 'productos'" class="lp-slide-prods">
-                <div v-for="p in destacados.slice(0, 3)" :key="p.id" class="lp-slide-prod"><img :src="p.imagen" alt="" /></div>
-              </div>
-              <div v-else-if="s.visual === 'marcas'" class="lp-slide-brands">
-                <div v-for="m in marcas.slice(0, 6)" :key="m.nombre" class="lp-slide-brand"><img :src="m.logo" alt="" /></div>
-              </div>
-              <div v-else class="lp-slide-cfdi">
-                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
-                <span>CFDI 4.0</span>
-              </div>
+        <div v-if="heroFotos.length === 4" class="lp-hero-visual" aria-hidden="true">
+          <div class="lp-hero-blob" />
+          <div class="lp-hero-mosaic">
+            <div v-for="(c, i) in heroFotos" :key="c.id" :class="['lp-hero-tile', `t${i}`]">
+              <img :src="c.imagen2 || c.imagen" alt="" />
+              <span>{{ c.nombre }}</span>
             </div>
           </div>
-        </TransitionGroup>
-
-        <button type="button" class="lp-slider-arrow prev" aria-label="Anterior" @click="moverSlide(-1)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        </button>
-        <button type="button" class="lp-slider-arrow next" aria-label="Siguiente" @click="moverSlide(1)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </button>
-        <div class="lp-slider-dots">
-          <button v-for="(s, i) in slides" :key="s.titulo" type="button" :aria-label="`Ir al anuncio ${i + 1}`" :class="{ active: i === slide }" @click="slide = i" />
         </div>
       </div>
-    </section>
 
-    <!-- ───────────── DESTACADOS ───────────── -->
-    <section v-if="destacados.length" id="productos" class="lp-wrap lp-section">
-      <div class="lp-section-head">
-        <h2 class="lp-h2">Destacados</h2>
-        <NuxtLink to="/productos" class="lp-see-all">Ver catálogo completo →</NuxtLink>
-      </div>
-
-      <div class="lp-grid">
-        <article v-for="p in destacados" :key="p.id" class="lp-card">
-          <div class="lp-card-img">
-            <img :src="p.imagen" :alt="p.nombre" loading="lazy" @error="(e) => ((e.target as HTMLImageElement).style.visibility = 'hidden')" />
-            <span :class="['lp-card-stock', p.disponible ? 'ok' : 'soon']">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-              {{ p.disponible ? 'Disponible' : 'Bajo pedido' }}
-            </span>
-          </div>
-          <div class="lp-card-body">
-            <div class="lp-card-brand">{{ p.marca }}</div>
-            <div class="lp-card-model">
-              <span>{{ p.modelo }}</span>
-              <button type="button" :aria-label="`Copiar modelo ${p.modelo}`" :title="copiado === p.id ? '¡Copiado!' : 'Copiar modelo'" @click="copiar(p)">
-                <svg v-if="copiado !== p.id" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-              </button>
-            </div>
-            <h3 class="lp-card-name" :title="p.nombre">{{ p.nombre }}</h3>
-            <NuxtLink to="/login" class="lp-card-btn">Iniciar sesión</NuxtLink>
-          </div>
-        </article>
+      <!-- Beneficios -->
+      <div class="lp-wrap">
+        <ul class="lp-perks">
+          <li v-for="b in beneficios" :key="b.titulo">
+            <span class="lp-perk-ico" v-html="b.icon" />
+            <div><strong>{{ b.titulo }}</strong><span>{{ b.texto }}</span></div>
+          </li>
+        </ul>
       </div>
     </section>
 
     <!-- ───────────── CATEGORÍAS ───────────── -->
-    <section class="lp-band">
-      <div class="lp-wrap lp-section">
-        <h2 class="lp-h2">Categorías Interesantes</h2>
-        <div class="lp-cats">
-          <NuxtLink v-for="c in categorias" :key="c.id" :to="`/productos?categoria=${c.id}`" class="lp-cat">
-            <div class="lp-cat-img" :style="{ '--glow': c.glow }">
-              <span v-html="c.icon" />
+    <section id="categorias" class="lp-wrap lp-section">
+      <div class="lp-section-head">
+        <div>
+          <span class="lp-kicker">Catálogo</span>
+          <h2>Explora por categoría</h2>
+        </div>
+        <NuxtLink to="/productos" class="lp-more">Ver todo el catálogo →</NuxtLink>
+      </div>
+
+      <div class="lp-cats">
+        <NuxtLink v-for="(c, i) in categorias" :key="c.id" :to="`/productos?categoria=${c.id}`" class="lp-cat" :style="{ '--tint': tintes[i % tintes.length] }">
+          <div class="lp-cat-photo">
+            <img v-if="c.imagen" :src="c.imagen" :alt="c.nombre" loading="lazy" @error="(e) => ((e.target as HTMLImageElement).style.visibility = 'hidden')" />
+          </div>
+          <div class="lp-cat-foot">
+            <span>{{ c.nombre }}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+        </NuxtLink>
+        <NuxtLink to="/productos" class="lp-cat lp-cat-all">
+          <div class="lp-cat-photo">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1.5"/><rect width="7" height="7" x="14" y="3" rx="1.5"/><rect width="7" height="7" x="14" y="14" rx="1.5"/><rect width="7" height="7" x="3" y="14" rx="1.5"/></svg>
+          </div>
+          <div class="lp-cat-foot">
+            <span>Ver todo el catálogo</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+        </NuxtLink>
+      </div>
+    </section>
+
+    <!-- ───────────── PRODUCTOS DESTACADOS ───────────── -->
+    <section v-if="todos.length" id="productos" class="lp-section lp-products-band">
+      <div class="lp-wrap">
+        <div class="lp-section-head">
+          <div>
+            <span class="lp-kicker">En existencia</span>
+            <h2>Productos destacados</h2>
+          </div>
+          <div class="lp-tabs" role="tablist" aria-label="Filtrar productos">
+            <button v-for="t in tabs" :key="t.id" type="button" role="tab" :aria-selected="tab === t.id" :class="{ active: tab === t.id }" @click="tab = t.id">{{ t.nombre }}</button>
+          </div>
+        </div>
+
+        <div class="lp-grid">
+          <article v-for="p in visibles" :key="p.id" class="lp-card">
+            <div class="lp-card-img">
+              <img :src="p.imagen" :alt="p.nombre" loading="lazy" @error="(e) => ((e.target as HTMLImageElement).style.visibility = 'hidden')" />
+              <span class="lp-card-stock"><i /> Disponible</span>
             </div>
-            <div class="lp-cat-name">{{ c.nombre }}</div>
-            <div class="lp-cat-line" />
-          </NuxtLink>
-          <NuxtLink to="/productos" class="lp-cat">
-            <div class="lp-cat-img" style="--glow:#3B82F6">
-              <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            <div class="lp-card-body">
+              <span class="lp-card-brand">{{ p.marca }}</span>
+              <h3 class="lp-card-name" :title="p.nombre">{{ p.nombre }}</h3>
+              <button type="button" class="lp-card-model" :title="copiado === p.id ? '¡Copiado!' : 'Copiar modelo'" @click="copiar(p)">
+                <span>{{ p.modelo }}</span>
+                <svg v-if="copiado !== p.id" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                <svg v-else width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </button>
+              <div class="lp-card-foot">
+                <span class="lp-card-lock">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  Precio para clientes
+                </span>
+                <NuxtLink to="/login" class="lp-card-go" :aria-label="`Ver precio de ${p.modelo}`">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </NuxtLink>
+              </div>
             </div>
-            <div class="lp-cat-name">Ver todo el catálogo</div>
-            <div class="lp-cat-line" />
-          </NuxtLink>
+          </article>
         </div>
       </div>
     </section>
 
     <!-- ───────────── MARCAS ───────────── -->
-    <section v-if="marcas.length" class="lp-wrap lp-section">
-      <h2 class="lp-h2 lp-h2-underline">Principales Marcas</h2>
+    <section v-if="marcas.length" class="lp-wrap lp-section lp-brands-section">
+      <p class="lp-brands-title">Distribuimos las marcas que usan los integradores</p>
       <div class="lp-brands" aria-label="Marcas que manejamos">
-        <div class="lp-brands-track" :style="{ animationDuration: `${marcas.length * 3}s` }">
-          <div v-for="(m, i) in [...marcas, ...marcas]" :key="`${m.nombre}-${i}`" class="lp-brand" :aria-hidden="i >= marcas.length">
-            <img :src="m.logo" :alt="m.nombre" @error="(e) => ((e.target as HTMLImageElement).closest('.lp-brand') as HTMLElement).style.display = 'none'" />
-          </div>
+        <div class="lp-brands-track" :style="{ animationDuration: `${marcas.length * 3.5}s` }">
+          <img v-for="(m, i) in [...marcas, ...marcas]" :key="`${m.nombre}-${i}`" :src="m.logo" :alt="i < marcas.length ? m.nombre : ''" :aria-hidden="i >= marcas.length"
+            @error="(e) => ((e.target as HTMLImageElement).style.display = 'none')" />
         </div>
       </div>
     </section>
 
-    <!-- ───────────── CONTACTO (banda verde) ───────────── -->
-    <section id="contacto" class="lp-wrap lp-cta-section">
-      <div class="lp-cta">
-        <div class="lp-cta-left">
-          <h2>¡Obtén precios de distribuidor!</h2>
-          <div class="lp-cta-row">
-            <div class="lp-cta-bubble">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
-            </div>
-            <ul>
-              <li>Precios preferenciales</li>
-              <li>Factura CFDI al momento</li>
-              <li>Entrega a domicilio</li>
-              <li>Ejecutivo dedicado</li>
-            </ul>
-          </div>
+    <!-- ───────────── CONTACTO ───────────── -->
+    <section id="contacto" class="lp-wrap lp-section lp-contact-section">
+      <div class="lp-contact">
+        <div class="lp-contact-text">
+          <span class="lp-kicker lp-kicker-light">Quiero ser cliente</span>
+          <h2>Obtén tus precios de distribuidor</h2>
+          <p>Déjanos tus datos y un ejecutivo te contacta en menos de 24 horas para activar tu cuenta.</p>
+          <ul>
+            <li>Precios preferenciales según tu volumen</li>
+            <li>Factura CFDI de cada pedido</li>
+            <li>Envío a tu empresa o a tu obra</li>
+            <li>Seguimiento de pedidos en línea</li>
+          </ul>
         </div>
 
-        <div class="lp-cta-right">
-          <div v-if="requestSent" class="lp-cta-done">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <div>
-              <strong>¡Mensaje recibido!</strong>
-              <p>Gracias por tu interés. Nos pondremos en contacto contigo a la brevedad.</p>
-              <button type="button" @click="requestSent = false; resetForm()">Enviar otra solicitud</button>
+        <div class="lp-contact-card">
+          <div v-if="requestSent" class="lp-contact-done">
+            <div class="lp-done-ico">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
             </div>
+            <h3>¡Mensaje recibido!</h3>
+            <p>Gracias por tu interés. Nos pondremos en contacto contigo a la brevedad.</p>
+            <button type="button" class="lp-btn lp-btn-ghost" @click="requestSent = false; resetForm()">Enviar otra solicitud</button>
           </div>
 
-          <form v-else class="lp-cta-form" @submit.prevent="handleRequest">
-            <input v-model="form.name" type="text" placeholder="Nombre completo *" aria-label="Nombre completo" required />
-            <input v-model="form.email" type="email" placeholder="Correo electrónico *" aria-label="Correo electrónico" required />
-            <input v-model="form.company" type="text" placeholder="Empresa" aria-label="Empresa" />
-            <input v-model="form.phone" type="tel" placeholder="Teléfono" aria-label="Teléfono" />
-            <button type="submit" :disabled="reqLoading">{{ reqLoading ? 'Enviando…' : 'Quiero ser cliente' }}</button>
-            <p v-if="reqError" class="lp-cta-error">{{ reqError }}</p>
-            <p v-else class="lp-cta-note">Déjanos tus datos y te contactamos en menos de 24 horas para darte acceso.</p>
+          <form v-else class="lp-form" @submit.prevent="handleRequest">
+            <label>Nombre completo *<input v-model="form.name" type="text" placeholder="Juan García" required /></label>
+            <label>Correo electrónico *<input v-model="form.email" type="email" placeholder="juan@miempresa.com" required /></label>
+            <div class="lp-form-row">
+              <label>Empresa<input v-model="form.company" type="text" placeholder="Mi Empresa S.A. de C.V." /></label>
+              <label>Teléfono<input v-model="form.phone" type="tel" placeholder="961 000 0000" /></label>
+            </div>
+            <p v-if="reqError" class="lp-form-error">{{ reqError }}</p>
+            <button type="submit" class="lp-btn lp-btn-primary lp-btn-block" :disabled="reqLoading">{{ reqLoading ? 'Enviando…' : 'Solicitar acceso' }}</button>
           </form>
         </div>
       </div>
@@ -201,54 +228,39 @@
     <!-- ───────────── FOOTER ───────────── -->
     <footer class="lp-footer">
       <div class="lp-wrap lp-footer-grid">
+        <div class="lp-footer-brand">
+          <img src="/logosieeg.jpg" alt="SIEEG" />
+          <p>Distribuidores especializados en tecnología para empresas e integradores, con precios preferenciales y facturación CFDI inmediata.</p>
+        </div>
         <div>
-          <h3>SIEEG Integradores</h3>
-          <p class="lp-footer-desc">Distribuidores especializados en tecnología para empresas: videovigilancia, redes, control de acceso, energía y más, con precios preferenciales y facturación CFDI inmediata.</p>
-          <ul class="lp-footer-contact">
-            <li>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-              Boulevard Belisario Domínguez #4213 L5, Tuxtla Gutiérrez, Chiapas
-            </li>
-            <li>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              <a href="tel:9611180157">961 118 0157</a>
-            </li>
-            <li>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-              <a href="mailto:contacto@sieeg.com.mx">contacto@sieeg.com.mx</a>
-            </li>
-            <li>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              Lun – Vie 07:00 – 20:00 · Sáb 07:00 – 17:00
-            </li>
+          <h3>Categorías</h3>
+          <ul>
+            <li v-for="c in categorias.slice(0, 6)" :key="c.id"><NuxtLink :to="`/productos?categoria=${c.id}`">{{ c.nombre }}</NuxtLink></li>
           </ul>
         </div>
-
         <div>
-          <h3>Nuestras Políticas</h3>
-          <ul class="lp-footer-links">
-            <li><NuxtLink to="/terminos">Términos y Condiciones</NuxtLink></li>
-            <li><NuxtLink to="/privacidad">Políticas de Privacidad</NuxtLink></li>
-          </ul>
-          <h3 style="margin-top:28px;">Accesos</h3>
-          <ul class="lp-footer-links">
+          <h3>SIEEG</h3>
+          <ul>
             <li><NuxtLink to="/productos">Catálogo de productos</NuxtLink></li>
             <li><NuxtLink to="/login">Iniciar sesión</NuxtLink></li>
             <li><a href="#contacto" @click.prevent="scrollTo('contacto')">Quiero ser cliente</a></li>
+            <li><NuxtLink to="/terminos">Términos y Condiciones</NuxtLink></li>
+            <li><NuxtLink to="/privacidad">Políticas de Privacidad</NuxtLink></li>
           </ul>
         </div>
-
         <div>
-          <h3>Nuestros Beneficios</h3>
-          <div class="lp-benefits">
-            <div v-for="b in beneficios" :key="b.titulo" class="lp-benefit">
-              <span v-html="b.icon" />
-              <span>{{ b.titulo }}</span>
-            </div>
-          </div>
+          <h3>Contacto</h3>
+          <ul class="lp-footer-contact">
+            <li>Boulevard Belisario Domínguez #4213 L5, Tuxtla Gutiérrez, Chiapas</li>
+            <li><a href="tel:9611180157">961 118 0157</a></li>
+            <li><a href="mailto:contacto@sieeg.com.mx">contacto@sieeg.com.mx</a></li>
+            <li>Lun – Vie 07:00 – 20:00<br />Sáb 07:00 – 17:00</li>
+          </ul>
         </div>
       </div>
-      <div class="lp-wrap lp-footer-bottom">© {{ new Date().getFullYear() }} SIEEG Integradores. Todos los derechos reservados.</div>
+      <div class="lp-wrap">
+        <div class="lp-footer-bottom">© {{ new Date().getFullYear() }} SIEEG Integradores. Todos los derechos reservados.</div>
+      </div>
     </footer>
 
   </div>
@@ -257,27 +269,37 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'landing', middleware: 'redirect-authenticated' })
 
-// Catálogo público (sin precios). Mezcla varias categorías; si falla, las secciones se ocultan.
+// Catálogo público (sin precios). Si SYSCOM falla, las secciones se ocultan.
 interface ProductoPublico { id: string; nombre: string; modelo: string; marca: string; marcaLogo: string; imagen: string; disponible: boolean }
-const CATEGORIAS_DESTACADOS = ['22', '26', '37', '30'] // Videovigilancia, Redes e IT, Control de Acceso, Energía
-const { data: catPreview } = await useAsyncData('landing-destacados', async () => {
-  const listas = await Promise.all(CATEGORIAS_DESTACADOS.map(categoria =>
-    $fetch<{ productos: ProductoPublico[] }>('/api/public/catalogo', { query: { categoria } })
-      .then(r => r.productos)
-      .catch(() => [] as ProductoPublico[]),
-  ))
-  // Intercalar categorías para que la cuadrícula se vea variada
-  // SYSCOM repite productos entre categorías (y variantes con el mismo modelo): sin duplicados
-  const destacados: ProductoPublico[] = []
-  const vistos = new Set<string>()
-  const disponibles = listas.map(l => l.filter(p => p.disponible))
-  for (let i = 0; destacados.length < 15 && disponibles.some(l => i < l.length); i++) {
-    for (const l of disponibles) {
-      const p = l[i]
-      if (!p || destacados.length >= 15 || vistos.has(p.id) || vistos.has(p.modelo)) continue
-      vistos.add(p.id); vistos.add(p.modelo); destacados.push(p)
-    }
-  }
+interface CategoriaPortada { id: string; nombre: string; imagen: string; imagen2?: string }
+
+const TABS = [
+  { id: '22', nombre: 'Videovigilancia' },
+  { id: '26', nombre: 'Redes e IT' },
+  { id: '37', nombre: 'Control de Acceso' },
+  { id: '30', nombre: 'Energía' },
+]
+const POR_PESTANA = 8
+
+const { data: catalogo } = await useAsyncData('landing-catalogo', async () => {
+  const [portadas, ...listas] = await Promise.all([
+    $fetch<CategoriaPortada[]>('/api/public/categorias-portada').catch(() => [] as CategoriaPortada[]),
+    ...TABS.map(t =>
+      $fetch<{ productos: ProductoPublico[] }>('/api/public/catalogo', { query: { categoria: t.id } })
+        .then(r => r.productos)
+        .catch(() => [] as ProductoPublico[]),
+    ),
+  ])
+  // SYSCOM repite productos y variantes con el mismo modelo: sin duplicados, solo con existencia
+  const porCategoria: Record<string, ProductoPublico[]> = {}
+  TABS.forEach((t, i) => {
+    const vistos = new Set<string>()
+    porCategoria[t.id] = listas[i].filter(p => {
+      if (!p.disponible || vistos.has(p.modelo)) return false
+      vistos.add(p.modelo)
+      return true
+    }).slice(0, POR_PESTANA)
+  })
   // Marcas con logotipo, una por marca base ("LINKEDPRO BY EPCOM" y "LINKEDPRO" son la misma)
   const marcas: { nombre: string; logo: string }[] = []
   const vistas = new Set<string>()
@@ -286,54 +308,49 @@ const { data: catPreview } = await useAsyncData('landing-destacados', async () =
     if (!p.marcaLogo || vistas.has(base)) continue
     vistas.add(base); marcas.push({ nombre: p.marca, logo: p.marcaLogo })
   }
-  return { destacados, marcas }
+  return { portadas, porCategoria, marcas }
 })
-const destacados = computed(() => catPreview.value?.destacados ?? [])
-const marcas     = computed(() => catPreview.value?.marcas ?? [])
 
-// ── Categorías de SYSCOM (ids reales de /api/public/categorias) ──
-const ico = (paths: string) => `<svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`
-const categorias = [
-  { id: '22',    nombre: 'Videovigilancia',            glow: '#8B5CF6', icon: ico('<path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/><circle cx="12" cy="12" r="10"/>') },
-  { id: '26',    nombre: 'Redes e IT',                 glow: '#0EA5E9', icon: ico('<path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/>') },
-  { id: '37',    nombre: 'Control de Acceso',          glow: '#6366F1', icon: ico('<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>') },
-  { id: '30',    nombre: 'Energía y Climatización',    glow: '#F59E0B', icon: ico('<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>') },
-  { id: '65811', nombre: 'Cableado Estructurado',      glow: '#14B8A6', icon: ico('<path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/>') },
-  { id: '32',    nombre: 'Automatización e Intrusión', glow: '#EF4444', icon: ico('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>') },
-  { id: '38',    nombre: 'Detección de Fuego',         glow: '#F97316', icon: ico('<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>') },
-  { id: '25',    nombre: 'Radiocomunicación',          glow: '#22C55E', icon: ico('<path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/>') },
-  { id: '27',    nombre: 'GPS y Equipamiento Vehicular', glow: '#3B82F6', icon: ico('<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>') },
-  { id: '66523', nombre: 'Audio y Video Profesional',  glow: '#EC4899', icon: ico('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>') },
-  { id: '42',    nombre: 'Herramientas y Material Eléctrico', glow: '#EAB308', icon: ico('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>') },
-  { id: '66630', nombre: 'Industria, BMS y Robots',    glow: '#06B6D4', icon: ico('<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>') },
-  { id: '67040', nombre: 'Retail y Punto de Venta',    glow: '#A855F7', icon: ico('<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>') },
+// Nombres fijos por si SYSCOM no responde; las fotos llegan de /api/public/categorias-portada
+const CATEGORIAS_BASE: CategoriaPortada[] = [
+  { id: '22', nombre: 'Videovigilancia', imagen: '' },
+  { id: '26', nombre: 'Redes e IT', imagen: '' },
+  { id: '37', nombre: 'Control de Acceso', imagen: '' },
+  { id: '30', nombre: 'Energía y Climatización', imagen: '' },
+  { id: '65811', nombre: 'Cableado Estructurado', imagen: '' },
+  { id: '32', nombre: 'Automatización e Intrusión', imagen: '' },
+  { id: '38', nombre: 'Detección de Fuego', imagen: '' },
+  { id: '25', nombre: 'Radiocomunicación', imagen: '' },
+  { id: '27', nombre: 'GPS y Equipamiento Vehicular', imagen: '' },
+  { id: '66523', nombre: 'Audio y Video Profesional', imagen: '' },
+  { id: '42', nombre: 'Herramientas y Material Eléctrico', imagen: '' },
+  { id: '66630', nombre: 'Industria, BMS y Robots', imagen: '' },
+  { id: '67040', nombre: 'Retail y Punto de Venta', imagen: '' },
 ]
+const categorias = computed(() => catalogo.value?.portadas?.length ? catalogo.value.portadas : CATEGORIAS_BASE)
+const heroFotos  = computed(() => categorias.value.filter(c => c.imagen).slice(0, 4))
+const marcas     = computed(() => catalogo.value?.marcas ?? [])
+const tintes     = ['#EAF2FF', '#E8F7F4', '#F1EDFF', '#FFF4E5', '#E9F5FB', '#FDEEEF', '#F2F7E8']
 
-// ── Slider de promociones ──
-const slides = [
-  { badge: 'DISTRIBUCIÓN B2B · MÉXICO', titulo: '¡Tecnología para tu empresa!', texto: 'Videovigilancia, redes, control de acceso y energía de las mejores marcas, con precios preferenciales para empresas e integradores.', cta: 'Quiero ser cliente', to: '', visual: 'productos', fondo: 'linear-gradient(120deg,#5B1C8C 0%,#3B2A9E 45%,#1E4FD1 100%)' },
-  { badge: 'CATÁLOGO COMPLETO',          titulo: 'Las mejores marcas en un solo lugar', texto: 'Miles de productos disponibles con existencias al día. Consulta el catálogo y regístrate para ver tus precios de distribuidor.', cta: 'Ver catálogo', to: '/productos', visual: 'marcas', fondo: 'linear-gradient(120deg,#0B2A6B 0%,#1D4ED8 55%,#0EA5E9 100%)' },
-  { badge: 'FACTURACIÓN',                titulo: 'Factura CFDI de cada compra', texto: 'Genera la factura de tu pedido al momento, 100% digital y sin trámites adicionales. Da seguimiento a tus pedidos desde tu cuenta.', cta: 'Iniciar sesión', to: '/login', visual: 'cfdi', fondo: 'linear-gradient(120deg,#12306E 0%,#4C1D95 55%,#7C3AED 100%)' },
-]
-const slide = ref(0)
-const sliderPausado = ref(false)
-function moverSlide(dir: 1 | -1) { slide.value = (slide.value + dir + slides.length) % slides.length }
-let sliderTimer: ReturnType<typeof setInterval> | undefined
-onMounted(() => {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  sliderTimer = setInterval(() => { if (!sliderPausado.value && document.visibilityState === 'visible') moverSlide(1) }, 6000)
+// ── Pestañas de productos ──
+const tabs = computed(() => [{ id: 'todos', nombre: 'Todos' }, ...TABS.filter(t => catalogo.value?.porCategoria[t.id]?.length)])
+const tab  = ref('todos')
+const todos = computed(() => {
+  // Intercala categorías para que "Todos" se vea variado
+  // (un mismo producto puede estar en dos categorías: se muestra una vez)
+  const listas = TABS.map(t => catalogo.value?.porCategoria[t.id] ?? [])
+  const out: ProductoPublico[] = []
+  const vistos = new Set<string>()
+  for (let i = 0; out.length < POR_PESTANA && listas.some(l => i < l.length); i++) {
+    for (const l of listas) {
+      const p = l[i]
+      if (!p || out.length >= POR_PESTANA || vistos.has(p.modelo)) continue
+      vistos.add(p.modelo); out.push(p)
+    }
+  }
+  return out
 })
-
-// ── Menú de categorías ──
-const menuOpen = ref(false)
-function cerrarMenu(e: MouseEvent) {
-  if (menuOpen.value && !(e.target as HTMLElement).closest('.lp-menu-wrap')) menuOpen.value = false
-}
-onMounted(() => document.addEventListener('click', cerrarMenu))
-onUnmounted(() => {
-  document.removeEventListener('click', cerrarMenu)
-  clearInterval(sliderTimer)
-})
+const visibles = computed(() => tab.value === 'todos' ? todos.value : (catalogo.value?.porCategoria[tab.value] ?? []))
 
 // ── Búsqueda → catálogo público ──
 const texto = ref('')
@@ -352,14 +369,12 @@ async function copiar(p: ProductoPublico) {
   } catch { /* portapapeles no disponible */ }
 }
 
-const bIco = (paths: string) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`
+const ico = (paths: string) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`
 const beneficios = [
-  { titulo: 'Precios Preferenciales',  icon: bIco('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>') },
-  { titulo: 'Factura CFDI',            icon: bIco('<rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/>') },
-  { titulo: 'Entrega a Domicilio',     icon: bIco('<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>') },
-  { titulo: 'Marcas Líderes',          icon: bIco('<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>') },
-  { titulo: 'Atención Personalizada',  icon: bIco('<path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/>') },
-  { titulo: 'Seguimiento de Pedidos',  icon: bIco('<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>') },
+  { titulo: 'Precios de distribuidor', texto: 'Tarifas preferenciales para tu empresa', icon: ico('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>') },
+  { titulo: 'Factura CFDI',            texto: 'Al momento, 100% digital',               icon: ico('<rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/>') },
+  { titulo: 'Envío a domicilio',       texto: 'A tu empresa, sucursal u obra',          icon: ico('<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>') },
+  { titulo: 'Ejecutivo dedicado',      texto: 'Cotizaciones y soporte personalizado',   icon: ico('<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>') },
 ]
 
 function scrollTo(id: string) {
@@ -397,219 +412,287 @@ async function handleRequest() {
 
 <style scoped>
 .lp {
-  --navy: #133A86;
-  --navy-2: #0F2F6E;
-  --blue: #3B82F6;
-  --blue-d: #2563EB;
+  --brand: #1570EF;
+  --brand-d: #0B5BD3;
+  --brand-soft: #EAF2FF;
   --ink: #0B1B33;
+  --ink-2: #13294B;
   --muted: #5B6B82;
-  --line: #E3EAF5;
-  --soft: #F6F9FE;
+  --line: #E4E9F1;
+  --bg-soft: #F5F8FC;
+  --gutter: 32px;
   min-height: 100vh;
   background: #fff;
   color: var(--ink);
-  font-family: 'Noto Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   overflow-x: hidden;
 }
-.lp-wrap { max-width: 1376px; margin: 0 auto; padding: 0 32px; }
+.lp *, .lp *::before, .lp *::after { box-sizing: border-box; }
+.lp img { max-width: 100%; }
+.lp-wrap { width: 100%; max-width: calc(1280px + 2 * var(--gutter)); margin: 0 auto; padding-left: var(--gutter); padding-right: var(--gutter); }
+
+/* ── Botones ── */
+.lp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 22px; border-radius: 12px; font-size: 15px; font-weight: 600; text-decoration: none; border: 1px solid transparent; cursor: pointer; font-family: inherit; transition: background .2s, border-color .2s, transform .2s, box-shadow .2s; white-space: nowrap; }
+.lp-btn-sm { height: 40px; padding: 0 16px; font-size: 14px; border-radius: 10px; }
+.lp-btn-block { width: 100%; }
+.lp-btn-primary { background: var(--brand); color: #fff; box-shadow: 0 6px 18px rgba(21,112,239,0.28); }
+.lp-btn-primary:hover:not(:disabled) { background: var(--brand-d); transform: translateY(-1px); }
+.lp-btn-primary:disabled { opacity: .75; cursor: not-allowed; }
+.lp-btn-ghost { background: #fff; color: var(--ink); border-color: var(--line); }
+.lp-btn-ghost:hover { border-color: #C5D2E4; background: var(--bg-soft); }
+
+/* ── Barra superior ── */
+.lp-topbar { background: var(--ink); color: rgba(255,255,255,0.78); font-size: 13px; }
+.lp-topbar-row { height: 38px; display: flex; align-items: center; gap: 24px; justify-content: flex-end; }
+.lp-topbar-item { display: inline-flex; align-items: center; gap: 7px; color: inherit; text-decoration: none; white-space: nowrap; }
+.lp-topbar-item:first-child { margin-right: auto; }
+a.lp-topbar-item:hover { color: #fff; }
 
 /* ── Header ── */
-.lp-header { position: sticky; top: 0; z-index: 50; background: var(--navy); box-shadow: 0 2px 12px rgba(10,30,70,0.25); }
-.lp-header-row { height: 80px; display: flex; align-items: center; gap: 24px; }
-.lp-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; flex-shrink: 0; }
-.lp-logo img { height: 48px; width: auto; background: #fff; border-radius: 10px; padding: 4px 8px; }
-.lp-logo-text { color: #fff; font-weight: 800; font-size: 20px; letter-spacing: 1px; line-height: 1; display: flex; flex-direction: column; }
-.lp-logo-text small { font-size: 9.5px; font-weight: 600; letter-spacing: 3.2px; margin-top: 4px; opacity: 0.85; }
-.lp-menu-wrap { position: relative; }
-.lp-icon-btn { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; background: transparent; border: none; cursor: pointer; }
-.lp-icon-btn:hover { background: rgba(255,255,255,0.1); }
-.lp-menu { position: absolute; top: 52px; left: 0; width: 280px; max-height: 70vh; overflow-y: auto; background: #fff; border-radius: 14px; box-shadow: 0 18px 48px rgba(10,30,70,0.25); padding: 10px; display: flex; flex-direction: column; }
-.lp-menu-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); padding: 8px 12px; }
-.lp-menu a { padding: 9px 12px; border-radius: 8px; font-size: 14px; color: var(--ink); text-decoration: none; }
-.lp-menu a:hover { background: var(--soft); color: var(--blue-d); }
-.lp-menu-sep { height: 1px; background: var(--line); margin: 6px 4px; }
-.lp-drop-enter-active, .lp-drop-leave-active { transition: opacity .15s, transform .15s; }
-.lp-drop-enter-from, .lp-drop-leave-to { opacity: 0; transform: translateY(-6px); }
+.lp-header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.96); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.lp-header-row { height: 76px; display: flex; align-items: center; gap: 28px; }
+.lp-logo { flex-shrink: 0; display: flex; }
+.lp-logo img { height: 50px; width: auto; }
+.lp-search { flex: 1; min-width: 0; max-width: 560px; height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 5px 0 16px; border-radius: 12px; background: var(--bg-soft); border: 1px solid var(--line); color: #8A97AB; transition: border-color .2s, box-shadow .2s, background .2s; }
+.lp-search svg { flex-shrink: 0; }
+.lp-search:focus-within { background: #fff; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(21,112,239,0.12); }
+.lp-search input { flex: 1; min-width: 0; height: 100%; border: none; outline: none; background: transparent; font-size: 15px; color: var(--ink); font-family: inherit; text-overflow: ellipsis; }
+.lp-search button { flex-shrink: 0; height: 38px; padding: 0 18px; border: none; border-radius: 9px; background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.lp-search button:hover { background: var(--ink-2); }
+.lp-header-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.lp-link { padding: 9px 12px; border-radius: 9px; color: var(--ink); font-size: 14.5px; font-weight: 500; text-decoration: none; white-space: nowrap; }
+.lp-link:hover { background: var(--bg-soft); color: var(--brand-d); }
 
-.lp-search { box-sizing: border-box; position: relative; flex: 1; max-width: 380px; height: 56px; background: #fff; border-radius: 999px; display: flex; align-items: center; padding: 6px; box-shadow: 0 0 0 3px rgba(255,255,255,0.25); }
-.lp-search input { flex: 1; min-width: 0; height: 100%; border: none; outline: none; background: transparent; padding: 0 44px 0 18px; font-size: 14.5px; color: var(--ink); font-family: inherit; }
-.lp-search input::placeholder { color: #8A97AB; }
-.lp-search-ico { position: absolute; right: 120px; color: #0EA5E9; pointer-events: none; }
-.lp-search button { height: 100%; padding: 0 24px; border-radius: 999px; border: none; background: var(--blue); color: #fff; font-size: 14.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
-.lp-search button:hover { background: var(--blue-d); }
+.lp-catbar { border-top: 1px solid var(--line); }
+.lp-catbar-row { height: 46px; display: flex; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.lp-catbar-row::-webkit-scrollbar { display: none; }
+.lp-catbar-row a { flex-shrink: 0; padding: 7px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.lp-catbar-row a:hover { color: var(--brand-d); background: var(--brand-soft); }
+.lp-catbar-row .lp-catbar-all { display: inline-flex; align-items: center; gap: 8px; color: var(--brand-d); font-weight: 600; background: var(--brand-soft); margin-right: 8px; }
 
-.lp-header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-.lp-hdr-link { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; color: #fff; font-size: 14.5px; font-weight: 500; text-decoration: none; white-space: nowrap; }
-.lp-hdr-link:hover { background: rgba(255,255,255,0.1); }
-.lp-hdr-cta { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; background: #fff; color: var(--navy); font-size: 14.5px; font-weight: 700; text-decoration: none; white-space: nowrap; }
-.lp-hdr-cta:hover { background: #EAF1FF; }
+/* ── Hero ── */
+.lp-hero { background: radial-gradient(900px 480px at 85% 10%, #DCEBFF 0%, transparent 60%), linear-gradient(180deg, #F3F8FF 0%, #fff 100%); padding-top: 56px; }
+.lp-hero-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 48px; align-items: center; }
+.lp-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font-size: 13px; font-weight: 600; color: var(--ink-2); box-shadow: 0 2px 8px rgba(11,27,51,0.05); }
+.lp-dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 0 4px rgba(34,197,94,0.18); }
+.lp-hero h1 { font-size: clamp(32px, 4.4vw, 58px); line-height: 1.08; letter-spacing: -1.5px; font-weight: 800; margin: 20px 0 18px; color: var(--ink); overflow-wrap: break-word; }
+.lp-hero h1 em { font-style: normal; color: var(--brand); background: linear-gradient(transparent 68%, #CFE2FF 68%); }
+.lp-hero-text > p { font-size: clamp(16px, 1.3vw, 18px); line-height: 1.7; color: var(--muted); max-width: 560px; margin: 0 0 30px; }
+.lp-hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+.lp-hero-stats { display: flex; flex-wrap: wrap; gap: 20px 36px; margin: 40px 0 0; padding: 0; }
+.lp-hero-stats div { display: flex; flex-direction: column-reverse; }
+.lp-hero-stats dt { font-size: 26px; font-weight: 800; color: var(--ink); letter-spacing: -0.5px; }
+.lp-hero-stats dd { margin: 0; font-size: 13.5px; color: var(--muted); }
 
-/* ── Promociones ── */
-.lp-promos { padding-top: 28px; }
-.lp-promos-title { text-align: center; font-size: clamp(26px, 3vw, 38px); font-weight: 800; letter-spacing: 0.5px; color: #4A8FE7; margin: 0; }
-.lp-promos-sub { text-align: center; color: var(--muted); font-size: 16px; margin: 8px 0 24px; }
-.lp-slider { position: relative; height: 500px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(30,60,140,0.18); }
-.lp-slide { position: absolute; inset: 0; display: grid; grid-template-columns: 1.05fr 1fr; align-items: center; gap: 32px; padding: 48px 96px; color: #fff; }
-.lp-slide::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 80% 90%, rgba(56,189,248,0.35), transparent 70%), radial-gradient(ellipse 50% 60% at 10% 0%, rgba(236,72,153,0.18), transparent 70%); pointer-events: none; }
-.lp-slide-text { position: relative; z-index: 1; max-width: 520px; }
-.lp-slide-badge { display: inline-block; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(147,197,253,0.6); background: rgba(59,130,246,0.18); color: #93C5FD; font-size: 13px; font-weight: 700; letter-spacing: 1.2px; }
-.lp-slide h2 { font-size: clamp(28px, 3.2vw, 38px); font-weight: 800; line-height: 1.15; margin: 14px 0 12px; }
-.lp-slide p { font-size: 18px; line-height: 1.6; color: rgba(255,255,255,0.88); margin: 0 0 28px; }
-.lp-slide-btn { display: inline-block; padding: 13px 30px; border-radius: 6px; background: var(--blue); color: #fff; font-size: 18px; font-weight: 500; text-decoration: none; box-shadow: 0 6px 18px rgba(0,0,0,0.2); transition: background .2s, transform .2s; }
-.lp-slide-btn:hover { background: var(--blue-d); transform: translateY(-1px); }
-.lp-slide-visual { position: relative; z-index: 1; display: flex; justify-content: center; }
-.lp-slide-prods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; max-width: 560px; }
-.lp-slide-prod { aspect-ratio: 3/4; background: #fff; border-radius: 16px; display: flex; align-items: center; justify-content: center; padding: 14px; box-shadow: 0 16px 40px rgba(0,0,0,0.3); }
-.lp-slide-prod:nth-child(2) { transform: translateY(-22px); }
-.lp-slide-prod img { width: 100%; height: 100%; object-fit: contain; }
-.lp-slide-brands { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; max-width: 520px; }
-.lp-slide-brand { height: 86px; background: rgba(255,255,255,0.95); border-radius: 14px; display: flex; align-items: center; justify-content: center; padding: 16px; box-shadow: 0 10px 28px rgba(0,0,0,0.25); }
-.lp-slide-brand img { max-width: 100%; max-height: 100%; object-fit: contain; }
-.lp-slide-cfdi { display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 44px; font-weight: 800; letter-spacing: 2px; text-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-.lp-fade-enter-active, .lp-fade-leave-active { transition: opacity .6s ease; }
-.lp-fade-enter-from, .lp-fade-leave-to { opacity: 0; }
-.lp-slider-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 32px; height: 32px; border-radius: 50%; border: none; background: #fff; color: var(--ink); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-.lp-slider-arrow.prev { left: 32px; }
-.lp-slider-arrow.next { right: 32px; }
-.lp-slider-arrow:hover { background: #EAF1FF; }
-.lp-slider-dots { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 8px; }
-.lp-slider-dots button { width: 8px; height: 8px; border-radius: 8px; border: none; padding: 0; background: rgba(255,255,255,0.45); cursor: pointer; transition: all .25s; }
-.lp-slider-dots button.active { width: 26px; background: #fff; }
+.lp-hero-visual { position: relative; }
+.lp-hero-blob { position: absolute; inset: 30px 20px; border-radius: 40% 60% 55% 45% / 50% 40% 60% 50%; background: linear-gradient(135deg, #1570EF 0%, #06B6D4 100%); opacity: 0.12; }
+.lp-hero-mosaic { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 10px 10px 30px; max-width: 560px; margin-left: auto; }
+.lp-hero-tile { position: relative; min-width: 0; background: #fff; border-radius: 22px; border: 1px solid var(--line); box-shadow: 0 20px 44px rgba(11,27,51,0.10); padding: 18px 18px 44px; display: flex; align-items: center; justify-content: center; aspect-ratio: 1 / 0.95; }
+.lp-hero-tile img { width: 100%; height: 100%; object-fit: contain; }
+.lp-hero-tile span { position: absolute; left: 16px; right: 12px; bottom: 14px; font-size: 13px; font-weight: 600; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lp-hero-tile.t1, .lp-hero-tile.t3 { transform: translateY(28px); }
+
+.lp-perks { list-style: none; margin: 48px 0 0; padding: 22px 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 14px 36px rgba(11,27,51,0.06); position: relative; top: 36px; }
+.lp-perks li { display: flex; align-items: center; gap: 14px; padding: 4px 20px; min-width: 0; }
+.lp-perks li + li { border-left: 1px solid var(--line); }
+.lp-perk-ico { width: 46px; height: 46px; border-radius: 12px; background: var(--brand-soft); color: var(--brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.lp-perks strong { display: block; font-size: 15px; color: var(--ink); }
+.lp-perks li span:not(.lp-perk-ico) { font-size: 13px; color: var(--muted); }
 
 /* ── Secciones ── */
-.lp-section { padding-top: 72px; padding-bottom: 8px; }
-.lp-section-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
-.lp-h2 { font-size: clamp(26px, 3vw, 38px); font-weight: 800; color: var(--ink); margin: 0 0 28px; letter-spacing: -0.3px; }
-.lp-section-head .lp-h2 { margin: 0; }
-.lp-h2-underline { position: relative; padding-bottom: 14px; }
-.lp-h2-underline::after { content: ''; position: absolute; left: 0; bottom: 0; width: 96px; height: 4px; border-radius: 4px; background: var(--blue); }
-.lp-see-all { font-size: 14px; font-weight: 600; color: var(--blue-d); text-decoration: none; padding: 9px 16px; border: 1px solid var(--line); border-radius: 8px; white-space: nowrap; }
-.lp-see-all:hover { background: var(--soft); }
+.lp-section { padding-top: 96px; }
+.lp-section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px 20px; flex-wrap: wrap; margin-bottom: 28px; }
+.lp-section-head > div:first-child { min-width: 0; }
+.lp-kicker { display: block; font-size: 13px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--brand); margin-bottom: 8px; }
+.lp-kicker-light { color: #7CB6FF; }
+.lp-section h2 { font-size: clamp(26px, 3vw, 40px); font-weight: 800; letter-spacing: -0.8px; margin: 0; color: var(--ink); }
+.lp-more { font-size: 14.5px; font-weight: 600; color: var(--brand-d); text-decoration: none; }
+.lp-more:hover { text-decoration: underline; }
 
-/* ── Destacados ── */
-.lp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
-.lp-card { display: flex; flex-direction: column; border: 2px solid var(--line); border-radius: 14px; background: linear-gradient(180deg,#fff 0%,#F8FBFF 100%); padding: 16px; transition: border-color .2s, box-shadow .2s, transform .2s; }
-.lp-card:hover { border-color: #BFD4F6; box-shadow: 0 12px 28px rgba(30,70,150,0.1); transform: translateY(-2px); }
-.lp-card-img { position: relative; aspect-ratio: 1; background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
-.lp-card-img img { width: 92%; height: 92%; object-fit: contain; }
-.lp-card-stock { position: absolute; left: -4px; bottom: -6px; display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: #fff; font-size: 13.5px; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-.lp-card-stock svg { color: var(--ink); }
-.lp-card-stock.ok { color: #16A34A; }
-.lp-card-stock.soon { color: #B45309; }
-.lp-card-body { flex: 1; display: flex; flex-direction: column; padding-top: 8px; }
-.lp-card-brand { font-size: 12.5px; font-weight: 600; text-transform: uppercase; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lp-card-model { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 12.5px; color: var(--blue); font-weight: 500; }
+/* ── Categorías con foto ── */
+.lp-section#categorias { padding-top: 128px; }
+.lp-cats { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 16px; }
+.lp-cat { display: flex; flex-direction: column; min-width: 0; border-radius: 18px; background: var(--tint); text-decoration: none; color: var(--ink); overflow: hidden; border: 1px solid transparent; transition: transform .25s, box-shadow .25s, border-color .25s; }
+.lp-cat:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(11,27,51,0.12); border-color: rgba(21,112,239,0.25); }
+.lp-cat-photo { aspect-ratio: 1 / 0.82; display: flex; align-items: center; justify-content: center; padding: 18px 18px 6px; }
+.lp-cat-photo img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; transition: transform .35s; }
+.lp-cat:hover .lp-cat-photo img { transform: scale(1.07); }
+.lp-cat-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px 16px; font-size: 14.5px; font-weight: 700; line-height: 1.3; min-height: 3.6em; }
+.lp-cat-all { background: var(--ink); color: #fff; }
+.lp-cat-all .lp-cat-photo { color: #7CB6FF; }
+.lp-cat-all .lp-cat-foot svg { color: #7CB6FF; opacity: 1; transform: none; }
+.lp-cat-foot svg { flex-shrink: 0; color: var(--brand); opacity: 0; transform: translateX(-4px); transition: opacity .2s, transform .2s; }
+.lp-cat:hover .lp-cat-foot svg { opacity: 1; transform: translateX(0); }
+
+/* ── Productos ── */
+.lp-products-band { margin-top: 96px; padding-top: 72px; padding-bottom: 80px; background: var(--bg-soft); }
+.lp-tabs { display: flex; gap: 6px; padding: 5px; background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.lp-tabs::-webkit-scrollbar { display: none; }
+.lp-tabs button { flex-shrink: 0; height: 36px; padding: 0 14px; border: none; border-radius: 8px; background: transparent; color: var(--muted); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.lp-tabs button:hover { color: var(--ink); }
+.lp-tabs button.active { background: var(--ink); color: #fff; }
+.lp-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+.lp-card { display: flex; flex-direction: column; min-width: 0; background: #fff; border-radius: 18px; border: 1px solid var(--line); overflow: hidden; transition: transform .2s, box-shadow .2s; }
+.lp-card:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(11,27,51,0.09); }
+.lp-card-img { position: relative; aspect-ratio: 1 / 0.85; display: flex; align-items: center; justify-content: center; padding: 22px; background: #fff; border-bottom: 1px solid var(--line); }
+.lp-card-img img { width: 100%; height: 100%; object-fit: contain; }
+.lp-card-stock { position: absolute; top: 12px; left: 12px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: #ECFDF3; color: #15803D; font-size: 12px; font-weight: 700; }
+.lp-card-stock i { width: 6px; height: 6px; border-radius: 50%; background: #22C55E; }
+.lp-card-body { flex: 1; display: flex; flex-direction: column; padding: 16px 18px 18px; min-width: 0; }
+.lp-card-brand { font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lp-card-name { margin: 6px 0 8px; font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8em; }
+.lp-card-model { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 3px 8px; border-radius: 6px; border: none; background: var(--bg-soft); color: var(--ink-2); font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px; cursor: pointer; }
 .lp-card-model span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lp-card-model button { flex-shrink: 0; border: none; background: transparent; color: var(--ink); padding: 2px; cursor: pointer; display: flex; }
-.lp-card-name { margin: 14px 0 16px; font-size: 14.5px; font-weight: 600; line-height: 1.4; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8em; }
-.lp-card-btn { margin-top: auto; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--blue); border-radius: 4px; color: var(--blue); font-size: 14.5px; font-weight: 500; text-decoration: none; transition: background .2s, color .2s; }
-.lp-card-btn:hover { background: var(--blue); color: #fff; }
-
-/* ── Categorías ── */
-.lp-band { margin-top: 72px; background: linear-gradient(180deg,#F6F9FE 0%,#fff 100%); padding-bottom: 32px; }
-.lp-band .lp-section { padding-top: 64px; }
-.lp-cats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 20px; }
-.lp-cat { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 24px 16px 22px; background: #fff; border: 2px solid var(--line); border-radius: 8px; text-decoration: none; color: var(--ink); transition: border-color .2s, box-shadow .2s, transform .2s; }
-.lp-cat:hover { border-color: #BFD4F6; box-shadow: 0 12px 28px rgba(30,70,150,0.1); transform: translateY(-2px); }
-.lp-cat-img { width: 112px; height: 112px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 110%, var(--glow) 0%, transparent 65%), linear-gradient(160deg, #1A1446 0%, #0B1030 100%); box-shadow: inset 0 -20px 40px -20px var(--glow); }
-.lp-cat-img :deep(svg) { filter: drop-shadow(0 0 10px var(--glow)); }
-.lp-cat-name { margin-top: 16px; font-size: 16px; font-weight: 600; line-height: 1.45; min-height: 2.9em; display: flex; align-items: center; }
-.lp-cat-line { margin-top: 10px; width: 75%; height: 4px; border-radius: 4px; background: linear-gradient(90deg,#DBEAFE,#FEF3C7); }
+.lp-card-model svg { flex-shrink: 0; }
+.lp-card-model:hover { background: var(--brand-soft); color: var(--brand-d); }
+.lp-card-foot { margin-top: auto; padding-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.lp-card-lock { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); min-width: 0; }
+.lp-card-lock svg { flex-shrink: 0; }
+.lp-card-go { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--ink); color: #fff; flex-shrink: 0; transition: background .2s, transform .2s; }
+.lp-card-go:hover { background: var(--brand); transform: translateX(2px); }
 
 /* ── Marcas ── */
-.lp-brands { overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); padding: 4px 0; }
-.lp-brands-track { display: flex; gap: 16px; width: max-content; animation: lp-marquee linear infinite; }
+.lp-brands-section { padding-top: 72px; }
+.lp-brands-title { text-align: center; font-size: 15px; font-weight: 600; color: var(--muted); margin: 0 0 28px; }
+.lp-brands { overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.lp-brands-track { display: flex; align-items: center; gap: 64px; width: max-content; animation: lp-marquee linear infinite; }
 .lp-brands:hover .lp-brands-track { animation-play-state: paused; }
-.lp-brand { width: 146px; height: 128px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 20px; background: #fff; border: 1px solid var(--line); border-radius: 8px; }
-.lp-brand img { max-width: 100%; max-height: 60px; object-fit: contain; }
-@keyframes lp-marquee { from { transform: translateX(0); } to { transform: translateX(calc(-50% - 8px)); } }
+.lp-brands-track img { height: 40px; width: auto; max-width: 150px; object-fit: contain; filter: grayscale(1); opacity: .6; transition: filter .25s, opacity .25s; }
+.lp-brands-track img:hover { filter: none; opacity: 1; }
+@keyframes lp-marquee { from { transform: translateX(0); } to { transform: translateX(calc(-50% - 32px)); } }
 @media (prefers-reduced-motion: reduce) { .lp-brands-track { animation: none; } .lp-brands { overflow-x: auto; } }
 
-/* ── Banda verde de contacto ── */
-.lp-cta-section { padding-top: 80px; padding-bottom: 96px; scroll-margin-top: 96px; }
-.lp-cta { display: grid; grid-template-columns: 1fr 1fr; border-radius: 10px; overflow: hidden; background: linear-gradient(100deg,#1DB954 0%,#16B981 45%,#34D17A 100%); box-shadow: 0 24px 48px rgba(34,197,94,0.18); color: #fff; }
-.lp-cta-left { padding: 32px; }
-.lp-cta-left h2 { font-size: clamp(26px, 2.8vw, 36px); font-weight: 800; line-height: 1.15; margin: 0 0 20px; }
-.lp-cta-row { display: flex; align-items: center; gap: 20px; }
-.lp-cta-bubble { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.lp-cta-row ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 32px; font-size: 16px; }
-.lp-cta-row li { display: flex; align-items: center; gap: 10px; }
-.lp-cta-row li::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: #FDE047; flex-shrink: 0; }
-.lp-cta-right { padding: 32px; border-left: 1px solid rgba(255,255,255,0.18); display: flex; flex-direction: column; justify-content: center; }
-.lp-cta-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.lp-cta-form input { height: 46px; border: none; border-radius: 8px; padding: 0 14px; font-size: 14.5px; color: var(--ink); background: #fff; outline: none; font-family: inherit; }
-.lp-cta-form input:focus { box-shadow: 0 0 0 3px rgba(255,255,255,0.5); }
-.lp-cta-form button { grid-column: 1 / -1; height: 48px; border: none; border-radius: 8px; background: #157A3A; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; }
-.lp-cta-form button:hover:not(:disabled) { background: #0F6630; }
-.lp-cta-form button:disabled { opacity: .75; cursor: not-allowed; }
-.lp-cta-note, .lp-cta-error { grid-column: 1 / -1; margin: 2px 0 0; font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,0.92); }
-.lp-cta-error { color: #fff; background: rgba(185,28,28,0.55); padding: 8px 12px; border-radius: 8px; }
-.lp-cta-done { display: flex; gap: 16px; align-items: flex-start; }
-.lp-cta-done strong { font-size: 20px; }
-.lp-cta-done p { margin: 6px 0 14px; font-size: 15px; }
-.lp-cta-done button { padding: 9px 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.7); background: transparent; color: #fff; font-weight: 600; cursor: pointer; font-family: inherit; }
+/* ── Contacto ── */
+.lp-contact-section { padding-bottom: 96px; scroll-margin-top: 140px; }
+.lp-contact { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; padding: 56px; border-radius: 28px; overflow: hidden; color: #fff; background: radial-gradient(600px 360px at 0% 0%, rgba(21,112,239,0.45), transparent 60%), radial-gradient(500px 320px at 100% 100%, rgba(6,182,212,0.30), transparent 60%), var(--ink); }
+.lp-contact-text h2 { color: #fff; margin-bottom: 14px; }
+.lp-contact-text p { font-size: 16.5px; line-height: 1.7; color: rgba(255,255,255,0.78); margin: 0 0 22px; max-width: 460px; }
+.lp-contact-text ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.lp-contact-text li { display: flex; align-items: center; gap: 12px; font-size: 15.5px; color: rgba(255,255,255,0.92); }
+.lp-contact-text li::before { content: ''; width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; background: rgba(34,197,94,0.2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234ADE80' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / 12px no-repeat; }
+.lp-contact-card { background: #fff; color: var(--ink); border-radius: 20px; padding: 32px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); min-width: 0; }
+.lp-form { display: flex; flex-direction: column; gap: 14px; }
+.lp-form label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-2); min-width: 0; }
+.lp-form input { width: 100%; height: 46px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg-soft); font-size: 15px; color: var(--ink); font-family: inherit; outline: none; transition: border-color .2s, box-shadow .2s, background .2s; min-width: 0; }
+.lp-form input:focus { background: #fff; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(21,112,239,0.12); }
+.lp-form-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.lp-form-error { margin: 0; padding: 10px 12px; border-radius: 10px; background: #FEF2F2; color: #B91C1C; font-size: 13.5px; }
+.lp-form .lp-btn { margin-top: 6px; }
+.lp-contact-done { text-align: center; padding: 16px 0; }
+.lp-done-ico { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; background: #ECFDF3; color: #16A34A; }
+.lp-contact-done h3 { margin: 0 0 8px; font-size: 21px; }
+.lp-contact-done p { margin: 0 0 20px; color: var(--muted); line-height: 1.6; }
 
 /* ── Footer ── */
-.lp-footer { background: var(--navy); color: #fff; padding-top: 56px; }
-.lp-footer-grid { display: grid; grid-template-columns: 1.15fr 0.85fr 1.3fr; gap: 48px; padding-bottom: 32px; }
-.lp-footer h3 { font-size: 19px; font-weight: 700; margin: 0 0 18px; }
-.lp-footer-desc { font-size: 14.5px; line-height: 1.9; color: rgba(255,255,255,0.85); margin: 0 0 18px; }
-.lp-footer-contact { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14.5px; color: rgba(255,255,255,0.9); }
-.lp-footer-contact li { display: flex; gap: 10px; align-items: flex-start; line-height: 1.45; }
-.lp-footer-contact svg { flex-shrink: 0; margin-top: 2px; opacity: 0.85; }
-.lp-footer-contact a { color: inherit; text-decoration: none; }
-.lp-footer-contact a:hover { text-decoration: underline; }
-.lp-footer-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.lp-footer-links li { display: flex; align-items: center; gap: 10px; font-size: 14.5px; }
-.lp-footer-links li::before { content: ''; width: 12px; height: 7px; border-left: 2px solid #4ADE80; border-bottom: 2px solid #4ADE80; transform: rotate(-45deg) translateY(-2px); flex-shrink: 0; }
-.lp-footer-links a { color: rgba(255,255,255,0.9); text-decoration: none; }
-.lp-footer-links a:hover { color: #fff; text-decoration: underline; }
-.lp-benefits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.lp-benefit { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; min-height: 118px; padding: 16px 10px; border-radius: 6px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.14); font-size: 13.5px; font-weight: 600; line-height: 1.5; }
-.lp-footer-bottom { border-top: 1px solid rgba(255,255,255,0.18); padding-top: 32px; padding-bottom: 40px; text-align: center; font-size: 14.5px; color: rgba(255,255,255,0.72); }
+.lp-footer { background: var(--ink); color: rgba(255,255,255,0.72); padding-top: 64px; }
+.lp-footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.2fr; gap: 40px; padding-bottom: 48px; }
+.lp-footer-grid > div { min-width: 0; }
+.lp-footer-brand img { height: 52px; width: auto; background: #fff; border-radius: 10px; padding: 6px 10px; }
+.lp-footer-brand p { margin: 18px 0 0; font-size: 14.5px; line-height: 1.75; max-width: 320px; }
+.lp-footer h3 { font-size: 13px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #fff; margin: 6px 0 18px; }
+.lp-footer ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; font-size: 14.5px; }
+.lp-footer a { color: inherit; text-decoration: none; overflow-wrap: anywhere; }
+.lp-footer a:hover { color: #fff; }
+.lp-footer-contact li { line-height: 1.55; }
+.lp-footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 22px; padding-bottom: 28px; font-size: 13.5px; color: rgba(255,255,255,0.5); }
 
 /* ── Responsive ── */
-@media (max-width: 1280px) {
-  .lp-grid { grid-template-columns: repeat(4, 1fr); }
-  .lp-cats { grid-template-columns: repeat(5, 1fr); }
+
+/* Pantallas grandes (2K / 4K): contenedor más ancho y todo un poco más grande */
+@media (min-width: 1680px) {
+  .lp { --gutter: 48px; }
+  .lp-wrap { max-width: calc(1520px + 2 * var(--gutter)); }
+  .lp-hero { padding-top: 72px; }
+  .lp-hero-mosaic { max-width: 640px; }
+  .lp-cats { gap: 20px; }
+  .lp-grid { gap: 24px; }
+}
+@media (min-width: 2200px) {
+  .lp { zoom: 1.2; }
+}
+
+/* Laptops chicas */
+@media (max-width: 1180px) {
   .lp-hide-md { display: none; }
-}
-@media (max-width: 1024px) {
-  .lp-wrap { padding-left: 20px; padding-right: 20px; }
-  .lp-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .lp-cats { grid-template-columns: repeat(4, 1fr); gap: 14px; }
-  .lp-slide { grid-template-columns: 1fr; padding: 40px 56px; }
-  .lp-slide-visual { display: none; }
-  .lp-cta { grid-template-columns: 1fr; }
-  .lp-cta-right { border-left: none; border-top: 1px solid rgba(255,255,255,0.18); }
+  .lp-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .lp-cats { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .lp-perks { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 18px; }
+  .lp-perks li:nth-child(3) { border-left: none; }
   .lp-footer-grid { grid-template-columns: 1fr 1fr; }
-  .lp-footer-grid > :last-child { grid-column: 1 / -1; }
+  .lp-contact { padding: 44px; gap: 36px; }
 }
-@media (max-width: 760px) {
-  .lp-header-row { flex-wrap: wrap; height: auto; padding-top: 12px; padding-bottom: 12px; gap: 10px 12px; }
-  .lp-logo img { height: 38px; }
-  .lp-logo-text { display: none; }
-  .lp-search { order: 3; flex: none; width: 100%; max-width: none; height: 48px; }
-  .lp-search-ico { right: 108px; }
-  .lp-hdr-link, .lp-hdr-cta { padding: 8px 12px; font-size: 13.5px; }
-  .lp-slider { height: 460px; }
-  .lp-slide { padding: 32px 28px 48px; }
-  .lp-slide p { font-size: 16px; }
-  .lp-slider-arrow { display: none; }
-  .lp-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .lp-card { padding: 12px; }
-  .lp-cats { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .lp-cat-img { width: 88px; height: 88px; }
-  .lp-cat-name { font-size: 14.5px; }
-  .lp-section-head { flex-wrap: wrap; }
-  .lp-cta-left, .lp-cta-right { padding: 24px 20px; }
-  .lp-cta-row { align-items: flex-start; }
-  .lp-cta-row ul, .lp-cta-form { grid-template-columns: 1fr; }
-  .lp-footer-grid { grid-template-columns: 1fr; gap: 32px; }
-  .lp-benefits { grid-template-columns: repeat(2, 1fr); }
+
+/* Tablets */
+@media (max-width: 900px) {
+  .lp { --gutter: 20px; }
+  .lp-hide-sm { display: none; }
+  .lp-topbar-row { justify-content: center; }
+  .lp-topbar-item:first-child { margin-right: 0; }
+  .lp-header-row { gap: 16px; }
+  .lp-hero-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .lp-hero-mosaic { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 0; max-width: none; margin: 0; }
+  .lp-hero-blob { display: none; }
+  .lp-hero-tile { padding: 10px 10px 32px; border-radius: 16px; }
+  .lp-hero-tile span { font-size: 11.5px; left: 10px; right: 8px; bottom: 10px; }
+  .lp-hero-tile.t1, .lp-hero-tile.t3 { transform: none; }
+  .lp-contact { grid-template-columns: minmax(0, 1fr); padding: 36px 28px; gap: 28px; border-radius: 22px; }
+  .lp-section-head { align-items: flex-start; flex-direction: column; }
+  .lp-cats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
 }
-@media (max-width: 420px) {
-  .lp-hdr-link { display: none; }
+
+/* Celulares */
+@media (max-width: 640px) {
+  .lp { --gutter: 16px; }
+  .lp-hide-xs { display: none; }
+  .lp-header-row { flex-wrap: wrap; height: auto; padding-top: 10px; padding-bottom: 12px; gap: 10px; }
+  .lp-logo img { height: 40px; }
+  .lp-search { order: 3; flex: none; width: 100%; max-width: none; height: 46px; }
+  .lp-search button { padding: 0 14px; }
+  .lp-catbar-row { height: 42px; }
+  .lp-hero { padding-top: 32px; }
+  .lp-hero h1 { letter-spacing: -1px; }
+  .lp-hero-ctas .lp-btn { flex: 1 1 200px; }
+  .lp-hero-stats { gap: 16px 28px; margin-top: 28px; }
+  .lp-hero-stats dt { font-size: 21px; }
+  .lp-hero-mosaic { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lp-perks { grid-template-columns: minmax(0, 1fr); top: 24px; padding: 16px 4px; margin-top: 36px; }
+  .lp-perks li { padding: 4px 14px; }
+  .lp-perks li + li { border-left: none; }
+  .lp-section { padding-top: 64px; }
+  .lp-section#categorias { padding-top: 88px; }
+  .lp-cats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .lp-cat { border-radius: 14px; }
+  .lp-cat-photo { padding: 14px 14px 4px; }
+  .lp-cat-foot { font-size: 13.5px; padding: 8px 12px 12px; }
+  .lp-cat-foot svg { display: none; }
+  .lp-products-band { margin-top: 64px; padding-top: 52px; padding-bottom: 60px; }
+  .lp-tabs { width: 100%; }
+  .lp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .lp-card { border-radius: 14px; }
+  .lp-card-img { padding: 12px; }
+  .lp-card-body { padding: 12px; }
   .lp-card-name { font-size: 13.5px; }
+  .lp-card-lock { font-size: 11.5px; }
+  .lp-card-go { width: 32px; height: 32px; }
+  .lp-brands-section { padding-top: 56px; }
+  .lp-brands-track { gap: 40px; }
+  .lp-brands-track img { height: 30px; }
+  .lp-contact-section { padding-bottom: 64px; }
+  .lp-contact { padding: 28px 18px; border-radius: 18px; }
+  .lp-contact-card { padding: 22px 16px; border-radius: 16px; }
+  .lp-form-row { grid-template-columns: minmax(0, 1fr); }
+  .lp-footer { padding-top: 48px; }
+  .lp-footer-grid { grid-template-columns: minmax(0, 1fr); gap: 30px; padding-bottom: 36px; }
+}
+
+/* Celulares muy angostos (320–380 px) */
+@media (max-width: 380px) {
+  .lp-btn-sm { padding: 0 12px; font-size: 13px; }
+  .lp-logo img { height: 36px; }
+  .lp-search input { font-size: 14px; }
+  .lp-grid { grid-template-columns: minmax(0, 1fr); }
+  .lp-card-img { aspect-ratio: 1 / 0.7; }
+  .lp-card-lock { font-size: 13px; }
+  .lp-cat-foot { font-size: 12.5px; }
 }
 </style>
