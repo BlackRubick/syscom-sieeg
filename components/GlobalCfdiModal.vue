@@ -1,27 +1,27 @@
 <template>
   <Teleport to="body">
     <Transition name="fade">
-      <div v-if="open" style="position:fixed;inset:0;background:rgba(2,6,14,0.85);backdrop-filter:blur(6px);z-index:1060;" @click.self="emit('close')" />
+      <div v-if="open" style="position:fixed;inset:0;background:rgba(11,27,51,0.45);backdrop-filter:blur(6px);z-index:1060;" @click.self="emit('close')" />
     </Transition>
     <Transition name="modal">
       <div v-if="open" style="position:fixed;inset:0;z-index:1061;display:flex;align-items:center;justify-content:center;padding:16px;">
-        <div style="width:100%;max-width:640px;border-radius:22px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(245,158,11,0.2);box-shadow:0 32px 80px rgba(0,0,0,0.75);display:flex;flex-direction:column;max-height:90vh;">
+        <div style="width:100%;max-width:640px;border-radius:22px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(245,158,11,0.2);box-shadow:0 32px 80px rgba(11,27,51,0.16);display:flex;flex-direction:column;max-height:90vh;">
 
           <!-- Header -->
-          <div style="padding:22px 26px 16px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">
+          <div style="padding:22px 26px 16px;border-bottom:1px solid rgba(11,27,51,0.07);flex-shrink:0;">
             <div style="position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.5),transparent);border-radius:999px;" />
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
               <div>
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8H8"/><path d="M16 12H8"/><path d="M12 16H8"/></svg>
-                  <span style="font-size:15px;font-weight:700;color:#E2EAF4;">Factura Global CFDI 4.0</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8H8"/><path d="M16 12H8"/><path d="M12 16H8"/></svg>
+                  <span style="font-size:15px;font-weight:700;color:#0B1B33;">Factura Global CFDI 4.0</span>
                 </div>
-                <div style="font-size:12px;color:rgba(100,118,142,0.7);">
-                  Receptor: <span style="color:#fbbf24;font-weight:600;font-family:monospace;">XAXX010101000</span>
+                <div style="font-size:12px;color:#7A889C;">
+                  Receptor: <span style="color:#B45309;font-weight:600;font-family:monospace;">XAXX010101000</span>
                   <span style="margin:0 6px;opacity:0.4;">·</span>PUBLICO EN GENERAL
                 </div>
               </div>
-              <button v-if="!result" @click="emit('close')" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(100,118,142,0.8);">
+              <button v-if="!result" @click="emit('close')" style="width:30px;height:30px;border-radius:8px;background:rgba(11,27,51,0.05);border:1px solid rgba(11,27,51,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5B6B82;">
                 <X :size="14" />
               </button>
             </div>
@@ -30,16 +30,16 @@
           <!-- Éxito -->
           <div v-if="result" style="padding:32px 26px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;">
             <div style="width:56px;height:56px;border-radius:16px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);display:flex;align-items:center;justify-content:center;">
-              <CheckCircle :size="26" color="#fbbf24" />
+              <CheckCircle :size="26" color="#B45309" />
             </div>
             <div>
-              <div style="font-size:16px;font-weight:700;color:#E2EAF4;margin-bottom:4px;">Factura Global Timbrada</div>
-              <div style="font-size:12px;color:rgba(100,118,142,0.7);">{{ result.ordersIncluded }} pedido{{ result.ordersIncluded!==1?'s':'' }} incluido{{ result.ordersIncluded!==1?'s':'' }}</div>
+              <div style="font-size:16px;font-weight:700;color:#0B1B33;margin-bottom:4px;">Factura Global Timbrada</div>
+              <div style="font-size:12px;color:#7A889C;">{{ result.ordersIncluded }} pedido{{ result.ordersIncluded!==1?'s':'' }} incluido{{ result.ordersIncluded!==1?'s':'' }}</div>
             </div>
             <div style="width:100%;border-radius:14px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);padding:16px 20px;text-align:left;display:flex;flex-direction:column;gap:10px;">
               <div v-for="row in resultRows" :key="row.label" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
-                <span style="font-size:11px;font-weight:600;color:rgba(100,118,142,0.6);white-space:nowrap;">{{ row.label }}</span>
-                <span :style="{ fontSize:'11px', color:'#94a3b8', fontFamily:row.mono?'monospace':'inherit', textAlign:'right', wordBreak:'break-all' }">{{ row.value }}</span>
+                <span style="font-size:11px;font-weight:600;color:#7A889C;white-space:nowrap;">{{ row.label }}</span>
+                <span :style="{ fontSize:'11px', color:'#5B6B82', fontFamily:row.mono?'monospace':'inherit', textAlign:'right', wordBreak:'break-all' }">{{ row.value }}</span>
               </div>
             </div>
             <div style="display:flex;gap:10px;">
@@ -48,10 +48,10 @@
                 <FileDown :size="13" />{{ downloading==='pdf'?'Descargando…':'PDF' }}
               </button>
               <button @click="downloadResult('xml')" :disabled="downloading==='xml'"
-                :style="{ height:'40px', padding:'0 20px', borderRadius:'10px', background:downloading==='xml'?'rgba(34,197,94,0.3)':'linear-gradient(135deg,#22C55E,#059669)', border:'none', color:'#fff', fontSize:'13px', fontWeight:600, cursor:downloading==='xml'?'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'7px', opacity:downloading==='xml'?0.7:1 }">
+                :style="{ height:'40px', padding:'0 20px', borderRadius:'10px', background:downloading==='xml'?'rgba(34,197,94,0.3)':'linear-gradient(135deg,#16A34A,#059669)', border:'none', color:'#fff', fontSize:'13px', fontWeight:600, cursor:downloading==='xml'?'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'7px', opacity:downloading==='xml'?0.7:1 }">
                 <FileDown :size="13" />{{ downloading==='xml'?'Descargando…':'XML' }}
               </button>
-              <button @click="emit('close'); emit('created')" style="height:40px;padding:0 20px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+              <button @click="emit('close'); emit('created')" style="height:40px;padding:0 20px;border-radius:10px;background:rgba(11,27,51,0.06);border:1px solid rgba(11,27,51,0.1);color:#5B6B82;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
                 Cerrar
               </button>
             </div>
@@ -63,19 +63,19 @@
 
               <!-- Resumen de pedidos -->
               <div style="padding:14px 16px;border-radius:12px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);margin-bottom:20px;display:flex;align-items:center;gap:12px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
                 <div>
-                  <div style="font-size:13px;font-weight:700;color:#fbbf24;">{{ pendingOrders.length }} pedido{{ pendingOrders.length!==1?'s':'' }} sin facturar individualmente</div>
-                  <div style="font-size:11px;color:rgba(100,118,142,0.7);margin-top:2px;">Total: <span style="color:#E2EAF4;font-weight:600;">{{ fmtMXN(pendingTotal) }}</span> <span style="font-size:10px;">IVA incl.</span></div>
+                  <div style="font-size:13px;font-weight:700;color:#B45309;">{{ pendingOrders.length }} pedido{{ pendingOrders.length!==1?'s':'' }} sin facturar individualmente</div>
+                  <div style="font-size:11px;color:#7A889C;margin-top:2px;">Total: <span style="color:#0B1B33;font-weight:600;">{{ fmtMXN(pendingTotal) }}</span> <span style="font-size:10px;">IVA incl.</span></div>
                 </div>
               </div>
 
               <!-- InformacionGlobal -->
               <div style="margin-bottom:18px;">
-                <div style="font-size:10px;font-weight:700;color:rgba(100,118,142,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Período</div>
+                <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Período</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:5px;">Periodicidad *</div>
+                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Periodicidad *</div>
                     <select v-model="form.periodicidad" v-bind="sel">
                       <option value="">Seleccionar…</option>
                       <option value="01">01 – Diario</option>
@@ -86,7 +86,7 @@
                     </select>
                   </div>
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:5px;">Mes *</div>
+                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Mes *</div>
                     <select v-model="form.meses" v-bind="sel">
                       <option value="">Seleccionar…</option>
                       <template v-if="form.periodicidad !== '05'">
@@ -98,7 +98,7 @@
                     </select>
                   </div>
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:5px;">Año *</div>
+                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Año *</div>
                     <input v-model="form.año" placeholder="2025" maxlength="4" v-bind="inp" />
                   </div>
                 </div>
@@ -106,31 +106,31 @@
 
               <!-- Configuración de pago -->
               <div style="margin-bottom:18px;">
-                <div style="font-size:10px;font-weight:700;color:rgba(100,118,142,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Configuración</div>
+                <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Configuración</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:5px;">Uso CFDI *</div>
+                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Uso CFDI *</div>
                     <select v-model="form.usoCfdi" v-bind="sel">
                       <option value="">Seleccionar…</option>
                       <option v-for="(nombre, clave) in USOS_CFDI" :key="clave" :value="clave">{{ clave }} – {{ nombre }}</option>
                     </select>
                   </div>
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:5px;">Moneda</div>
+                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Moneda</div>
                     <select v-model="form.moneda" v-bind="sel">
                       <option value="MXN">MXN – Peso mexicano</option>
                       <option value="USD">USD – Dólar</option>
                     </select>
                   </div>
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:5px;">Forma de pago *</div>
+                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Forma de pago *</div>
                     <select v-model="form.formaPago" v-bind="sel">
                       <option value="">Seleccionar…</option>
                       <option v-for="f in FORMAS_PAGO" :key="f.c" :value="f.c">{{ f.c }} – {{ f.n }}</option>
                     </select>
                   </div>
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);margin-bottom:5px;">Método de pago *</div>
+                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Método de pago *</div>
                     <select v-model="form.metodoPago" v-bind="sel">
                       <option value="PUE">PUE – Una sola exhibición</option>
                       <option value="PPD">PPD – Parcialidades o diferido</option>
@@ -143,14 +143,14 @@
             </div>
 
             <!-- Footer -->
-            <div style="padding:16px 26px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-              <div style="font-size:11px;color:rgba(100,118,142,0.5);">{{ pendingOrders.length }} pedido{{ pendingOrders.length!==1?'s':'' }} · {{ fmtMXN(pendingTotal) }}</div>
+            <div style="padding:16px 26px;border-top:1px solid rgba(11,27,51,0.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+              <div style="font-size:11px;color:#7A889C;">{{ pendingOrders.length }} pedido{{ pendingOrders.length!==1?'s':'' }} · {{ fmtMXN(pendingTotal) }}</div>
               <div style="display:flex;gap:10px;">
-                <button @click="emit('close')" style="height:38px;padding:0 18px;border-radius:9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;font-size:13px;cursor:pointer;font-family:inherit;">
+                <button @click="emit('close')" style="height:38px;padding:0 18px;border-radius:9px;background:rgba(11,27,51,0.05);border:1px solid rgba(11,27,51,0.1);color:#5B6B82;font-size:13px;cursor:pointer;font-family:inherit;">
                   Cancelar
                 </button>
                 <button @click="preview" :disabled="previewing || loading || !pendingOrders.length" title="Ver cómo quedará la factura sin timbrar ni usar folio"
-                  :style="{ height:'38px', padding:'0 18px', borderRadius:'9px', background:'rgba(99,102,241,0.1)', border:'1px solid rgba(99,102,241,0.3)', color:'#a5b4fc', fontSize:'13px', fontWeight:600, cursor:previewing||loading||!pendingOrders.length?'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'7px', opacity:!pendingOrders.length?0.4:previewing?0.7:1 }">
+                  :style="{ height:'38px', padding:'0 18px', borderRadius:'9px', background:'rgba(99,102,241,0.1)', border:'1px solid rgba(99,102,241,0.3)', color:'#4F46E5', fontSize:'13px', fontWeight:600, cursor:previewing||loading||!pendingOrders.length?'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'7px', opacity:!pendingOrders.length?0.4:previewing?0.7:1 }">
                   <svg v-if="previewing" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
                   <Eye v-else :size="13" />
                   {{ previewing ? 'Generando…' : 'Vista previa' }}
@@ -287,8 +287,8 @@ const resultRows = computed(() => result.value ? [
 
 const fmtMXN = (n: number) => n.toLocaleString('es-MX', { style:'currency', currency:'MXN' })
 
-const sel = { style:'width:100%;height:34px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0 10px;font-size:12px;color:#E2EAF4;outline:none;font-family:inherit;box-sizing:border-box;cursor:pointer;' }
-const inp = { style:'width:100%;height:34px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0 10px;font-size:12px;color:#E2EAF4;outline:none;font-family:inherit;box-sizing:border-box;' }
+const sel = { style:'width:100%;height:34px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:8px;padding:0 10px;font-size:12px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;cursor:pointer;' }
+const inp = { style:'width:100%;height:34px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:8px;padding:0 10px;font-size:12px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;' }
 
 const MESES = [
   { v:'01',l:'Enero' },{ v:'02',l:'Febrero' },{ v:'03',l:'Marzo' },{ v:'04',l:'Abril' },

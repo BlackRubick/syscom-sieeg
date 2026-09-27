@@ -1,13 +1,13 @@
 <template>
-  <div style="display:flex; height:100vh; background:#06101E; position:relative; overflow:hidden;">
+  <div style="display:flex; height:100vh; background:#F5F8FC; position:relative; overflow:hidden;">
     <!-- Fondo -->
-    <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 70% 50% at 0% 0%,rgba(14,165,233,0.09) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 100% 100%,rgba(14,165,233,0.06) 0%,transparent 60%)" />
-    <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,0.016) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.016) 1px,transparent 1px);background-size:64px 64px" />
+    <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 70% 50% at 0% 0%,rgba(21,112,239,0.09) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 100% 100%,rgba(21,112,239,0.06) 0%,transparent 60%)" />
+    <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(11,27,51,0.016) 1px,transparent 1px),linear-gradient(90deg,rgba(11,27,51,0.016) 1px,transparent 1px);background-size:64px 64px" />
 
     <!-- Backdrop mobile -->
     <Transition name="fade">
       <div v-if="isMobile && ui.mobileSidebarOpen"
-        style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:150;backdrop-filter:blur(2px);"
+        style="position:fixed;inset:0;background:rgba(11,27,51,0.45);z-index:150;backdrop-filter:blur(2px);"
         @click="ui.closeMobileSidebar()" />
     </Transition>
 
@@ -22,10 +22,10 @@
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px;border-radius:12px;background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.06));border:1px solid rgba(245,158,11,0.3);margin-top:12px;flex-wrap:wrap;gap:10px;">
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="width:32px;height:32px;border-radius:9px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <AlertTriangle :size="15" color="#fbbf24" />
+                <AlertTriangle :size="15" color="#B45309" />
               </div>
               <div>
-                <div style="font-size:13px;font-weight:600;color:#fcd34d;">Datos fiscales incompletos</div>
+                <div style="font-size:13px;font-weight:600;color:#B45309;">Datos fiscales incompletos</div>
                 <div style="font-size:12px;color:rgba(245,158,11,0.8);margin-top:1px;">Completa tu información fiscal para poder recibir facturas (CFDI).</div>
               </div>
             </div>

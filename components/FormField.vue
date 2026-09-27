@@ -19,12 +19,12 @@ function onInput(e: Event) {
 }
 
 const focus = ref(false)
-const labelStyle = { display:'block', fontSize:'11px', fontWeight:500, color:'rgba(123,146,176,0.85)', marginBottom:'6px' }
+const labelStyle = { display:'block', fontSize:'11px', fontWeight:500, color:'#5B6B82', marginBottom:'6px' }
 const inputStyle = computed(() => ({
   width:'100%', height:'40px',
-  background: focus.value ? 'rgba(14,165,233,0.06)' : 'rgba(255,255,255,0.04)',
-  border:`1px solid ${focus.value ? 'rgba(14,165,233,0.45)' : 'rgba(255,255,255,0.1)'}`,
-  borderRadius:'10px', padding:'0 12px', fontSize:'13px', color:'#E2EAF4',
+  background: focus.value ? 'rgba(21,112,239,0.06)' : 'rgba(11,27,51,0.04)',
+  border:`1px solid ${focus.value ? 'rgba(21,112,239,0.45)' : 'rgba(11,27,51,0.1)'}`,
+  borderRadius:'10px', padding:'0 12px', fontSize:'13px', color:'#0B1B33',
   outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.18s',
   textTransform: props.uppercase ? 'uppercase' : 'none',
 }))

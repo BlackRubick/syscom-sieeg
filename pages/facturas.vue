@@ -4,8 +4,8 @@
     <!-- Header -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div>
-        <h1 style="font-size:22px;font-weight:800;color:#E2EAF4;margin:0;">Facturación CFDI 4.0</h1>
-        <p style="font-size:13px;color:rgba(100,118,142,0.85);margin-top:4px;">
+        <h1 style="font-size:22px;font-weight:800;color:#0B1B33;margin:0;">Facturación CFDI 4.0</h1>
+        <p style="font-size:13px;color:#5B6B82;margin-top:4px;">
           <template v-if="tab==='orders'">
             <span v-if="loadingOrders">Cargando pedidos…</span>
             <span v-else>{{ orders.length }} pedido{{ orders.length!==1?'s':'' }} · {{ listos }} listo{{ listos!==1?'s':'' }} para facturar</span>
@@ -14,7 +14,7 @@
             <span v-if="loadingCfdis">Cargando facturas…</span>
             <span v-else-if="cfdiError" style="color:#EF4444;">{{ cfdiError }}</span>
             <span v-else>Serie S · {{ cfdis.length }} CFDI{{ cfdis.length!==1?'s':'' }} emitido{{ cfdis.length!==1?'s':'' }}
-              <template v-if="totalFacturado>0"> · <span style="color:#a5b4fc;">{{ fmtMXN(totalFacturado) }}</span></template>
+              <template v-if="totalFacturado>0"> · <span style="color:#4F46E5;">{{ fmtMXN(totalFacturado) }}</span></template>
             </span>
           </template>
         </p>
@@ -22,7 +22,7 @@
       <!-- Botón Factura Global (solo visible en tab Órdenes) -->
       <button v-if="tab==='orders' && !loadingOrders" @click="globalOpen=true" :disabled="!pendingForGlobal.length"
         :style="{ height:'40px', padding:'0 18px', borderRadius:'11px', border:'1px solid rgba(245,158,11,0.35)', fontSize:'13px', fontWeight:700, cursor:!pendingForGlobal.length?'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'8px', transition:'all 0.2s', opacity:!pendingForGlobal.length?0.4:1,
-          background: 'linear-gradient(135deg,rgba(245,158,11,0.12),rgba(217,119,6,0.08))', color:'#fbbf24',
+          background: 'linear-gradient(135deg,rgba(245,158,11,0.12),rgba(217,119,6,0.08))', color:'#B45309',
           boxShadow: pendingForGlobal.length ? '0 4px 16px rgba(245,158,11,0.15)' : 'none' }">
         <FileText :size="14" />
         Factura Global
@@ -31,11 +31,11 @@
     </div>
 
     <!-- Tabs -->
-    <div style="display:flex;gap:4px;margin-bottom:20px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);padding:4px;width:fit-content;">
+    <div style="display:flex;gap:4px;margin-bottom:20px;border-radius:12px;background:rgba(11,27,51,0.03);border:1px solid rgba(11,27,51,0.07);padding:4px;width:fit-content;">
       <button v-for="t in tabs" :key="t.key" @click="tab=t.key"
         :style="{ height:'34px', padding:'0 18px', borderRadius:'9px', border:'none', fontSize:'12.5px', fontWeight:tab===t.key?700:500, cursor:'pointer', fontFamily:'inherit', transition:'all 0.18s',
           background: tab===t.key ? 'linear-gradient(135deg,#6366f1,#4f46e5)' : 'transparent',
-          color:      tab===t.key ? '#fff' : 'rgba(100,118,142,0.8)',
+          color:      tab===t.key ? '#fff' : '#5B6B82',
           boxShadow:  tab===t.key ? '0 2px 10px rgba(99,102,241,0.3)' : 'none' }">
         {{ t.label }}
       </button>
@@ -48,27 +48,27 @@
 
       <!-- KPIs pedidos -->
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
-        <div v-for="k in orderKpis" :key="k.label" style="border-radius:14px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);padding:16px 18px;">
+        <div v-for="k in orderKpis" :key="k.label" style="border-radius:14px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:16px 18px;">
           <div :style="{ fontSize:'24px', fontWeight:800, background:k.grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', lineHeight:1 }">
             {{ loadingOrders ? '—' : k.value }}
           </div>
-          <div style="font-size:11px;color:rgba(100,118,142,0.8);margin-top:4px;font-weight:500;">{{ k.label }}</div>
+          <div style="font-size:11px;color:#5B6B82;margin-top:4px;font-weight:500;">{{ k.label }}</div>
         </div>
       </div>
 
       <!-- Filtros pedidos -->
-      <div style="border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:10px;">
+      <div style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:10px;">
         <div style="position:relative;max-width:360px;">
-          <Search :size="13" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="orderSearchFocus?'#6366f1':'rgba(100,118,142,0.6)'" />
+          <Search :size="13" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="orderSearchFocus?'#6366f1':'#7A889C'" />
           <input v-model="orderSearch" placeholder="Buscar por cliente, número CL-…, RFC o folio SYSCOM…"
             @focus="orderSearchFocus=true" @blur="orderSearchFocus=false"
-            :style="{ width:'100%', height:'38px', background: orderSearchFocus?'rgba(99,102,241,0.06)':'rgba(255,255,255,0.04)', border:`1px solid ${orderSearchFocus?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)'}`, borderRadius:'9px', paddingLeft:'36px', paddingRight:'12px', fontSize:'12px', color:'#E2EAF4', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
+            :style="{ width:'100%', height:'38px', background: orderSearchFocus?'rgba(99,102,241,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${orderSearchFocus?'rgba(99,102,241,0.4)':'rgba(11,27,51,0.08)'}`, borderRadius:'9px', paddingLeft:'36px', paddingRight:'12px', fontSize:'12px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <button v-for="f in orderFilters" :key="f.key" @click="orderFilter=f.key"
             :style="{ height:'28px', padding:'0 12px', borderRadius:'20px', fontSize:'11px', fontWeight:orderFilter===f.key?600:500, cursor:'pointer', border:'none', fontFamily:'inherit',
-              background: orderFilter===f.key ? 'linear-gradient(135deg,#6366f1,#4f46e5)' : 'rgba(255,255,255,0.05)',
-              color:      orderFilter===f.key ? '#fff' : 'rgba(100,118,142,0.9)',
+              background: orderFilter===f.key ? 'linear-gradient(135deg,#6366f1,#4f46e5)' : 'rgba(11,27,51,0.05)',
+              color:      orderFilter===f.key ? '#fff' : '#5B6B82',
               boxShadow:  orderFilter===f.key ? '0 2px 8px rgba(99,102,241,0.25)' : 'none' }">
             {{ f.label }}
           </button>
@@ -77,40 +77,40 @@
 
       <!-- Skeleton pedidos -->
       <div v-if="loadingOrders" style="display:flex;flex-direction:column;gap:3px;">
-        <div v-for="i in 5" :key="i" class="pulse" style="border-radius:12px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);height:72px;" />
+        <div v-for="i in 5" :key="i" class="pulse" style="border-radius:12px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);height:72px;" />
       </div>
 
       <!-- Tabla pedidos -->
-      <div v-else-if="filteredOrders.length>0" style="border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
-        <div style="display:grid;grid-template-columns:0.8fr 1.6fr 0.7fr 0.8fr 0.9fr 120px;gap:0;padding:10px 18px;border-bottom:1px solid rgba(255,255,255,0.07);">
+      <div v-else-if="filteredOrders.length>0" style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);overflow:hidden;">
+        <div style="display:grid;grid-template-columns:0.8fr 1.6fr 0.7fr 0.8fr 0.9fr 120px;gap:0;padding:10px 18px;border-bottom:1px solid rgba(11,27,51,0.07);">
           <span v-for="h in ['Pedido','Cliente','Artículos','Total','Estado fiscal','Acción']" :key="h"
-            style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);text-transform:uppercase;letter-spacing:0.8px;">{{ h }}</span>
+            style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;">{{ h }}</span>
         </div>
 
         <div v-for="(o, idx) in filteredOrders" :key="o.id"
-          :style="{ display:'grid', gridTemplateColumns:'0.8fr 1.6fr 0.7fr 0.8fr 0.9fr 120px', gap:0, padding:'12px 18px', borderBottom: idx<filteredOrders.length-1?'1px solid rgba(255,255,255,0.05)':'none', alignItems:'center' }">
+          :style="{ display:'grid', gridTemplateColumns:'0.8fr 1.6fr 0.7fr 0.8fr 0.9fr 120px', gap:0, padding:'12px 18px', borderBottom: idx<filteredOrders.length-1?'1px solid rgba(11,27,51,0.05)':'none', alignItems:'center' }">
 
           <!-- Pedido -->
           <div>
-            <div style="font-size:12px;font-weight:600;color:#E2EAF4;font-family:monospace;">{{ o.id.slice(-6).toUpperCase() }}</div>
-            <div style="font-size:10px;color:rgba(100,118,142,0.5);margin-top:2px;">{{ fmtDate(o.createdAt) }}</div>
+            <div style="font-size:12px;font-weight:600;color:#0B1B33;font-family:monospace;">{{ o.id.slice(-6).toUpperCase() }}</div>
+            <div style="font-size:10px;color:#7A889C;margin-top:2px;">{{ fmtDate(o.createdAt) }}</div>
           </div>
 
           <!-- Cliente -->
           <div style="min-width:0;">
-            <div style="font-size:12px;font-weight:600;color:#E2EAF4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ o.userName }}</div>
-            <div style="font-size:10px;font-weight:600;color:#7DD3FC;font-family:monospace;margin-top:2px;">{{ formatClientNumber(o.clientNumber) || '—' }} · {{ o.userFiscalRfc ?? 'Sin RFC' }}</div>
+            <div style="font-size:12px;font-weight:600;color:#0B1B33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ o.userName }}</div>
+            <div style="font-size:10px;font-weight:600;color:#0B5BD3;font-family:monospace;margin-top:2px;">{{ formatClientNumber(o.clientNumber) || '—' }} · {{ o.userFiscalRfc ?? 'Sin RFC' }}</div>
           </div>
 
           <!-- Artículos -->
           <div>
-            <div style="font-size:12px;font-weight:600;color:#E2EAF4;">{{ (o.items as OrderItem[]).length }} art.</div>
+            <div style="font-size:12px;font-weight:600;color:#0B1B33;">{{ (o.items as OrderItem[]).length }} art.</div>
           </div>
 
           <!-- Total -->
           <div>
-            <div style="font-size:12px;font-weight:700;color:#a5b4fc;">{{ fmtMXN(o.total) }}</div>
-            <div style="font-size:9px;color:rgba(100,118,142,0.5);">IVA incl.</div>
+            <div style="font-size:12px;font-weight:700;color:#4F46E5;">{{ fmtMXN(o.total) }}</div>
+            <div style="font-size:9px;color:#7A889C;">IVA incl.</div>
           </div>
 
           <!-- Estado fiscal -->
@@ -140,13 +140,13 @@
               {{ syncing===o.userId ? 'Sincronizando…' : 'Sincronizar' }}
             </button>
             <!-- Bloqueado sin datos -->
-            <div v-else style="font-size:10px;color:rgba(100,118,142,0.35);line-height:1.3;">{{ billBlockReason(o) }}</div>
+            <div v-else style="font-size:10px;color:rgba(91,107,130,0.35);line-height:1.3;">{{ billBlockReason(o) }}</div>
           </div>
 
         </div>
       </div>
 
-      <div v-else-if="!loadingOrders" style="display:flex;align-items:center;justify-content:center;padding:50px;border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);font-size:13px;color:#94a3b8;">
+      <div v-else-if="!loadingOrders" style="display:flex;align-items:center;justify-content:center;padding:50px;border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);font-size:13px;color:#5B6B82;">
         No se encontraron pedidos
       </div>
 
@@ -159,65 +159,65 @@
 
       <!-- KPIs CFDIs -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
-        <div v-for="k in cfdiKpis" :key="k.label" style="border-radius:14px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);padding:16px 18px;">
+        <div v-for="k in cfdiKpis" :key="k.label" style="border-radius:14px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:16px 18px;">
           <div :style="{ fontSize:'24px', fontWeight:800, background:k.grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', lineHeight:1 }">
             {{ loadingCfdis ? '—' : k.value }}
           </div>
-          <div style="font-size:11px;color:rgba(100,118,142,0.8);margin-top:4px;font-weight:500;">{{ k.label }}</div>
+          <div style="font-size:11px;color:#5B6B82;margin-top:4px;font-weight:500;">{{ k.label }}</div>
         </div>
       </div>
 
       <!-- Búsqueda CFDIs -->
-      <div style="border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);padding:14px 16px;margin-bottom:20px;">
+      <div style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:14px 16px;margin-bottom:20px;">
         <div style="position:relative;max-width:360px;">
-          <Search :size="13" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="cfdiSearchFocus?'#6366f1':'rgba(100,118,142,0.6)'" />
+          <Search :size="13" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="cfdiSearchFocus?'#6366f1':'#7A889C'" />
           <input v-model="cfdiSearch" placeholder="Buscar por folio, RFC o nombre…"
             @focus="cfdiSearchFocus=true" @blur="cfdiSearchFocus=false"
-            :style="{ width:'100%', height:'38px', background: cfdiSearchFocus?'rgba(99,102,241,0.06)':'rgba(255,255,255,0.04)', border:`1px solid ${cfdiSearchFocus?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)'}`, borderRadius:'9px', paddingLeft:'36px', paddingRight:'12px', fontSize:'12px', color:'#E2EAF4', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
+            :style="{ width:'100%', height:'38px', background: cfdiSearchFocus?'rgba(99,102,241,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${cfdiSearchFocus?'rgba(99,102,241,0.4)':'rgba(11,27,51,0.08)'}`, borderRadius:'9px', paddingLeft:'36px', paddingRight:'12px', fontSize:'12px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
         </div>
       </div>
 
       <!-- Skeleton CFDIs -->
       <div v-if="loadingCfdis" style="display:flex;flex-direction:column;gap:3px;">
-        <div v-for="i in 5" :key="i" class="pulse" style="border-radius:12px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);height:64px;" />
+        <div v-for="i in 5" :key="i" class="pulse" style="border-radius:12px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);height:64px;" />
       </div>
 
       <!-- Tabla CFDIs -->
-      <div v-else-if="filteredCfdis.length>0" style="border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
-        <div style="display:grid;grid-template-columns:0.8fr 2fr 1fr 1fr 0.9fr 90px;gap:0;padding:10px 18px;border-bottom:1px solid rgba(255,255,255,0.07);">
+      <div v-else-if="filteredCfdis.length>0" style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);overflow:hidden;">
+        <div style="display:grid;grid-template-columns:0.8fr 2fr 1fr 1fr 0.9fr 90px;gap:0;padding:10px 18px;border-bottom:1px solid rgba(11,27,51,0.07);">
           <span v-for="h in ['Folio','Cliente','Fecha','Total','Estado','']" :key="h"
-            style="font-size:10px;font-weight:600;color:rgba(100,118,142,0.6);text-transform:uppercase;letter-spacing:0.8px;">{{ h }}</span>
+            style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;">{{ h }}</span>
         </div>
         <div v-for="(c, idx) in filteredCfdis" :key="c.UID"
-          :style="{ display:'grid', gridTemplateColumns:'0.8fr 2fr 1fr 1fr 0.9fr 90px', gap:0, padding:'11px 18px', borderBottom: idx<filteredCfdis.length-1?'1px solid rgba(255,255,255,0.05)':'none', alignItems:'center' }">
+          :style="{ display:'grid', gridTemplateColumns:'0.8fr 2fr 1fr 1fr 0.9fr 90px', gap:0, padding:'11px 18px', borderBottom: idx<filteredCfdis.length-1?'1px solid rgba(11,27,51,0.05)':'none', alignItems:'center' }">
 
           <div>
-            <div style="font-size:12px;font-weight:700;color:#E2EAF4;font-family:monospace;">{{ c.Folio ?? '—' }}</div>
-            <div style="font-size:9px;color:rgba(100,118,142,0.45);margin-top:2px;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="c.UUID">{{ c.UUID.slice(0,18) }}…</div>
+            <div style="font-size:12px;font-weight:700;color:#0B1B33;font-family:monospace;">{{ c.Folio ?? '—' }}</div>
+            <div style="font-size:9px;color:rgba(91,107,130,0.45);margin-top:2px;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="c.UUID">{{ c.UUID.slice(0,18) }}…</div>
           </div>
 
           <div style="min-width:0;">
-            <div style="font-size:12px;font-weight:600;color:#E2EAF4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ c.RazonSocialReceptor ?? '—' }}</div>
-            <div style="font-size:10px;font-weight:600;color:#7DD3FC;font-family:monospace;margin-top:2px;">{{ c.Receptor ?? '' }}</div>
+            <div style="font-size:12px;font-weight:600;color:#0B1B33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ c.RazonSocialReceptor ?? '—' }}</div>
+            <div style="font-size:10px;font-weight:600;color:#0B5BD3;font-family:monospace;margin-top:2px;">{{ c.Receptor ?? '' }}</div>
           </div>
 
-          <div style="font-size:11px;color:rgba(123,146,176,0.8);">{{ fmtDate(c.FechaTimbrado) }}</div>
+          <div style="font-size:11px;color:#5B6B82;">{{ fmtDate(c.FechaTimbrado) }}</div>
 
           <div>
-            <div style="font-size:13px;font-weight:700;color:#a5b4fc;">{{ fmtMXN(Number(c.Total??0)) }}</div>
-            <div style="font-size:10px;color:rgba(100,118,142,0.5);">MXN</div>
+            <div style="font-size:13px;font-weight:700;color:#4F46E5;">{{ fmtMXN(Number(c.Total??0)) }}</div>
+            <div style="font-size:10px;color:#7A889C;">MXN</div>
           </div>
 
           <div><span :style="cfdiStatusStyle(c.Status)">{{ cfdiStatusLabel(c.Status) }}</span></div>
 
           <div style="display:flex;gap:6px;justify-content:flex-end;">
             <button @click="download(c.UID,'pdf')" :disabled="downloading===c.UID+'-pdf'" title="PDF"
-              :style="{ width:'32px', height:'32px', borderRadius:'8px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', color:'#f87171', cursor:downloading===c.UID+'-pdf'?'not-allowed':'pointer', display:'flex', alignItems:'center', justifyContent:'center', opacity:downloading===c.UID+'-pdf'?0.5:1 }">
+              :style="{ width:'32px', height:'32px', borderRadius:'8px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', color:'#DC2626', cursor:downloading===c.UID+'-pdf'?'not-allowed':'pointer', display:'flex', alignItems:'center', justifyContent:'center', opacity:downloading===c.UID+'-pdf'?0.5:1 }">
               <svg v-if="downloading===c.UID+'-pdf'" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
               <svg v-else width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </button>
             <button @click="download(c.UID,'xml')" :disabled="downloading===c.UID+'-xml'" title="XML"
-              :style="{ width:'32px', height:'32px', borderRadius:'8px', background:'rgba(34,197,94,0.1)', border:'1px solid rgba(34,197,94,0.2)', color:'#22C55E', cursor:downloading===c.UID+'-xml'?'not-allowed':'pointer', display:'flex', alignItems:'center', justifyContent:'center', opacity:downloading===c.UID+'-xml'?0.5:1 }">
+              :style="{ width:'32px', height:'32px', borderRadius:'8px', background:'rgba(34,197,94,0.1)', border:'1px solid rgba(34,197,94,0.2)', color:'#16A34A', cursor:downloading===c.UID+'-xml'?'not-allowed':'pointer', display:'flex', alignItems:'center', justifyContent:'center', opacity:downloading===c.UID+'-xml'?0.5:1 }">
               <svg v-if="downloading===c.UID+'-xml'" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
               <svg v-else width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
             </button>
@@ -225,24 +225,24 @@
         </div>
       </div>
 
-      <div v-else-if="!loadingCfdis && !cfdiError" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);gap:12px;text-align:center;">
+      <div v-else-if="!loadingCfdis && !cfdiError" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);gap:12px;text-align:center;">
         <div style="width:48px;height:48px;border-radius:14px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);display:flex;align-items:center;justify-content:center;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(99,102,241,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8H8"/><path d="M16 12H8"/><path d="M12 16H8"/></svg>
         </div>
-        <div style="font-size:14px;font-weight:600;color:#94a3b8;">No hay CFDIs serie S emitidos</div>
-        <div style="font-size:12px;color:rgba(100,118,142,0.6);">Ve a la pestaña "Pedidos" para facturar a un cliente</div>
+        <div style="font-size:14px;font-weight:600;color:#5B6B82;">No hay CFDIs serie S emitidos</div>
+        <div style="font-size:12px;color:#7A889C;">Ve a la pestaña "Pedidos" para facturar a un cliente</div>
       </div>
 
       <!-- #18 — Paginación CFDIs -->
       <div v-if="!loadingCfdis && cfdiTotalPages > 1" style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;">
         <button @click="prevCfdiPage" :disabled="cfdiPage===1"
-          style="height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;"
+          style="height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(11,27,51,0.1);background:rgba(11,27,51,0.04);color:#5B6B82;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;"
           :style="{ opacity: cfdiPage===1 ? 0.4 : 1, cursor: cfdiPage===1 ? 'not-allowed' : 'pointer' }">
           ← Anterior
         </button>
-        <span style="font-size:12px;color:rgba(100,118,142,0.7);">Página {{ cfdiPage }} de {{ cfdiTotalPages }}</span>
+        <span style="font-size:12px;color:#7A889C;">Página {{ cfdiPage }} de {{ cfdiTotalPages }}</span>
         <button @click="nextCfdiPage" :disabled="cfdiPage===cfdiTotalPages"
-          style="height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;"
+          style="height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(11,27,51,0.1);background:rgba(11,27,51,0.04);color:#5B6B82;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;"
           :style="{ opacity: cfdiPage===cfdiTotalPages ? 0.4 : 1, cursor: cfdiPage===cfdiTotalPages ? 'not-allowed' : 'pointer' }">
           Siguiente →
         </button>
@@ -251,7 +251,7 @@
     </template>
 
     <!-- Toast error descarga -->
-    <div v-if="downloadError" style="position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:10px;background:#1e0a0f;border:1px solid rgba(239,68,68,0.3);font-size:12px;color:#EF4444;z-index:2000;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+    <div v-if="downloadError" style="position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:10px;background:#FEF2F2;border:1px solid rgba(239,68,68,0.3);font-size:12px;color:#EF4444;z-index:2000;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(11,27,51,0.175);">
       {{ downloadError }}
       <button @click="downloadError=''" style="background:none;border:none;color:#EF4444;cursor:pointer;padding:0;font-size:16px;line-height:1;">×</button>
     </div>
@@ -364,18 +364,18 @@ function billBadgeStyle(o: BillingOrder) {
   const partial = !ready && o.userFiscalCompleted
   return {
     fontSize:'10px', fontWeight:600, padding:'2px 8px', borderRadius:'20px',
-    background: ready   ? 'rgba(34,197,94,0.1)' : partial ? 'rgba(245,158,11,0.1)' : 'rgba(100,118,142,0.08)',
-    color:      ready   ? '#22C55E'              : partial ? '#fbbf24'              : 'rgba(100,118,142,0.5)',
+    background: ready   ? 'rgba(34,197,94,0.1)' : partial ? 'rgba(245,158,11,0.1)' : 'rgba(91,107,130,0.08)',
+    color:      ready   ? '#16A34A'              : partial ? '#B45309'              : '#7A889C',
   }
 }
 
 const listos = computed(() => orders.value.filter(canBill).length)
 
 const orderKpis = computed(() => [
-  { label: 'Total pedidos',         value: orders.value.length,                                                      grad:'linear-gradient(135deg,#0EA5E9,#7DD3FC)' },
+  { label: 'Total pedidos',         value: orders.value.length,                                                      grad:'linear-gradient(135deg,#1570EF,#0B5BD3)' },
   { label: 'Listos para facturar',  value: listos.value,                                                             grad:'linear-gradient(135deg,#6366f1,#F59E0B)' },
-  { label: 'Sin datos fiscales',    value: orders.value.filter(o=>!o.userFiscalCompleted).length,                    grad:'linear-gradient(135deg,#F59E0B,#FCD34D)' },
-  { label: 'Sin sincronizar',       value: orders.value.filter(o=>o.userFiscalCompleted&&!o.userFacturaUid).length,  grad:'linear-gradient(135deg,#F43F5E,#FB7185)' },
+  { label: 'Sin datos fiscales',    value: orders.value.filter(o=>!o.userFiscalCompleted).length,                    grad:'linear-gradient(135deg,#F59E0B,#B45309)' },
+  { label: 'Sin sincronizar',       value: orders.value.filter(o=>o.userFiscalCompleted&&!o.userFacturaUid).length,  grad:'linear-gradient(135deg,#F43F5E,#E11D48)' },
 ])
 
 const filteredOrders = computed(() => {
@@ -470,8 +470,8 @@ const thisMonth = computed(() => {
 
 const cfdiKpis = computed(() => [
   { label:'Total emitidas',  value: cfdis.value.length,         grad:'linear-gradient(135deg,#6366f1,#F59E0B)' },
-  { label:'Total facturado', value: fmtMXN(totalFacturado.value), grad:'linear-gradient(135deg,#0EA5E9,#7DD3FC)' },
-  { label:'Este mes',        value: thisMonth.value,            grad:'linear-gradient(135deg,#22C55E,#22C55E)' },
+  { label:'Total facturado', value: fmtMXN(totalFacturado.value), grad:'linear-gradient(135deg,#1570EF,#0B5BD3)' },
+  { label:'Este mes',        value: thisMonth.value,            grad:'linear-gradient(135deg,#16A34A,#16A34A)' },
 ])
 
 const filteredCfdis = computed(() => {
@@ -491,7 +491,7 @@ function cfdiStatusLabel(s?: string) {
 }
 function cfdiStatusStyle(s?: string) {
   const ok = ['enviada','active','vigente'].includes((s??'').toLowerCase())
-  return { fontSize:'10px', fontWeight:600, padding:'2px 9px', borderRadius:'20px', background:ok?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.1)', color:ok?'#22C55E':'#EF4444' }
+  return { fontSize:'10px', fontWeight:600, padding:'2px 9px', borderRadius:'20px', background:ok?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.1)', color:ok?'#16A34A':'#EF4444' }
 }
 
 /* ── Descarga PDF/XML ── */

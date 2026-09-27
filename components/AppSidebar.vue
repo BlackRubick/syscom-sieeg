@@ -3,8 +3,8 @@
 
     <!-- Logo -->
     <div style="height:60px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;gap:10px;overflow:hidden;">
-      <div style="width:30px;height:30px;border-radius:8px;overflow:hidden;flex-shrink:0;box-shadow:0 0 14px rgba(14,165,233,0.35);">
-        <img src="/logosieeg.jpg" alt="SIEEG" style="width:100%;height:100%;object-fit:cover;" />
+      <div style="width:34px;height:34px;border-radius:9px;overflow:hidden;flex-shrink:0;background:#fff;padding:3px;display:flex;align-items:center;">
+        <img src="/logosieeg.jpg" alt="SIEEG" style="width:100%;height:100%;object-fit:contain;" />
       </div>
       <div v-if="!collapsed || isMobile" style="overflow:hidden;white-space:nowrap;transition:opacity 0.2s;flex:1;">
         <div style="font-size:13px;font-weight:800;color:#E2EAF4;line-height:1;letter-spacing:-0.3px;">SIEEG</div>
@@ -32,11 +32,11 @@
           @mouseleave="e => onHover(e, item.href, false)">
 
           <!-- Indicador activo -->
-          <div v-if="isActive(item.href)" style="position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;border-radius:0 3px 3px 0;background:#0EA5E9;box-shadow:0 0 8px rgba(14,165,233,0.7);" />
+          <div v-if="isActive(item.href)" style="position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;border-radius:0 3px 3px 0;background:#1570EF;box-shadow:0 0 8px rgba(21,112,239,0.7);" />
 
           <!-- Icono SVG inline -->
           <svg :width="15" :height="15" viewBox="0 0 24 24" fill="none"
-            :stroke="isActive(item.href) ? '#7DD3FC' : 'rgba(100,118,142,0.75)'"
+            :stroke="isActive(item.href) ? '#7CB6FF' : 'rgba(100,118,142,0.75)'"
             :stroke-width="isActive(item.href) ? 2.2 : 1.8"
             stroke-linecap="round" stroke-linejoin="round"
             style="flex-shrink:0;" v-html="item.svg" />
@@ -56,7 +56,7 @@
 
     <!-- Botón colapsar (solo desktop) -->
     <button v-if="!isMobile" @click="ui.toggleSidebar()"
-      style="position:absolute;right:-11px;top:72px;width:22px;height:22px;border-radius:50%;background:#0C1A2E;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:30;box-shadow:0 2px 8px rgba(0,0,0,0.4);padding:0;">
+      style="position:absolute;right:-11px;top:72px;width:22px;height:22px;border-radius:50%;background:#13294B;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:30;box-shadow:0 2px 8px rgba(0,0,0,0.4);padding:0;">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(123,146,176,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path v-if="!collapsed" d="m15 18-6-6 6-6"/>
         <path v-else            d="m9 18 6-6-6-6"/>
@@ -129,7 +129,7 @@ const sidebarStyle = computed(() => {
       width:      '260px',
       display:    'flex',
       flexDirection: 'column',
-      background: 'rgba(3,9,20,0.99)',
+      background: '#0B1B33',
       borderRight: '1px solid rgba(255,255,255,0.07)',
       zIndex:     '200',
       overflow:   'visible',
@@ -144,7 +144,7 @@ const sidebarStyle = computed(() => {
     height:      '100%',
     display:     'flex',
     flexDirection: 'column',
-    background:  'rgba(3,9,20,0.98)',
+    background:  '#0B1B33',
     borderRight: '1px solid rgba(255,255,255,0.07)',
     position:    'relative',
     zIndex:      '20',
@@ -169,8 +169,8 @@ function linkStyle(href: string) {
     borderRadius: '9px',
     position: 'relative',
     cursor: 'pointer',
-    background: active ? 'rgba(14,165,233,0.10)' : 'transparent',
-    border: `1px solid ${active ? 'rgba(14,165,233,0.18)' : 'transparent'}`,
+    background: active ? 'rgba(21,112,239,0.1)' : 'transparent',
+    border: `1px solid ${active ? 'rgba(21,112,239,0.18)' : 'transparent'}`,
     transition: 'background 0.15s, border-color 0.15s',
     overflow: 'hidden',
   }
@@ -187,7 +187,7 @@ const badgeStyle = computed(() => ({
   top:        (!collapsed.value || isMobile.value) ? undefined : '3px',
   right:      (!collapsed.value || isMobile.value) ? undefined : '3px',
   minWidth:   '17px', height: '17px', borderRadius: '9px',
-  background: '#0EA5E9', display: 'flex', alignItems: 'center',
+  background: '#1570EF', display: 'flex', alignItems: 'center',
   justifyContent: 'center', fontSize: '9px', fontWeight: 700,
   color: 'white', padding: '0 4px', flexShrink: 0,
 }))

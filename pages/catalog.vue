@@ -14,7 +14,7 @@
           </p>
         </div>
         <div v-if="hasFilter" class="cat-results-chip">
-          <Loader2 v-if="loading" :size="11" color="#7DD3FC" class="spin" />
+          <Loader2 v-if="loading" :size="11" color="#0B5BD3" class="spin" />
           <div v-else class="cat-results-dot" />
           <span>{{ loading ? 'Buscando…' : `${cantidad.toLocaleString('es-MX')} resultados` }}</span>
         </div>
@@ -33,7 +33,7 @@
 
         <!-- Buscador -->
         <div style="position:relative;">
-          <svg class="search-icon" :style="{color:searchFocused?'#0EA5E9':'rgba(100,118,142,0.55)'}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <svg class="search-icon" :style="{color:searchFocused?'#1570EF':'#7A889C'}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input
             v-model="search"
             placeholder="Buscar por nombre, modelo, marca o SKU…"
@@ -50,11 +50,11 @@
 
           <!-- Sort -->
           <div style="position:relative;display:flex;align-items:center;flex-shrink:0;">
-            <svg style="position:absolute;left:11px;pointer-events:none;color:rgba(100,118,142,0.6);" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="9" y2="18"/></svg>
+            <svg style="position:absolute;left:11px;pointer-events:none;color:#7A889C;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="9" y2="18"/></svg>
             <select v-model="sortBy" @change="pagina=1" class="filter-select">
-              <option v-for="o in SORT_OPTIONS" :key="o.value" :value="o.value" style="background:#0C1A2E;">{{ o.label }}</option>
+              <option v-for="o in SORT_OPTIONS" :key="o.value" :value="o.value" style="background:#FFFFFF;">{{ o.label }}</option>
             </select>
-            <ChevronDown :size="12" color="rgba(100,118,142,0.65)" style="position:absolute;right:9px;pointer-events:none;" />
+            <ChevronDown :size="12" color="#7A889C" style="position:absolute;right:9px;pointer-events:none;" />
           </div>
 
           <!-- Marca -->
@@ -67,7 +67,7 @@
                 </span>
               </div>
               <span v-if="activeBrandId" @click.stop="clearBrand()" class="filter-btn-x">×</span>
-              <ChevronDown v-else :size="12" color="rgba(100,118,142,0.65)" />
+              <ChevronDown v-else :size="12" color="#7A889C" />
             </button>
             <Transition name="dropdown">
               <div v-if="brandDropOpen" class="brand-dropdown">
@@ -75,7 +75,7 @@
                   <input v-model="brandSearch" autofocus placeholder="Buscar marca…" class="brand-search" />
                 </div>
                 <div style="max-height:220px;overflow-y:auto;padding-bottom:6px;">
-                  <div v-if="loadingBrands" style="padding:16px;text-align:center;font-size:12px;color:rgba(100,118,142,0.7);">Cargando marcas…</div>
+                  <div v-if="loadingBrands" style="padding:16px;text-align:center;font-size:12px;color:#7A889C;">Cargando marcas…</div>
                   <button v-else v-for="b in filteredBrands" :key="b.id" @click="selectBrand(b.id)"
                     class="brand-option" :class="{ selected: activeBrandId===b.id }">
                     {{ b.nombre }}
@@ -96,7 +96,7 @@
                 </span>
               </div>
               <span v-if="activeCategoryId" @click.stop="selectCategory(null)" class="filter-btn-x">×</span>
-              <ChevronDown v-else :size="12" color="rgba(100,118,142,0.65)" :style="{ transition:'transform 0.2s', transform: catPanelOpen ? 'rotate(180deg)' : 'rotate(0)' }" />
+              <ChevronDown v-else :size="12" color="#7A889C" :style="{ transition:'transform 0.2s', transform: catPanelOpen ? 'rotate(180deg)' : 'rotate(0)' }" />
             </button>
 
             <!-- Panel desktop (dropdown) -->
@@ -111,7 +111,7 @@
                 <!-- Buscador interno -->
                 <div style="padding:0 12px 10px;">
                   <div style="position:relative;">
-                    <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:rgba(100,118,142,0.5);" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:#7A889C;" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                     <input v-model="catSearch" placeholder="Buscar categoría…" class="cat-drop-search" />
                   </div>
                 </div>
@@ -141,7 +141,7 @@
                     <span>{{ cat.nombre }}</span>
                     <span v-if="activeCategoryId===cat.id" class="cat-drop-check">✓</span>
                   </button>
-                  <div v-if="!loadingCats && filteredCats.length===0" style="grid-column:1/-1;padding:20px;text-align:center;font-size:12px;color:rgba(100,118,142,0.6);">
+                  <div v-if="!loadingCats && filteredCats.length===0" style="grid-column:1/-1;padding:20px;text-align:center;font-size:12px;color:#7A889C;">
                     Sin resultados
                   </div>
                 </div>
@@ -166,28 +166,28 @@
 
     <!-- ══ BOTTOM SHEET mobile ══ -->
     <Transition name="sheet-bg">
-      <div v-if="catPanelOpen && isMobile" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;backdrop-filter:blur(3px);" @click="catPanelOpen=false" />
+      <div v-if="catPanelOpen && isMobile" style="position:fixed;inset:0;background:rgba(11,27,51,0.45);z-index:200;backdrop-filter:blur(3px);" @click="catPanelOpen=false" />
     </Transition>
     <Transition name="sheet-up">
       <div v-if="catPanelOpen && isMobile" class="cat-sheet">
         <!-- Handle -->
         <div style="display:flex;justify-content:center;padding:10px 0 4px;">
-          <div style="width:36px;height:4px;border-radius:99px;background:rgba(255,255,255,0.15);" />
+          <div style="width:36px;height:4px;border-radius:99px;background:rgba(11,27,51,0.15);" />
         </div>
 
         <!-- Header -->
         <div class="cat-drop-head" style="padding:8px 18px 12px;">
           <span class="cat-drop-title">Categorías</span>
           <span class="cat-drop-count">{{ categories.length }}</span>
-          <button @click="catPanelOpen=false" style="margin-left:auto;width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.06);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(123,146,176,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <button @click="catPanelOpen=false" style="margin-left:auto;width:28px;height:28px;border-radius:8px;background:rgba(11,27,51,0.06);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5B6B82" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
 
         <!-- Buscador -->
         <div style="padding:0 16px 12px;">
           <div style="position:relative;">
-            <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:rgba(100,118,142,0.5);" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:#7A889C;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input v-model="catSearch" placeholder="Buscar categoría…" class="cat-drop-search" style="height:40px;font-size:13px;" />
           </div>
         </div>
@@ -215,9 +215,9 @@
           >
             <span class="cat-drop-item-dot" :class="{ active: activeCategoryId===cat.id }" />
             <span style="flex:1;text-align:left;">{{ cat.nombre }}</span>
-            <span v-if="activeCategoryId===cat.id" style="font-size:13px;color:#7DD3FC;">✓</span>
+            <span v-if="activeCategoryId===cat.id" style="font-size:13px;color:#0B5BD3;">✓</span>
           </button>
-          <div v-if="!loadingCats && filteredCats.length===0" style="padding:24px;text-align:center;font-size:13px;color:rgba(100,118,142,0.6);">
+          <div v-if="!loadingCats && filteredCats.length===0" style="padding:24px;text-align:center;font-size:13px;color:#7A889C;">
             Sin resultados
           </div>
         </div>
@@ -233,7 +233,7 @@
     <!-- Cargando categorías -->
     <div v-if="loadingCats" class="state-box">
       <div class="state-icon">
-        <Loader2 :size="24" color="#7DD3FC" :stroke-width="1.8" class="spin" />
+        <Loader2 :size="24" color="#0B5BD3" :stroke-width="1.8" class="spin" />
       </div>
       <div class="state-title">Cargando catálogo…</div>
       <div class="state-sub">Conectando con el catálogo SIEEG</div>
@@ -242,7 +242,7 @@
     <!-- Estado inicial (sin filtro) -->
     <div v-else-if="!hasFilter && !loading" class="state-box">
       <div class="state-icon">
-        <Search :size="26" color="#7DD3FC" :stroke-width="1.6" />
+        <Search :size="26" color="#0B5BD3" :stroke-width="1.6" />
       </div>
       <div class="state-title">Busca o elige una categoría</div>
       <div class="state-sub">Escribe en el buscador o selecciona una categoría para ver los productos disponibles.</div>
@@ -286,7 +286,7 @@
               @error="(e) => (e.currentTarget as HTMLImageElement).style.display='none'"
             />
             <div v-else class="product-img-placeholder">
-              <Package :size="28" color="#7DD3FC" :stroke-width="1.6" />
+              <Package :size="28" color="#0B5BD3" :stroke-width="1.6" />
             </div>
 
             <div class="product-hover-overlay" :class="{ visible: hoveredId===product.id }">
@@ -354,8 +354,8 @@
 
     <!-- Sin resultados -->
     <div v-else-if="hasFilter && !loading" class="state-box">
-      <div class="state-icon" style="background:rgba(100,118,142,0.06);border-color:rgba(100,118,142,0.15);">
-        <Search :size="22" color="rgba(100,118,142,0.45)" />
+      <div class="state-icon" style="background:rgba(91,107,130,0.06);border-color:rgba(91,107,130,0.15);">
+        <Search :size="22" color="rgba(91,107,130,0.45)" />
       </div>
       <div class="state-title">Sin resultados</div>
       <div class="state-sub" style="margin-bottom:20px;">Prueba con otra búsqueda o categoría</div>
@@ -492,94 +492,94 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 /* ── Header ── */
 .cat-header { display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px; }
 .cat-header-left { display:flex;align-items:center;gap:14px;flex-wrap:wrap; }
-.cat-title { font-size:24px;font-weight:900;color:#E2EAF4;margin:0;letter-spacing:-0.5px; }
-.cat-badge { font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:linear-gradient(135deg,#0EA5E9,#7DD3FC);color:white;letter-spacing:0.5px; }
-.cat-subtitle { font-size:12px;color:rgba(100,118,142,0.75);margin:4px 0 0; }
-.cat-results-chip { display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.25);font-size:12px;font-weight:700;color:#7DD3FC; }
-.cat-results-dot { width:6px;height:6px;border-radius:50%;background:#0EA5E9; }
+.cat-title { font-size:24px;font-weight:900;color:#0B1B33;margin:0;letter-spacing:-0.5px; }
+.cat-badge { font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;letter-spacing:0.5px; }
+.cat-subtitle { font-size:12px;color:#5B6B82;margin:4px 0 0; }
+.cat-results-chip { display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;background:rgba(21,112,239,0.1);border:1px solid rgba(21,112,239,0.25);font-size:12px;font-weight:700;color:#0B5BD3; }
+.cat-results-dot { width:6px;height:6px;border-radius:50%;background:#1570EF; }
 
 /* ── Filter panel ── */
-.filter-panel { border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.08);overflow:visible; }
-.filter-accent-bar { height:3px;background:linear-gradient(90deg,#0EA5E9,#7DD3FC,#F59E0B);border-radius:16px 16px 0 0; }
+.filter-panel { border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.08);overflow:visible; }
+.filter-accent-bar { height:3px;background:linear-gradient(90deg,#1570EF,#0B5BD3,#F59E0B);border-radius:16px 16px 0 0; }
 .filter-body { padding:18px;display:flex;flex-direction:column;gap:14px; }
 
 /* ── Search ── */
 .search-icon { position:absolute;left:17px;top:50%;transform:translateY(-50%);pointer-events:none;transition:color 0.2s; }
 .search-input {
   width:100%;height:52px;
-  background:rgba(255,255,255,0.04);
-  border:1.5px solid rgba(255,255,255,0.1);
+  background:rgba(11,27,51,0.04);
+  border:1.5px solid rgba(11,27,51,0.1);
   border-radius:13px;padding-left:50px;padding-right:46px;
-  font-size:14px;color:#E2EAF4;outline:none;font-family:inherit;
+  font-size:14px;color:#0B1B33;outline:none;font-family:inherit;
   box-sizing:border-box;transition:all 0.2s;
 }
-.search-input.focused { background:rgba(14,165,233,0.06);border-color:#0EA5E9;box-shadow:0 0 0 4px rgba(14,165,233,0.08); }
-.search-input::placeholder { color:rgba(100,118,142,0.55); }
-.search-clear { position:absolute;right:13px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.08);border:none;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#94a3b8;font-size:15px;transition:background 0.15s; }
-.search-clear:hover { background:rgba(255,255,255,0.16); }
+.search-input.focused { background:rgba(21,112,239,0.06);border-color:#1570EF;box-shadow:0 0 0 4px rgba(21,112,239,0.08); }
+.search-input::placeholder { color:#7A889C; }
+.search-clear { position:absolute;right:13px;top:50%;transform:translateY(-50%);background:rgba(11,27,51,0.08);border:none;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5B6B82;font-size:15px;transition:background 0.15s; }
+.search-clear:hover { background:rgba(11,27,51,0.16); }
 
 /* ── Controls row ── */
 .filter-controls { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
 .filter-select {
   height:38px;padding-left:30px;padding-right:28px;
-  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.11);
-  border-radius:10px;font-size:12.5px;color:#7B92B0;
+  background:rgba(11,27,51,0.05);border:1px solid rgba(11,27,51,0.11);
+  border-radius:10px;font-size:12.5px;color:#5B6B82;
   outline:none;appearance:none;cursor:pointer;font-family:inherit;min-width:152px;transition:border-color 0.15s;
 }
-.filter-select:focus { border-color:rgba(14,165,233,0.4); }
+.filter-select:focus { border-color:rgba(21,112,239,0.4); }
 .filter-btn {
   height:38px;padding:0 11px;border-radius:10px;
-  border:1px solid rgba(255,255,255,0.11);
-  background:rgba(255,255,255,0.04);
-  color:#7B92B0;font-size:12.5px;font-weight:400;
+  border:1px solid rgba(11,27,51,0.11);
+  background:rgba(11,27,51,0.04);
+  color:#5B6B82;font-size:12.5px;font-weight:400;
   cursor:pointer;font-family:inherit;
   display:flex;align-items:center;gap:7px;
   min-width:135px;justify-content:space-between;transition:all 0.15s;
 }
-.filter-btn.active { border-color:rgba(14,165,233,0.4);background:rgba(14,165,233,0.1);color:#7DD3FC;font-weight:600; }
+.filter-btn.active { border-color:rgba(21,112,239,0.4);background:rgba(21,112,239,0.1);color:#0B5BD3;font-weight:600; }
 .filter-btn.cat-btn { min-width:155px; }
 .filter-btn-x { font-size:16px;line-height:1;cursor:pointer;opacity:0.65;margin-left:2px; }
-.brand-dropdown { position:absolute;left:0;top:44px;width:248px;background:#0C1A2E;border:1px solid rgba(255,255,255,0.1);border-radius:13px;overflow:hidden;z-index:50;box-shadow:0 16px 40px rgba(0,0,0,0.6); }
-.brand-search { width:100%;height:34px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0 10px;font-size:12px;color:#E2EAF4;outline:none;font-family:inherit;box-sizing:border-box; }
-.brand-option { display:block;width:100%;padding:7px 14px;font-size:12px;color:#7B92B0;background:transparent;border:none;cursor:pointer;font-family:inherit;text-align:left;transition:background 0.1s; }
-.brand-option:hover { background:rgba(255,255,255,0.04); }
-.brand-option.selected { color:#7DD3FC;background:rgba(14,165,233,0.1);font-weight:600; }
+.brand-dropdown { position:absolute;left:0;top:44px;width:248px;background:#FFFFFF;border:1px solid rgba(11,27,51,0.1);border-radius:13px;overflow:hidden;z-index:50;box-shadow:0 16px 40px rgba(11,27,51,0.16); }
+.brand-search { width:100%;height:34px;background:rgba(11,27,51,0.05);border:1px solid rgba(11,27,51,0.1);border-radius:8px;padding:0 10px;font-size:12px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box; }
+.brand-option { display:block;width:100%;padding:7px 14px;font-size:12px;color:#5B6B82;background:transparent;border:none;cursor:pointer;font-family:inherit;text-align:left;transition:background 0.1s; }
+.brand-option:hover { background:rgba(11,27,51,0.04); }
+.brand-option.selected { color:#0B5BD3;background:rgba(21,112,239,0.1);font-weight:600; }
 
 /* ── Category dropdown panel (desktop) ── */
 .cat-dropdown {
   position:absolute;left:0;top:46px;
   width:480px;max-width:calc(100vw - 32px);
-  background:linear-gradient(160deg,#0C1A2E,#06101E);
-  border:1px solid rgba(255,255,255,0.1);
+  background:linear-gradient(160deg,#FFFFFF,#F5F8FC);
+  border:1px solid rgba(11,27,51,0.1);
   border-radius:16px;overflow:hidden;
-  z-index:50;box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(14,165,233,0.06);
+  z-index:50;box-shadow:0 20px 60px rgba(11,27,51,0.16), 0 0 0 1px rgba(21,112,239,0.06);
 }
 .cat-drop-head {
   display:flex;align-items:center;gap:8px;
   padding:14px 14px 10px;
-  border-bottom:1px solid rgba(255,255,255,0.07);
+  border-bottom:1px solid rgba(11,27,51,0.07);
 }
-.cat-drop-title { font-size:13px;font-weight:700;color:#E2EAF4; }
-.cat-drop-count { font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.2);color:#7DD3FC; }
+.cat-drop-title { font-size:13px;font-weight:700;color:#0B1B33; }
+.cat-drop-count { font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(21,112,239,0.12);border:1px solid rgba(21,112,239,0.2);color:#0B5BD3; }
 .cat-drop-search {
   width:100%;height:32px;padding-left:30px;padding-right:10px;
-  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);
-  border-radius:8px;font-size:12px;color:#E2EAF4;outline:none;font-family:inherit;
+  background:rgba(11,27,51,0.05);border:1px solid rgba(11,27,51,0.09);
+  border-radius:8px;font-size:12px;color:#0B1B33;outline:none;font-family:inherit;
   box-sizing:border-box;transition:border-color 0.15s;
 }
-.cat-drop-search:focus { border-color:rgba(14,165,233,0.4); }
-.cat-drop-search::placeholder { color:rgba(100,118,142,0.5); }
+.cat-drop-search:focus { border-color:rgba(21,112,239,0.4); }
+.cat-drop-search::placeholder { color:#7A889C; }
 .cat-drop-all {
   width:100%;display:flex;align-items:center;gap:8px;
   height:36px;padding:0 12px;border-radius:9px;
-  font-size:12.5px;font-weight:500;color:rgba(100,118,142,0.8);
-  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+  font-size:12.5px;font-weight:500;color:#5B6B82;
+  background:rgba(11,27,51,0.03);border:1px solid rgba(11,27,51,0.07);
   cursor:pointer;font-family:inherit;transition:all 0.15s;
 }
-.cat-drop-all:hover { background:rgba(255,255,255,0.06);color:#7B92B0; }
-.cat-drop-all.active { background:rgba(14,165,233,0.12);border-color:rgba(14,165,233,0.3);color:#7DD3FC;font-weight:600; }
-.cat-drop-check { margin-left:auto;font-size:12px;color:#7DD3FC;font-weight:700; }
-.cat-drop-divider { height:1px;background:rgba(255,255,255,0.07);margin:2px 0; }
+.cat-drop-all:hover { background:rgba(11,27,51,0.06);color:#5B6B82; }
+.cat-drop-all.active { background:rgba(21,112,239,0.12);border-color:rgba(21,112,239,0.3);color:#0B5BD3;font-weight:600; }
+.cat-drop-check { margin-left:auto;font-size:12px;color:#0B5BD3;font-weight:700; }
+.cat-drop-divider { height:1px;background:rgba(11,27,51,0.07);margin:2px 0; }
 .cat-drop-grid {
   display:grid;grid-template-columns:1fr 1fr;
   gap:3px;padding:10px 12px 12px;
@@ -588,25 +588,25 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 .cat-drop-item {
   display:flex;align-items:center;gap:8px;
   height:34px;padding:0 10px;border-radius:8px;
-  font-size:12px;font-weight:400;color:rgba(100,118,142,0.8);
+  font-size:12px;font-weight:400;color:#5B6B82;
   background:transparent;border:1px solid transparent;
   cursor:pointer;font-family:inherit;text-align:left;transition:all 0.12s;
   overflow:hidden;
 }
-.cat-drop-item:hover { background:rgba(255,255,255,0.05);color:#7B92B0; }
-.cat-drop-item.active { background:rgba(14,165,233,0.1);border-color:rgba(14,165,233,0.25);color:#7DD3FC;font-weight:600; }
+.cat-drop-item:hover { background:rgba(11,27,51,0.05);color:#5B6B82; }
+.cat-drop-item.active { background:rgba(21,112,239,0.1);border-color:rgba(21,112,239,0.25);color:#0B5BD3;font-weight:600; }
 .cat-drop-item span:nth-child(2) { overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1; }
-.cat-drop-item-dot { width:5px;height:5px;border-radius:50%;background:rgba(100,118,142,0.35);flex-shrink:0;transition:background 0.15s; }
-.cat-drop-item-dot.active { background:#0EA5E9;box-shadow:0 0 6px rgba(14,165,233,0.6); }
+.cat-drop-item-dot { width:5px;height:5px;border-radius:50%;background:rgba(91,107,130,0.35);flex-shrink:0;transition:background 0.15s; }
+.cat-drop-item-dot.active { background:#1570EF;box-shadow:0 0 6px rgba(21,112,239,0.6); }
 
 /* ── Bottom sheet (mobile) ── */
 .cat-sheet {
   position:fixed;bottom:0;left:0;right:0;
-  background:linear-gradient(180deg,#0C1A2E,#081020);
-  border-top:1px solid rgba(255,255,255,0.1);
+  background:linear-gradient(180deg,#FFFFFF,#FFFFFF);
+  border-top:1px solid rgba(11,27,51,0.1);
   border-radius:20px 20px 0 0;
   z-index:201;
-  box-shadow:0 -20px 60px rgba(0,0,0,0.6);
+  box-shadow:0 -20px 60px rgba(11,27,51,0.16);
   max-height:82vh;
   display:flex;flex-direction:column;
 }
@@ -618,83 +618,83 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 .cat-sheet-item {
   display:flex;align-items:center;gap:10px;
   height:44px;padding:0 12px;border-radius:10px;
-  font-size:13px;font-weight:400;color:rgba(100,118,142,0.85);
+  font-size:13px;font-weight:400;color:#5B6B82;
   background:transparent;border:1px solid transparent;
   cursor:pointer;font-family:inherit;transition:all 0.12s;
 }
-.cat-sheet-item:hover { background:rgba(255,255,255,0.04); }
-.cat-sheet-item.active { background:rgba(14,165,233,0.1);border-color:rgba(14,165,233,0.22);color:#7DD3FC;font-weight:600; }
+.cat-sheet-item:hover { background:rgba(11,27,51,0.04); }
+.cat-sheet-item.active { background:rgba(21,112,239,0.1);border-color:rgba(21,112,239,0.22);color:#0B5BD3;font-weight:600; }
 
 /* ── Active chips ── */
 .active-chips { display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:auto; }
-.chip { display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.25);font-size:11px;font-weight:600;color:#7DD3FC;max-width:190px; }
-.chip-x { background:none;border:none;cursor:pointer;color:rgba(56,189,248,0.55);font-size:14px;padding:0 0 0 1px;line-height:1;transition:color 0.15s; }
+.chip { display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;background:rgba(21,112,239,0.1);border:1px solid rgba(21,112,239,0.25);font-size:11px;font-weight:600;color:#0B5BD3;max-width:190px; }
+.chip-x { background:none;border:none;cursor:pointer;color:rgba(21,112,239,0.55);font-size:14px;padding:0 0 0 1px;line-height:1;transition:color 0.15s; }
 .chip-x:hover { color:#EF4444; }
 
 /* ── Errors / states ── */
 .error-bar { padding:12px 15px;border-radius:12px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.22);color:#EF4444;font-size:13px;display:flex;align-items:center;gap:10px; }
-.state-box { display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);text-align:center; }
-.state-icon { width:64px;height:64px;border-radius:18px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.18);display:flex;align-items:center;justify-content:center;margin-bottom:18px; }
-.state-title { font-size:17px;font-weight:700;color:#94a3b8;margin-bottom:8px; }
-.state-sub { font-size:13px;color:rgba(100,118,142,0.9);max-width:320px;line-height:1.6; }
+.state-box { display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);text-align:center; }
+.state-icon { width:64px;height:64px;border-radius:18px;background:rgba(21,112,239,0.08);border:1px solid rgba(21,112,239,0.18);display:flex;align-items:center;justify-content:center;margin-bottom:18px; }
+.state-title { font-size:17px;font-weight:700;color:#5B6B82;margin-bottom:8px; }
+.state-sub { font-size:13px;color:#5B6B82;max-width:320px;line-height:1.6; }
 
 /* ── Product grid ── */
 .products-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:16px; }
 
 /* ── Skeleton ── */
-.product-card-skeleton { border-radius:16px;background:linear-gradient(160deg,#0C1A2E,#06101E);border:1px solid rgba(255,255,255,0.07);overflow:hidden; }
+.product-card-skeleton { border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);overflow:hidden; }
 
 /* ── Product card ── */
 .product-card {
   border-radius:16px;
-  background:linear-gradient(160deg,#122238,#080F20);
-  border:1px solid rgba(255,255,255,0.07);
+  background:linear-gradient(160deg,#FFFFFF,#FFFFFF);
+  border:1px solid rgba(11,27,51,0.07);
   overflow:hidden;cursor:pointer;
   transition:border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-  box-shadow:0 2px 12px rgba(0,0,0,0.3);
+  box-shadow:0 2px 12px rgba(11,27,51,0.105);
   display:flex;flex-direction:column;
 }
 .product-card:hover {
-  border-color:rgba(14,165,233,0.35);
-  box-shadow:0 12px 36px rgba(0,0,0,0.55), 0 0 0 1px rgba(14,165,233,0.1);
+  border-color:rgba(21,112,239,0.35);
+  box-shadow:0 12px 36px rgba(11,27,51,0.16), 0 0 0 1px rgba(21,112,239,0.1);
   transform:translateY(-4px);
 }
 
 /* ── Product image ── */
-.product-img-wrap { position:relative;height:180px;background:rgba(255,255,255,0.025);display:flex;align-items:center;justify-content:center;overflow:hidden; }
+.product-img-wrap { position:relative;height:180px;background:rgba(11,27,51,0.025);display:flex;align-items:center;justify-content:center;overflow:hidden; }
 .product-img { width:100%;height:100%;object-fit:contain;padding:14px;transition:transform 0.3s; }
 .product-img.zoomed { transform:scale(1.06); }
-.product-img-placeholder { width:64px;height:64px;border-radius:16px;background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.18);display:flex;align-items:center;justify-content:center; }
+.product-img-placeholder { width:64px;height:64px;border-radius:16px;background:rgba(21,112,239,0.07);border:1px solid rgba(21,112,239,0.18);display:flex;align-items:center;justify-content:center; }
 .product-hover-overlay {
   position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(8,15,32,0.72) 0%,rgba(8,15,32,0.1) 60%);
+  background:linear-gradient(to top,rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.9) 60%);
   display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px;
   opacity:0;transition:opacity 0.2s;pointer-events:none;
 }
 .product-hover-overlay.visible { opacity:1; }
-.product-detail-hint { display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.9);background:rgba(14,165,233,0.25);backdrop-filter:blur(6px);padding:5px 14px;border-radius:20px;border:1px solid rgba(14,165,233,0.3); }
+.product-detail-hint { display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.9);background:rgba(21,112,239,0.25);backdrop-filter:blur(6px);padding:5px 14px;border-radius:20px;border:1px solid rgba(21,112,239,0.3); }
 
 /* ── Badges ── */
-.badge-featured { font-size:9px;font-weight:700;padding:3px 7px;border-radius:5px;background:linear-gradient(135deg,#0EA5E9,#7DD3FC);color:white;letter-spacing:0.3px; }
-.badge-discount { font-size:9px;font-weight:700;padding:3px 7px;border-radius:20px;background:#22C55E;color:white; }
+.badge-featured { font-size:9px;font-weight:700;padding:3px 7px;border-radius:5px;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;letter-spacing:0.3px; }
+.badge-discount { font-size:9px;font-weight:700;padding:3px 7px;border-radius:20px;background:#16A34A;color:white; }
 .badge-stock { position:absolute;top:10px;right:10px;font-size:9px;font-weight:600;padding:3px 9px;border-radius:20px;z-index:2; }
-.badge-stock.stock-ok  { background:rgba(34,197,94,0.14);color:#22C55E; }
-.badge-stock.stock-low { background:rgba(245,158,11,0.14);color:#fbbf24; }
+.badge-stock.stock-ok  { background:rgba(34,197,94,0.14);color:#16A34A; }
+.badge-stock.stock-low { background:rgba(245,158,11,0.14);color:#B45309; }
 .badge-stock.stock-out { background:rgba(239,68,68,0.14);color:#EF4444; }
 
 /* ── Product info ── */
 .product-info { padding:14px 15px 15px;display:flex;flex-direction:column;flex:1; }
-.product-cat-label { display:inline-block;font-size:10px;color:rgba(100,118,142,0.7);font-weight:500;background:rgba(255,255,255,0.05);padding:2px 8px;border-radius:20px;align-self:flex-start;margin-bottom:7px; }
-.product-name { font-size:13px;font-weight:600;color:#7B92B0;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:38px;margin-bottom:5px;transition:color 0.15s; }
-.product-name.highlighted { color:#E2EAF4; }
-.product-sku { font-size:10px;color:rgba(100,118,142,0.45);margin-bottom:5px;font-family:ui-monospace,monospace;letter-spacing:0.4px; }
-.product-brand { font-size:11px;color:rgba(100,118,142,0.85);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:11px; }
-.product-divider { height:1px;background:rgba(255,255,255,0.06);margin-bottom:11px;margin-top:auto; }
+.product-cat-label { display:inline-block;font-size:10px;color:#7A889C;font-weight:500;background:rgba(11,27,51,0.05);padding:2px 8px;border-radius:20px;align-self:flex-start;margin-bottom:7px; }
+.product-name { font-size:13px;font-weight:600;color:#5B6B82;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:38px;margin-bottom:5px;transition:color 0.15s; }
+.product-name.highlighted { color:#0B1B33; }
+.product-sku { font-size:10px;color:rgba(91,107,130,0.45);margin-bottom:5px;font-family:ui-monospace,monospace;letter-spacing:0.4px; }
+.product-brand { font-size:11px;color:#5B6B82;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:11px; }
+.product-divider { height:1px;background:rgba(11,27,51,0.06);margin-bottom:11px;margin-top:auto; }
 .product-price-row { display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:0; }
-.product-price { font-size:17px;font-weight:800;color:#E2EAF4;letter-spacing:-0.5px;line-height:1; }
-.product-iva { font-size:9.5px;color:rgba(100,118,142,0.6);margin-top:3px; }
-.product-no-price { font-size:12px;color:rgba(100,118,142,0.6);font-style:italic; }
-.product-old-price { font-size:10px;color:rgba(100,118,142,0.45);text-decoration:line-through;margin-top:2px; }
+.product-price { font-size:17px;font-weight:800;color:#0B1B33;letter-spacing:-0.5px;line-height:1; }
+.product-iva { font-size:9.5px;color:#7A889C;margin-top:3px; }
+.product-no-price { font-size:12px;color:#7A889C;font-style:italic; }
+.product-old-price { font-size:10px;color:rgba(91,107,130,0.45);text-decoration:line-through;margin-top:2px; }
 
 /* ── Add button ── */
 .btn-add {
@@ -702,12 +702,12 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
   display:flex;align-items:center;gap:5px;
   border-radius:9px;font-size:12px;font-weight:600;
   cursor:pointer;font-family:inherit;flex-shrink:0;
-  border:1px solid rgba(14,165,233,0.25);
-  background:rgba(14,165,233,0.1);color:#7DD3FC;
+  border:1px solid rgba(21,112,239,0.25);
+  background:rgba(21,112,239,0.1);color:#0B5BD3;
   transition:all 0.2s;
 }
-.btn-add:hover:not(.disabled):not(.added) { background:rgba(14,165,233,0.2);border-color:rgba(14,165,233,0.4); }
-.btn-add.added { background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.25);color:#22C55E; }
+.btn-add:hover:not(.disabled):not(.added) { background:rgba(21,112,239,0.2);border-color:rgba(21,112,239,0.4); }
+.btn-add.added { background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.25);color:#16A34A; }
 .btn-add.disabled { opacity:0.35;cursor:not-allowed; }
 
 /* ── Clear button ── */
@@ -717,15 +717,15 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 /* ── Pagination ── */
 .pagination { display:flex;align-items:center;justify-content:center;gap:12px;margin-top:36px; }
 .page-btn { display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 20px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.15s; }
-.page-btn.prev { background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#7B92B0; }
-.page-btn.prev:hover:not(.disabled) { background:rgba(255,255,255,0.09); }
-.page-btn.next { background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.25);color:#7DD3FC;font-weight:600; }
-.page-btn.next:hover:not(.disabled) { background:rgba(14,165,233,0.18); }
+.page-btn.prev { background:rgba(11,27,51,0.05);border:1px solid rgba(11,27,51,0.1);color:#5B6B82; }
+.page-btn.prev:hover:not(.disabled) { background:rgba(11,27,51,0.09); }
+.page-btn.next { background:rgba(21,112,239,0.1);border:1px solid rgba(21,112,239,0.25);color:#0B5BD3;font-weight:600; }
+.page-btn.next:hover:not(.disabled) { background:rgba(21,112,239,0.18); }
 .page-btn.disabled { opacity:0.35;cursor:not-allowed; }
 .page-info { display:flex;align-items:baseline;gap:4px;padding:0 6px; }
-.page-current { font-size:18px;font-weight:800;color:#E2EAF4; }
-.page-sep { font-size:14px;color:rgba(100,118,142,0.4); }
-.page-total { font-size:13px;color:rgba(100,118,142,0.6);font-weight:500; }
+.page-current { font-size:18px;font-weight:800;color:#0B1B33; }
+.page-sep { font-size:14px;color:rgba(91,107,130,0.4); }
+.page-total { font-size:13px;color:#7A889C;font-weight:500; }
 
 /* ── Transitions ── */
 .dropdown-enter-active { transition:opacity 0.15s ease,transform 0.15s ease; }

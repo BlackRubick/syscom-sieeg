@@ -1,15 +1,15 @@
 <template>
   <Teleport to="body">
     <Transition name="fade">
-      <div v-if="modelValue" style="position:fixed;inset:0;background:rgba(2,6,14,0.82);backdrop-filter:blur(7px);z-index:2000;" @click.self="!saving && $emit('update:modelValue', false)" />
+      <div v-if="modelValue" style="position:fixed;inset:0;background:rgba(11,27,51,0.45);backdrop-filter:blur(7px);z-index:2000;" @click.self="!saving && $emit('update:modelValue', false)" />
     </Transition>
     <Transition name="modal">
       <div v-if="modelValue" style="position:fixed;inset:0;z-index:2001;display:flex;align-items:center;justify-content:center;padding:16px;">
         <div style="width:100%;max-width:600px;max-height:92vh;display:flex;flex-direction:column;">
           <!-- Borde degradado -->
           <div style="position:relative;display:flex;flex-direction:column;min-height:0;">
-            <div style="position:absolute;inset:-1px;border-radius:22px;background:linear-gradient(135deg,rgba(245,158,11,0.5),rgba(14,165,233,0.3),rgba(14,165,233,0.2));z-index:0;pointer-events:none;" />
-            <div style="position:relative;z-index:1;border-radius:22px;background:linear-gradient(160deg,#0C1A2E,#06101E);box-shadow:0 32px 80px rgba(0,0,0,0.75);display:flex;flex-direction:column;min-height:0;">
+            <div style="position:absolute;inset:-1px;border-radius:22px;background:linear-gradient(135deg,rgba(245,158,11,0.5),rgba(21,112,239,0.3),rgba(21,112,239,0.2));z-index:0;pointer-events:none;" />
+            <div style="position:relative;z-index:1;border-radius:22px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);box-shadow:0 32px 80px rgba(11,27,51,0.16);display:flex;flex-direction:column;min-height:0;">
 
               <!-- Header fijo -->
               <div style="padding:26px 28px 0;flex-shrink:0;">
@@ -17,23 +17,23 @@
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;">
                   <div style="display:flex;align-items:center;gap:12px;">
                     <div style="width:40px;height:40px;border-radius:12px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                      <FileText :size="18" color="#fbbf24" />
+                      <FileText :size="18" color="#B45309" />
                     </div>
                     <div>
-                      <div style="font-size:16px;font-weight:700;color:#E2EAF4;">Datos fiscales</div>
-                      <div style="font-size:12px;color:rgba(100,118,142,0.8);margin-top:2px;">Necesarios para la emisión de facturas (CFDI)</div>
+                      <div style="font-size:16px;font-weight:700;color:#0B1B33;">Datos fiscales</div>
+                      <div style="font-size:12px;color:#5B6B82;margin-top:2px;">Necesarios para la emisión de facturas (CFDI)</div>
                     </div>
                   </div>
                   <button v-if="!required" @click="!saving && $emit('update:modelValue', false)"
-                    style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(100,118,142,0.8);flex-shrink:0;">
+                    style="width:30px;height:30px;border-radius:8px;background:rgba(11,27,51,0.05);border:1px solid rgba(11,27,51,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5B6B82;flex-shrink:0;">
                     <X :size="14" />
                   </button>
                 </div>
 
                 <!-- Tabs -->
-                <div style="display:flex;gap:2px;background:rgba(255,255,255,0.04);border-radius:10px;padding:3px;margin:16px 0 0;">
+                <div style="display:flex;gap:2px;background:rgba(11,27,51,0.04);border-radius:10px;padding:3px;margin:16px 0 0;">
                   <button v-for="tab in tabs" :key="tab.key" @click="activeTab=tab.key"
-                    :style="{ flex:1, height:'32px', borderRadius:'8px', border:'none', fontSize:'12px', fontWeight: activeTab===tab.key ? 600:500, cursor:'pointer', fontFamily:'inherit', background: activeTab===tab.key ? 'linear-gradient(135deg,#0EA5E9,#0284C7)':'transparent', color: activeTab===tab.key ? '#fff':'rgba(100,118,142,0.8)', transition:'all 0.18s' }">
+                    :style="{ flex:1, height:'32px', borderRadius:'8px', border:'none', fontSize:'12px', fontWeight: activeTab===tab.key ? 600:500, cursor:'pointer', fontFamily:'inherit', background: activeTab===tab.key ? 'linear-gradient(135deg,#1570EF,#0B5BD3)':'transparent', color: activeTab===tab.key ? '#fff':'#5B6B82', transition:'all 0.18s' }">
                     {{ tab.label }}
                   </button>
                 </div>
@@ -44,44 +44,44 @@
 
                 <!-- Tab 1: Datos requeridos -->
                 <div v-show="activeTab==='required'">
-                  <p style="font-size:12px;color:rgba(100,118,142,0.75);margin:0 0 16px;">Los campos marcados con <span style="color:#EF4444;">*</span> son obligatorios.</p>
+                  <p style="font-size:12px;color:#5B6B82;margin:0 0 16px;">Los campos marcados con <span style="color:#EF4444;">*</span> son obligatorios.</p>
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
                     <div style="grid-column:1/-1;">
                       <FormField label="RFC" v-model="form.rfc" placeholder="XAXX010101000" :required="true" uppercase />
-                      <p style="font-size:11px;color:rgba(100,118,142,0.6);margin:4px 0 0;">Escríbelo exactamente como aparece en tu constancia de situación fiscal.</p>
+                      <p style="font-size:11px;color:#7A889C;margin:4px 0 0;">Escríbelo exactamente como aparece en tu constancia de situación fiscal.</p>
                     </div>
                     <div style="grid-column:1/-1;">
                       <FormField label="Razón Social (sin régimen capital)" v-model="form.razonSocial" placeholder="MI EMPRESA EJEMPLO" :required="true" uppercase />
-                      <p style="font-size:11px;color:rgba(100,118,142,0.6);margin:4px 0 0;">Sin S.A. de C.V., S. de R.L., etc. Solo la razón social base.</p>
+                      <p style="font-size:11px;color:#7A889C;margin:4px 0 0;">Sin S.A. de C.V., S. de R.L., etc. Solo la razón social base.</p>
                     </div>
                     <FormField label="Código Postal" v-model="form.codpos" placeholder="06600" :required="true" uppercase />
                     <FormField label="Email para facturas" type="email" v-model="form.email" placeholder="facturacion@empresa.com" :required="true" />
                     <div>
-                      <label style="display:block;font-size:11px;font-weight:500;color:rgba(123,146,176,0.85);margin-bottom:6px;">
+                      <label style="display:block;font-size:11px;font-weight:500;color:#5B6B82;margin-bottom:6px;">
                         Régimen Fiscal <span style="color:#EF4444;">*</span>
                       </label>
                       <select v-model="form.regimen" @focus="regimenFocus=true" @blur="regimenFocus=false"
                         :style="selectStyle(regimenFocus)">
-                        <option value="" style="background:#0C1A2E;" disabled>Selecciona...</option>
-                        <option v-for="r in REGIMENES" :key="r.clave" :value="r.clave" style="background:#0C1A2E;">{{ r.clave }} – {{ r.nombre }}</option>
+                        <option value="" style="background:#FFFFFF;" disabled>Selecciona...</option>
+                        <option v-for="r in REGIMENES" :key="r.clave" :value="r.clave" style="background:#FFFFFF;">{{ r.clave }} – {{ r.nombre }}</option>
                       </select>
                     </div>
                     <div>
-                      <label style="display:block;font-size:11px;font-weight:500;color:rgba(123,146,176,0.85);margin-bottom:6px;">
+                      <label style="display:block;font-size:11px;font-weight:500;color:#5B6B82;margin-bottom:6px;">
                         País <span style="color:#EF4444;">*</span>
                       </label>
                       <select v-model="form.pais" @focus="paisFocus=true" @blur="paisFocus=false"
                         :style="selectStyle(paisFocus)">
-                        <option value="" style="background:#0C1A2E;" disabled>Selecciona...</option>
-                        <option v-for="p in PAISES" :key="p.clave" :value="p.clave" style="background:#0C1A2E;">{{ p.clave }} – {{ p.nombre }}</option>
+                        <option value="" style="background:#FFFFFF;" disabled>Selecciona...</option>
+                        <option v-for="p in PAISES" :key="p.clave" :value="p.clave" style="background:#FFFFFF;">{{ p.clave }} – {{ p.nombre }}</option>
                       </select>
                     </div>
                     <div>
-                      <label style="display:block;font-size:11px;font-weight:500;color:rgba(123,146,176,0.85);margin-bottom:6px;">Uso de CFDI</label>
+                      <label style="display:block;font-size:11px;font-weight:500;color:#5B6B82;margin-bottom:6px;">Uso de CFDI</label>
                       <select v-model="form.usocfdi" @focus="cfdiF=true" @blur="cfdiF=false"
                         :style="selectStyle(cfdiF)">
-                        <option value="" style="background:#0C1A2E;">Sin especificar</option>
-                        <option v-for="c in USOS_CFDI" :key="c.clave" :value="c.clave" style="background:#0C1A2E;">{{ c.clave }} – {{ c.nombre }}</option>
+                        <option value="" style="background:#FFFFFF;">Sin especificar</option>
+                        <option v-for="c in USOS_CFDI" :key="c.clave" :value="c.clave" style="background:#FFFFFF;">{{ c.clave }} – {{ c.nombre }}</option>
                       </select>
                     </div>
                   </div>
@@ -89,7 +89,7 @@
 
                 <!-- Tab 2: Domicilio fiscal -->
                 <div v-show="activeTab==='address'">
-                  <p style="font-size:12px;color:rgba(100,118,142,0.75);margin:0 0 16px;">Domicilio fiscal tal como aparece en tu constancia de situación fiscal.</p>
+                  <p style="font-size:12px;color:#5B6B82;margin:0 0 16px;">Domicilio fiscal tal como aparece en tu constancia de situación fiscal.</p>
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
                     <div style="grid-column:1/-1;"><FormField label="Calle" v-model="form.calle" placeholder="AV. INSURGENTES SUR" uppercase /></div>
                     <FormField label="Número exterior" v-model="form.numeroExterior" placeholder="1234" uppercase />
@@ -104,36 +104,36 @@
 
                 <!-- Tab 3: Contacto adicional -->
                 <div v-show="activeTab==='contact'">
-                  <p style="font-size:12px;color:rgba(100,118,142,0.75);margin:0 0 16px;">Información adicional del contacto fiscal.</p>
+                  <p style="font-size:12px;color:#5B6B82;margin:0 0 16px;">Información adicional del contacto fiscal.</p>
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
                     <FormField label="Nombre" v-model="form.nombre" placeholder="JUAN" uppercase />
                     <FormField label="Apellidos" v-model="form.apellidos" placeholder="PÉREZ GARCÍA" uppercase />
                     <FormField label="Teléfono" v-model="form.telefono" placeholder="5512345678" />
                     <div style="grid-column:1/-1;">
                       <FormField label="Núm. Registro ID Tributario (extranjeros)" v-model="form.numregidtrib" placeholder="SOLO SI APLICA" uppercase />
-                      <p style="font-size:11px;color:rgba(100,118,142,0.6);margin:4px 0 0;">Solo requerido para residentes en el extranjero.</p>
+                      <p style="font-size:11px;color:#7A889C;margin:4px 0 0;">Solo requerido para residentes en el extranjero.</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               <!-- Footer fijo -->
-              <div style="padding:16px 28px 24px;flex-shrink:0;border-top:1px solid rgba(255,255,255,0.06);">
+              <div style="padding:16px 28px 24px;flex-shrink:0;border-top:1px solid rgba(11,27,51,0.06);">
                 <Transition name="fade">
                   <div v-if="formError" style="padding:9px 12px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);font-size:12px;color:#EF4444;margin-bottom:12px;">{{ formError }}</div>
                 </Transition>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                  <div style="font-size:11px;color:rgba(100,118,142,0.6);">
+                  <div style="font-size:11px;color:#7A889C;">
                     <span v-if="required">Completa los datos requeridos para continuar usando la plataforma.</span>
                     <span v-else>Puedes actualizar estos datos en cualquier momento.</span>
                   </div>
                   <div style="display:flex;gap:10px;flex-shrink:0;">
                     <button v-if="!required" type="button" @click="!saving && $emit('update:modelValue', false)"
-                      style="height:38px;padding:0 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#94a3b8;font-size:13px;cursor:pointer;font-family:inherit;">
+                      style="height:38px;padding:0 18px;border-radius:10px;border:1px solid rgba(11,27,51,0.1);background:rgba(11,27,51,0.04);color:#5B6B82;font-size:13px;cursor:pointer;font-family:inherit;">
                       Cancelar
                     </button>
                     <button @click="handleSave" :disabled="saving"
-                      :style="{ height:'38px', padding:'0 22px', borderRadius:'10px', border:'none', background: saving?'rgba(14,165,233,0.4)':'linear-gradient(135deg,#0EA5E9,#0284C7)', color:'white', fontSize:'13px', fontWeight:600, cursor:saving?'not-allowed':'pointer', fontFamily:'inherit', whiteSpace:'nowrap' }">
+                      :style="{ height:'38px', padding:'0 22px', borderRadius:'10px', border:'none', background: saving?'rgba(21,112,239,0.4)':'linear-gradient(135deg,#1570EF,#0B5BD3)', color:'white', fontSize:'13px', fontWeight:600, cursor:saving?'not-allowed':'pointer', fontFamily:'inherit', whiteSpace:'nowrap' }">
                       {{ saving ? 'Guardando...' : 'Guardar datos fiscales' }}
                     </button>
                   </div>
@@ -222,9 +222,9 @@ watch(() => props.modelValue, (open) => {
 
 const selectStyle = (focused: boolean) => ({
   width: '100%', height: '40px',
-  background: focused ? 'rgba(14,165,233,0.06)' : '#0C1A2E',
-  border: `1px solid ${focused ? 'rgba(14,165,233,0.45)' : 'rgba(255,255,255,0.1)'}`,
-  borderRadius: '10px', padding: '0 12px', fontSize: '13px', color: '#E2EAF4',
+  background: focused ? 'rgba(21,112,239,0.06)' : '#FFFFFF',
+  border: `1px solid ${focused ? 'rgba(21,112,239,0.45)' : 'rgba(11,27,51,0.1)'}`,
+  borderRadius: '10px', padding: '0 12px', fontSize: '13px', color: '#0B1B33',
   outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', transition: 'all 0.18s', cursor: 'pointer',
 })
 

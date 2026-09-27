@@ -1,17 +1,17 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body { height: 100%; font-family: 'Inter', system-ui, sans-serif; background: #06101E; color: #E2EAF4; }
+html, body { height: 100%; font-family: 'Inter', system-ui, sans-serif; background: #F5F8FC; color: #0B1B33; }
 
 #__nuxt { height: 100%; }
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+::-webkit-scrollbar-thumb { background: rgba(11,27,51,0.1); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(11,27,51,0.18); }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-input::placeholder, textarea::placeholder { color: rgba(100,118,142,0.8); }
+input::placeholder, textarea::placeholder { color: #5B6B82; }
 input, button, select, textarea { font-family: inherit; }
 button { cursor: pointer; }
 a { text-decoration: none; color: inherit; }
@@ -44,6 +44,6 @@ a { text-decoration: none; color: inherit; }
 .pulse  { animation: pulse   1.5s ease-in-out infinite; }
 .shimmer-bg {
   animation: shimmer 1.5s infinite;
-  background: linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.09) 50%,rgba(255,255,255,0.04) 75%);
+  background: linear-gradient(90deg,rgba(11,27,51,0.04) 25%,rgba(11,27,51,0.09) 50%,rgba(11,27,51,0.04) 75%);
   background-size: 200% 100%;
 }
