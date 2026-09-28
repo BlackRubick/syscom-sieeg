@@ -312,7 +312,7 @@ useHead(() => ({ title: quote.value ? `${quote.value.name ?? quote.value.folio} 
 @media print {
   @page { size: letter; margin: 14mm; }
   body, .app-shell { background: #fff !important; }
-  .sn-topbar, .sn-header, .no-print, .app-shell > .app-wrap:not(.app-main) { display: none !important; }
+  .sn-topbar, .sn-header, .no-print, .wa, .app-shell > .app-wrap:not(.app-main) { display: none !important; }
   .app-main { padding: 0 !important; max-width: none !important; }
   .qd { max-width: none !important; }
   .qd-card { border-color: #D5DEEA !important; box-shadow: none !important; break-inside: avoid; }

@@ -5,6 +5,7 @@
     <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 10% 0%,rgba(21,112,239,0.05) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 90% 100%,rgba(21,112,239,0.04) 0%,transparent 60%)" />
 
     <SiteNavbar />
+    <WhatsAppButton />
 
     <!-- CONTENIDO -->
     <main style="position:relative;z-index:1;max-width:800px;margin:0 auto;padding:64px 24px 100px;">

@@ -1,6 +1,7 @@
 <template>
   <div class="app-shell">
     <SiteNavbar app />
+    <WhatsAppButton v-if="esCliente" />
 
     <!-- Alerta datos fiscales pendientes -->
       <Transition name="slide-down">
@@ -48,6 +49,9 @@ onMounted(async () => {
 })
 
 const showFiscalModal     = ref(false)
+// El botón de WhatsApp es para clientes; admin y vendedores son parte del equipo
+const esCliente = computed(() => !!auth.user && !['admin', 'seller'].includes(auth.user.role))
+
 const fiscalModalRequired = computed(() => needsFiscal(auth.user))
 const showFiscalBanner    = computed(() => auth.loaded && needsFiscal(auth.user) && !showFiscalModal.value)
 </script>
@@ -55,10 +59,10 @@ const showFiscalBanner    = computed(() => auth.loaded && needsFiscal(auth.user)
 <style>
 .app-shell { min-height: 100vh; background: #F5F8FC; }
 .app-wrap { width: 100%; max-width: calc(1280px + 64px); margin: 0 auto; padding-left: 32px; padding-right: 32px; box-sizing: border-box; }
-.app-main { padding-top: 28px; padding-bottom: 48px; }
+.app-main { padding-top: 28px; padding-bottom: 96px; }
 @media (min-width: 1680px) { .app-wrap { max-width: calc(1520px + 96px); padding-left: 48px; padding-right: 48px; } }
 @media (max-width: 900px)  { .app-wrap { padding-left: 20px; padding-right: 20px; } }
-@media (max-width: 640px)  { .app-wrap { padding-left: 16px; padding-right: 16px; } .app-main { padding-top: 18px; padding-bottom: 32px; } }
+@media (max-width: 640px)  { .app-wrap { padding-left: 16px; padding-right: 16px; } .app-main { padding-top: 18px; padding-bottom: 90px; } }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.25s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>

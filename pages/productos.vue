@@ -1,6 +1,7 @@
 <template>
   <div class="pc">
     <SiteNavbar />
+    <WhatsAppButton />
 
     <!-- ── Encabezado ── -->
     <header class="pc-hero">
