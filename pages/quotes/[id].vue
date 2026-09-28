@@ -13,7 +13,7 @@
           <div class="qd-brand-data">
             <strong>SIEEG Integradores</strong>
             <span>Boulevard Belisario Domínguez #4213 L5, Tuxtla Gutiérrez, Chiapas</span>
-            <span>961 118 0157 · contacto@sieeg.com.mx</span>
+            <span>961 333 6529 · contacto@sieeg.com.mx</span>
           </div>
         </div>
         <div class="qd-folio-box">

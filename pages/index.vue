@@ -170,6 +170,8 @@
       </div>
     </section>
 
+    <WhatsAppButton />
+
     <!-- ───────────── FOOTER ───────────── -->
     <footer class="lp-footer">
       <div class="lp-wrap lp-footer-grid">
@@ -197,7 +199,8 @@
           <h3>Contacto</h3>
           <ul class="lp-footer-contact">
             <li>Boulevard Belisario Domínguez #4213 L5, Tuxtla Gutiérrez, Chiapas</li>
-            <li><a href="tel:9611180157">961 118 0157</a></li>
+            <li><a href="tel:9613336529">961 333 6529</a></li>
+            <li><a href="https://wa.me/529613336529" target="_blank" rel="noopener">WhatsApp: 961 333 6529</a></li>
             <li><a href="mailto:contacto@sieeg.com.mx">contacto@sieeg.com.mx</a></li>
             <li>Lun – Vie 07:00 – 20:00<br />Sáb 07:00 – 17:00</li>
           </ul>
