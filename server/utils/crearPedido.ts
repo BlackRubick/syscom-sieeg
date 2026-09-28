@@ -47,7 +47,7 @@ export async function crearPedido(opts: {
   const cliente = `${order.user.name}${order.user.clientNumber ? ` (${formatClientNumber(order.user.clientNumber)})` : ''}`
   const origen  = [
     order.seller ? `levantado por ${order.seller.name}` : '',
-    opts.quoteNumber ? `desde ${formatQuoteNumber(opts.quoteNumber)}` : '',
+    opts.quoteNumber ? `desde la cotización ${formatQuoteNumber(opts.quoteNumber)}` : '',
   ].filter(Boolean).join(', ')
 
   // Avisar a los admins; si lo hizo un vendedor, también al cliente

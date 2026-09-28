@@ -13,7 +13,7 @@
     <div class="qt-card qt-filters">
       <div class="qt-search">
         <Search :size="15" />
-        <input v-model="search" :placeholder="veTodas ? 'Buscar por nombre, folio COT-, cliente o vendedor…' : 'Buscar por nombre o folio COT-…'" />
+        <input v-model="search" :placeholder="veTodas ? 'Buscar por nombre, folio, cliente o vendedor…' : 'Buscar por nombre o folio…'" />
       </div>
       <div class="qt-tabs">
         <button v-for="t in TABS" :key="t.key" type="button" :class="{ active: estado === t.key }" @click="estado = t.key">{{ t.label }}</button>

@@ -5,7 +5,7 @@ import { normalizarItems, preciosDelDia, crearCotizacion, limpiarNombre, limpiar
 import { getMostradorId } from '~/server/utils/mostrador'
 import { formatQuoteNumber } from '~/utils/quoteNumber'
 
-/* Guarda el carrito como cotización (pedido previo) con folio COT-0001. */
+/* Guarda el carrito como cotización (pedido previo) con folio consecutivo (0001). */
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
   if (session.role === 'viewer') throw createError({ statusCode: 403, message: 'Tu cuenta es de solo consulta' })

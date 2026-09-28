@@ -229,20 +229,11 @@
 
       <!-- Cliente (vendedor / admin): el pedido o la cotización quedan a su nombre, con su precio -->
       <div v-if="vende" class="ct-client">
-        <div class="ct-client-text">
-          <div class="ct-client-title">¿Para quién es?</div>
-          <div class="ct-client-sub">
-            <template v-if="clienteSel?.mostrador">Se genera a <b>Mostrador · Público en general</b>. Después, desde la cotización o el pedido, lo asignas al cliente real con <b>Asignar a cliente</b>.</template>
-            <template v-else-if="clienteSel">Precios con el descuento de <b>{{ clienteSel.name }}</b>{{ clienteSel.discountPct ? ` (${clienteSel.discountPct}%)` : '' }}. El pedido se envía a su dirección fiscal.</template>
-            <template v-else-if="esVendedor">Elige el cliente para ver sus precios, guardar la cotización o generar el pedido.</template>
-            <template v-else>Opcional: elige un cliente para cotizar o levantar el pedido a su nombre.</template>
-          </div>
-          <div v-if="clienteSel && !clienteSel.mostrador && !clienteSel.fiscalCompleted" class="ct-client-warn">Este cliente no tiene datos fiscales: captúralos en Datos Fiscales antes de aprobar el pedido.</div>
-        </div>
         <div class="ct-client-pick">
           <FilterCombo v-model="clienteId" :options="opcionesClientes" label="Cliente" empty-label="Sin elegir" count-label="pedido" placeholder="Buscar por nombre, empresa o número…" />
           <NuxtLink to="/clientes?nuevo=1" class="ct-client-new">+ Nuevo cliente</NuxtLink>
         </div>
+        <div v-if="clienteSel && !clienteSel.mostrador && !clienteSel.fiscalCompleted" class="ct-client-warn">Este cliente no tiene datos fiscales: captúralos en Datos Fiscales antes de aprobar el pedido.</div>
       </div>
 
       <!-- Tabla de productos -->
@@ -407,7 +398,7 @@
               <FileText :size="15" /> {{ accion === 'cotizacion' ? 'Guardando…' : 'Guardar como cotización' }}
             </button>
             <div v-if="esVendedor && !clienteId" class="ct-note">Elige un cliente arriba para cotizar o generar el pedido.</div>
-            <div v-else class="ct-note">La cotización guarda los productos con un folio COT-; el precio se actualiza al del día cuando se acepta.</div>
+            <div v-else class="ct-note">La cotización guarda los productos con un número de folio; el precio se actualiza al del día cuando se acepta.</div>
           </div>
         </div>
       </div>
@@ -626,10 +617,7 @@
 <style>
 @keyframes spin { to { transform: rotate(360deg) } }
 .ct-client { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:16px; padding:16px 20px; border-radius:16px; background:#fff; border:1px solid rgba(21,112,239,0.22); box-shadow:0 6px 18px rgba(21,112,239,0.06); }
-.ct-client-text { flex:1; min-width:240px; }
-.ct-client-title { font-size:14px; font-weight:700; color:#0B1B33; }
-.ct-client-sub { font-size:12.5px; color:#5B6B82; margin-top:3px; line-height:1.5; }
-.ct-client-warn { margin-top:8px; padding:7px 10px; border-radius:8px; background:rgba(245,158,11,0.1); color:#92400E; font-size:12px; }
+.ct-client-warn { flex-basis:100%; margin-top:0; padding:7px 10px; border-radius:8px; background:rgba(245,158,11,0.1); color:#92400E; font-size:12px; }
 .ct-client-pick { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .ct-info { display:flex; flex-direction:column; gap:12px; margin:0 -20px -20px; padding:16px 20px 20px; border-top:1px solid rgba(11,27,51,0.07); background:#F7F9FC; border-radius:0 0 16px 16px; }
 .ct-info-title { font-size:13px; font-weight:700; color:#0B1B33; }

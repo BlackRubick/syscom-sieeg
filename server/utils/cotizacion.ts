@@ -146,7 +146,7 @@ export async function ligarCotizacion(q: { id: string; userId: string; sellerId:
       data: {
         userId:  q.sellerId,
         type:    'approval',
-        title:   `${formatQuoteNumber(q.number)} comprada`,
+        title:   `Cotización ${formatQuoteNumber(q.number)} comprada`,
         message: `${clienteNombre} hizo el pedido de la cotización${q.name ? ` «${q.name}»` : ''} desde su carrito.`,
         orderId,
       },

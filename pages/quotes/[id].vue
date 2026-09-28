@@ -105,7 +105,7 @@
         <NuxtLink :to="`/imprimir/cotizacion/${quote.id}`" class="qd-btn qd-btn-ghost"><Download :size="16" /> Descargar PDF</NuxtLink>
         <button v-if="puedeCotizar" class="qd-btn qd-btn-ghost" :disabled="!!accion" @click="alCarrito"><ShoppingCart :size="16" /> {{ quote.status === 'open' ? 'Editar en el carrito' : 'Volver a cotizar' }}</button>
         <AsignarClienteModal v-model="asignando" :actual="quote.cliente.id" :asignar="asignar"
-          :titulo="`Asignar ${quote.folio} a un cliente`" descripcion="La cotización pasa a nombre del cliente elegido, con sus precios, y le llega un aviso para que la revise y haga su pedido." />
+          :titulo="`Asignar la cotización ${quote.folio} a un cliente`" descripcion="La cotización pasa a nombre del cliente elegido, con sus precios, y le llega un aviso para que la revise y haga su pedido." />
         <button v-if="quote.status === 'open' && puedeCotizar" class="qd-btn qd-btn-danger" :disabled="!!accion" @click="cancelar">{{ accion === 'cancelar' ? 'Cancelando…' : 'Cancelar cotización' }}</button>
       </div>
     </template>
@@ -165,8 +165,8 @@ const accionError = ref('')
 async function convertir() {
   if (!quote.value) return
   const msg = esCliente.value
-    ? `¿Aceptar ${quote.value.folio} y generar el pedido por ${fmt(total.value)}?`
-    : `¿Convertir ${quote.value.folio} en pedido para ${quote.value.cliente.name} por ${fmt(total.value)}?`
+    ? `¿Aceptar la cotización ${quote.value.folio} y generar el pedido por ${fmt(total.value)}?`
+    : `¿Convertir la cotización ${quote.value.folio} en pedido para ${quote.value.cliente.name} por ${fmt(total.value)}?`
   if (!confirm(msg)) return
   accion.value = 'convertir'; accionError.value = ''
   try {
@@ -239,7 +239,7 @@ const fmt        = (n: number) => new Intl.NumberFormat('es-MX', { style: 'curre
 const fechaLarga = (iso: string) => new Date(iso).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })
 const fechaCorta = (iso: string) => new Date(iso).toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' })
 
-useHead(() => ({ title: quote.value ? `${quote.value.name ?? quote.value.folio} — ${quote.value.cliente.name}` : 'Cotización' }))
+useHead(() => ({ title: quote.value ? `${quote.value.name ?? `Cotización ${quote.value.folio}`} — ${quote.value.cliente.name}` : 'Cotización' }))
 </script>
 
 <style scoped>
