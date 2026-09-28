@@ -18,7 +18,6 @@
       <div class="qt-tabs">
         <button v-for="t in TABS" :key="t.key" type="button" :class="{ active: estado === t.key }" @click="estado = t.key">{{ t.label }}</button>
       </div>
-      <label v-if="esVendedor" class="qt-check"><input v-model="mias" type="checkbox" /> Solo las que hice yo</label>
     </div>
 
     <div v-if="error" class="qt-card qt-empty">
@@ -77,7 +76,6 @@ interface QuoteRow {
 
 const auth  = useAuthStore()
 const route = useRoute()
-const esVendedor   = computed(() => auth.user?.role === 'seller')
 const veTodas      = computed(() => ['admin', 'approver', 'seller'].includes(auth.user?.role ?? ''))
 const puedeCotizar = computed(() => auth.user?.role !== 'viewer')
 
@@ -92,7 +90,6 @@ const loading = ref(true)
 const error   = ref('')
 const search  = ref(typeof route.query.search === 'string' ? route.query.search : '')
 const estado  = ref(search.value ? '' : 'open')
-const mias    = ref(false)
 
 let reqId = 0
 async function cargar() {
@@ -100,7 +97,7 @@ async function cargar() {
   loading.value = true; error.value = ''
   try {
     const r = await $fetch<{ quotes: QuoteRow[] }>('/api/quotes', {
-      query: { status: estado.value || undefined, search: search.value.trim() || undefined, mias: mias.value ? '1' : undefined },
+      query: { status: estado.value || undefined, search: search.value.trim() || undefined },
     })
     if (id === reqId) quotes.value = r.quotes
   } catch (e: any) {
@@ -111,7 +108,7 @@ async function cargar() {
 }
 let t: ReturnType<typeof setTimeout>
 watch(search, () => { clearTimeout(t); t = setTimeout(cargar, 350) })
-watch([estado, mias], cargar)
+watch(estado, cargar)
 onMounted(cargar)
 
 const fmt   = (n: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(n)
@@ -136,7 +133,6 @@ const fecha = (iso: string) => new Date(iso).toLocaleDateString('es-MX', { day: 
 .qt-tabs { display: flex; gap: 4px; padding: 4px; background: #F5F8FC; border: 1px solid #E4E9F1; border-radius: 10px; overflow-x: auto; max-width: 100%; }
 .qt-tabs button { flex-shrink: 0; height: 32px; padding: 0 12px; border: none; border-radius: 7px; background: transparent; color: #5B6B82; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
 .qt-tabs button.active { background: #0B1B33; color: #fff; }
-.qt-check { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: #13294B; cursor: pointer; }
 
 .qt-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 48px 16px; text-align: center; color: #5B6B82; font-size: 13.5px; }
 .qt-empty strong { color: #0B1B33; font-size: 15px; }
