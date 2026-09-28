@@ -98,7 +98,7 @@
         <button v-if="quote.status === 'open' && puedeConvertir" class="qd-btn qd-btn-primary" :disabled="!!accion || !precios || precios.noDisponibles === filas.length" @click="convertir">
           <CheckCircle :size="16" /> {{ accion === 'convertir' ? 'Generando pedido…' : esCliente ? 'Aceptar y generar pedido' : 'Convertir en pedido' }}
         </button>
-        <button class="qd-btn qd-btn-ghost" @click="imprimir"><Download :size="16" /> Descargar PDF</button>
+        <NuxtLink :to="`/imprimir/cotizacion/${quote.id}`" class="qd-btn qd-btn-ghost"><Download :size="16" /> Descargar PDF</NuxtLink>
         <button v-if="puedeCotizar" class="qd-btn qd-btn-ghost" :disabled="!!accion" @click="alCarrito"><ShoppingCart :size="16" /> {{ quote.status === 'open' ? 'Editar en el carrito' : 'Volver a cotizar' }}</button>
         <button v-if="quote.status === 'open' && puedeCotizar" class="qd-btn qd-btn-danger" :disabled="!!accion" @click="cancelar">{{ accion === 'cancelar' ? 'Cancelando…' : 'Cancelar cotización' }}</button>
       </div>

@@ -401,6 +401,10 @@
               <button class="od-btn od-btn-ghost" :disabled="cancelling" @click="cancelOrder(detail)">{{ cancelling ? 'Cancelando…' : 'Cancelar pedido' }}</button>
             </section>
 
+            <div class="od-pdf">
+              <NuxtLink :to="`/imprimir/pedido/${detail.id}`" class="od-pdf-btn"><Download :size="14" /> Descargar PDF del pedido</NuxtLink>
+            </div>
+
             <footer class="od-meta">
               <span>ID <span class="od-mono">{{ detail.id }}</span></span>
               <span>Actualizada {{ fmtDateLong(detail.updatedAt) }}</span>
@@ -830,6 +834,9 @@ const fmtDateLong = (d: string) => new Intl.DateTimeFormat('es-MX', { day:'2-dig
   border-radius:20px; background:linear-gradient(160deg,#FFFFFF,#F5F8FC); border:1px solid rgba(21,112,239,0.22); box-shadow:0 32px 80px rgba(11,27,51,0.16); font-family:'Inter',system-ui,sans-serif; color:#0B1B33; }
 .od-head { flex-shrink:0; padding:20px 24px 16px; border-bottom:1px solid rgba(11,27,51,0.07); }
 .od-head-row { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
+.od-pdf { display:flex; justify-content:flex-end; }
+.od-pdf-btn { display:inline-flex; align-items:center; gap:7px; height:38px; padding:0 16px; border-radius:10px; border:1px solid #D5DEEA; background:#fff; color:#0B1B33; font-size:12.5px; font-weight:700; text-decoration:none; }
+.od-pdf-btn:hover { background:#F5F8FC; border-color:#1570EF; color:#0B5BD3; }
 .od-head-right { display:flex; align-items:flex-start; gap:14px; flex-shrink:0; }
 .od-head-total { text-align:right; }
 .od-title-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }

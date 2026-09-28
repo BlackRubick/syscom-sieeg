@@ -75,7 +75,8 @@ export function puedeVerCotizacion(session: { userId: string; role: string }, q:
 }
 
 export const QUOTE_INCLUDE = {
-  user:   { select: { id: true, name: true, email: true, clientNumber: true, fiscalRazonSocial: true, fiscalRfc: true, fiscalTelefono: true, discountPct: true } },
+  user:   { select: { id: true, name: true, email: true, clientNumber: true, fiscalRazonSocial: true, fiscalRfc: true, fiscalTelefono: true, discountPct: true,
+    fiscalCalle: true, fiscalNumExt: true, fiscalColonia: true, fiscalCiudad: true, fiscalEstado: true, fiscalCodpos: true } },
   seller: { select: { id: true, name: true, email: true } },
 } satisfies Prisma.QuoteInclude
 
@@ -102,6 +103,8 @@ export function serializeQuote(q: QuoteRow) {
       razonSocial:  q.user.fiscalRazonSocial,
       rfc:          q.user.fiscalRfc,
       telefono:     q.user.fiscalTelefono,
+      direccion:    [[q.user.fiscalCalle, q.user.fiscalNumExt].filter(Boolean).join(' '), q.user.fiscalColonia, q.user.fiscalCiudad, q.user.fiscalEstado, q.user.fiscalCodpos ? `C.P. ${q.user.fiscalCodpos}` : '']
+        .filter(Boolean).join(', ') || null,
     },
     vendedor: q.seller ? { id: q.seller.id, name: q.seller.name, email: q.seller.email } : null,
   }
