@@ -230,16 +230,17 @@
       <!-- Cliente (vendedor / admin): el pedido o la cotización quedan a su nombre, con su precio -->
       <div v-if="vende" class="ct-client">
         <div class="ct-client-text">
-          <div class="ct-client-title">¿Para qué cliente es?</div>
+          <div class="ct-client-title">¿Para quién es?</div>
           <div class="ct-client-sub">
-            <template v-if="clienteSel">Precios con el descuento de <b>{{ clienteSel.name }}</b>{{ clienteSel.discountPct ? ` (${clienteSel.discountPct}%)` : '' }}. El pedido se envía a su dirección fiscal.</template>
+            <template v-if="clienteSel?.mostrador">Se genera a <b>Mostrador · Público en general</b>. Después, desde la cotización o el pedido, lo asignas al cliente real con <b>Asignar a cliente</b>.</template>
+            <template v-else-if="clienteSel">Precios con el descuento de <b>{{ clienteSel.name }}</b>{{ clienteSel.discountPct ? ` (${clienteSel.discountPct}%)` : '' }}. El pedido se envía a su dirección fiscal.</template>
             <template v-else-if="esVendedor">Elige el cliente para ver sus precios, guardar la cotización o generar el pedido.</template>
             <template v-else>Opcional: elige un cliente para cotizar o levantar el pedido a su nombre.</template>
           </div>
-          <div v-if="clienteSel && !clienteSel.fiscalCompleted" class="ct-client-warn">Este cliente no tiene datos fiscales: captúralos en Datos Fiscales antes de aprobar el pedido.</div>
+          <div v-if="clienteSel && !clienteSel.mostrador && !clienteSel.fiscalCompleted" class="ct-client-warn">Este cliente no tiene datos fiscales: captúralos en Datos Fiscales antes de aprobar el pedido.</div>
         </div>
         <div class="ct-client-pick">
-          <FilterCombo v-model="clienteId" :options="opcionesClientes" label="Cliente" empty-label="Sin elegir" count-label="pedido" placeholder="Buscar por nombre, empresa o CL-…" />
+          <FilterCombo v-model="clienteId" :options="opcionesClientes" label="Cliente" empty-label="Sin elegir" count-label="pedido" placeholder="Buscar por nombre, empresa o número…" />
           <NuxtLink to="/clientes?nuevo=1" class="ct-client-new">+ Nuevo cliente</NuxtLink>
         </div>
       </div>
@@ -336,22 +337,17 @@
               <span :style="{ fontSize:'11px', fontWeight:600, color: activePri.color }">{{ priorityLabel }}</span>
             </div>
           </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <div style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;">Notas</div>
-              <span style="font-size:10px;color:#7A889C;">{{ notes.length }}/300</span>
-            </div>
-            <textarea v-model="notes" @input="notes = notes.slice(0, 300)"
-              placeholder="Justificación, área solicitante, instrucciones especiales..."
-              rows="3"
-              :style="{
-                width:'100%', padding:'10px 12px', fontSize:'12px', color:'#5B6B82',
-                outline:'none', resize:'none', fontFamily:'inherit', lineHeight:'1.5',
-                boxSizing:'border-box', borderRadius:'10px', transition:'all 0.2s',
-                background: notesFocus ? 'rgba(21,112,239,0.05)' : 'rgba(11,27,51,0.03)',
-                border: `1px solid ${notesFocus ? 'rgba(21,112,239,0.35)' : 'rgba(11,27,51,0.07)'}`
-              }"
-              @focus="notesFocus = true" @blur="notesFocus = false" />
+          <div class="ct-info">
+            <div class="ct-info-title">Información adicional</div>
+            <label class="ct-info-field">
+              <span>Folio interno / Orden de compra (opcional):</span>
+              <input v-model="purchaseOrder" maxlength="60" class="ct-info-input" />
+            </label>
+            <label class="ct-info-field">
+              <span class="ct-info-row">Comentarios a vendedor <em>{{ notes.length }}/300</em></span>
+              <textarea v-model="notes" maxlength="300" rows="4" class="ct-info-input ct-info-area"
+                placeholder="Escribe aquí cualquier comentario o instrucción especial…" />
+            </label>
           </div>
         </div>
 
@@ -375,10 +371,10 @@
           <div style="padding:14px 20px;border-top:1px solid rgba(11,27,51,0.06);display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;font-size:12px;color:#5B6B82;">
               <span>Envío</span>
-              <span :style="{ color: envio > 0 ? '#0B1B33' : '#16A34A', fontWeight: 600 }">{{ envio > 0 ? fmt(envio) : 'Sin costo' }}</span>
+              <span style="color:#0B1B33;font-weight:600;">{{ fmt(envio) }}</span>
             </div>
-            <div v-if="envio > 0" style="padding:8px 10px;border-radius:8px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);font-size:11px;color:#B45309;line-height:1.5;">
-              Agrega {{ fmt(faltaEnvio) }} más para envío sin costo (compras desde {{ fmt(shippingCfg.freeShippingMin) }} + IVA).
+            <div v-if="envio > 0 && !envioBasico" style="padding:8px 10px;border-radius:8px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);font-size:11px;color:#B45309;line-height:1.5;">
+              Agrega {{ fmt(faltaEnvio) }} más y solo pagas el envío básico de {{ fmt(shippingCfg.basicShippingFee ?? ENVIO_BASICO) }} (compras desde {{ fmt(shippingCfg.freeShippingMin) }} + IVA).
             </div>
             <div style="display:flex;justify-content:space-between;font-size:12px;color:#5B6B82;">
               <span>Subtotal (sin IVA)</span><span>{{ fmt(subtotal) }}</span>
@@ -395,7 +391,7 @@
             <div v-if="accionError" class="ct-error">{{ accionError }}</div>
             <div v-if="preview.loading" class="ct-note">Calculando precios del cliente…</div>
             <button v-if="clienteId" class="ct-btn ct-btn-primary" :disabled="!!accion || preview.loading" @click="generarPedidoCliente">
-              <Package :size="15" /> {{ accion === 'pedido' ? 'Generando…' : `Generar pedido para ${clienteSel?.name.split(' ')[0] ?? 'el cliente'}` }}
+              <Package :size="15" /> {{ accion === 'pedido' ? 'Generando…' : clienteSel?.mostrador ? 'Generar pedido de mostrador' : `Generar pedido para ${clienteSel?.name.split(' ')[0] ?? 'el cliente'}` }}
             </button>
             <button v-else-if="!esVendedor && !pagoEnLinea" class="ct-btn ct-btn-primary" :disabled="!!accion" @click="confirmarPedido">
               <Package :size="15" /> {{ accion === 'confirmar' ? 'Enviando…' : 'Confirmar pedido' }}
@@ -406,7 +402,7 @@
               <CreditCard :size="15" /> Elegir método de pago
             </button>
             <div class="ct-sep"><span>o guárdalo para después</span></div>
-            <input v-model="nombreCotizacion" class="ct-name" maxlength="120" :placeholder="clienteSel ? `Nombre de la cotización (ej. Casa de ${clienteSel.name.split(' ')[0]})` : 'Nombre de la cotización (ej. Casa de Fulanito)'" aria-label="Nombre de la cotización" />
+            <input v-model="nombreCotizacion" class="ct-name" maxlength="120" :placeholder="clienteSel && !clienteSel.mostrador ? `Nombre de la cotización (ej. Casa de ${clienteSel.name.split(' ')[0]})` : 'Nombre de la cotización (ej. Casa de Fulanito)'" aria-label="Nombre de la cotización" />
             <button class="ct-btn ct-btn-ghost" :disabled="!!accion || (esVendedor && !clienteId)" @click="guardarCotizacion">
               <FileText :size="15" /> {{ accion === 'cotizacion' ? 'Guardando…' : 'Guardar como cotización' }}
             </button>
@@ -635,6 +631,14 @@
 .ct-client-sub { font-size:12.5px; color:#5B6B82; margin-top:3px; line-height:1.5; }
 .ct-client-warn { margin-top:8px; padding:7px 10px; border-radius:8px; background:rgba(245,158,11,0.1); color:#92400E; font-size:12px; }
 .ct-client-pick { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.ct-info { display:flex; flex-direction:column; gap:12px; margin:0 -20px -20px; padding:16px 20px 20px; border-top:1px solid rgba(11,27,51,0.07); background:#F7F9FC; border-radius:0 0 16px 16px; }
+.ct-info-title { font-size:13px; font-weight:700; color:#0B1B33; }
+.ct-info-field { display:flex; flex-direction:column; gap:6px; font-size:12px; color:#5B6B82; }
+.ct-info-row { display:flex; justify-content:space-between; }
+.ct-info-row em { font-style:normal; font-size:10px; color:#7A889C; }
+.ct-info-input { width:100%; height:40px; padding:0 12px; border-radius:10px; border:1px solid #D5DEEA; background:#fff; font-size:13px; color:#0B1B33; font-family:inherit; outline:none; box-sizing:border-box; transition:border-color .2s; }
+.ct-info-input:focus { border-color:rgba(21,112,239,0.5); }
+.ct-info-area { height:auto; padding:10px 12px; resize:vertical; line-height:1.5; }
 .ct-client-new { font-size:12.5px; font-weight:600; color:#0B5BD3; white-space:nowrap; }
 .ct-btn { width:100%; height:44px; border-radius:11px; font-weight:700; font-size:13px; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; transition:background .2s, opacity .2s; }
 .ct-btn:disabled { opacity:.55; cursor:not-allowed; }
@@ -656,14 +660,15 @@
 
 <script setup lang="ts">
 import { ShoppingCart, Package, Trash2, Plus, Minus, CreditCard, X, Lock, FileText } from '@lucide/vue'
-import type { ShippingConfig } from '~/utils/orderTotals'
+import { ENVIO_BASICO, type ShippingConfig } from '~/utils/orderTotals'
 
 definePageMeta({ middleware: 'auth' })
 
 const cart      = useCartStore()
 const notes     = ref('')
+// Folio interno / orden de compra del cliente
+const purchaseOrder = ref('')
 const priority  = ref('normal')
-const notesFocus = ref(false)
 
 // ── States de resultado ──
 const submitted  = ref(false)
@@ -704,23 +709,20 @@ const priorities = [
 const activePri     = computed(() => priorities.find(p => p.key === priority.value)!)
 const priorityLabel = computed(() => ({ urgent:'Urgente — notificación inmediata', high:'Alta — procesamiento en 4h', normal:'Normal — procesamiento en 24h', low:'Baja — sin urgencia' }[priority.value] ?? ''))
 // Envío: si la compra no llega al mínimo se cobra nuestro cargo (el servidor lo vuelve a calcular)
-const { data: shippingCfg } = useFetch<ShippingConfig>('/api/config/shipping', { default: () => ({ freeShippingMin: 1000, shippingFee: 200 }) })
+const { data: shippingCfg } = useFetch<ShippingConfig>('/api/config/shipping', { default: () => ({ freeShippingMin: 1000, shippingFee: 200, basicShippingFee: ENVIO_BASICO }) })
 // ── Cliente (vendedor / admin) ──
 const auth       = useAuthStore()
 const esVendedor = computed(() => auth.user?.role === 'seller')
 const vende      = computed(() => esVendedor.value || auth.user?.role === 'admin')
-interface ClienteOpt { id: string; name: string; email: string; clientNumber: number | null; razonSocial: string | null; fiscalCompleted: boolean; discountPct: number; pedidos: number; status: string }
-const clientes   = ref<ClienteOpt[]>([])
+const { clientes, opciones: opcionesClientes, cargar: cargarClientes, mostrador } = useClientes()
 // Se conserva el cliente elegido mientras navega entre catálogo y carrito
 const clienteId  = useClienteCarrito()
 const clienteSel = computed(() => clientes.value.find(c => c.id === clienteId.value) ?? null)
-const opcionesClientes = computed(() => clientes.value.filter(c => c.status === 'active').map(c => ({
-  value: c.id, label: c.name, badge: formatClientNumber(c.clientNumber), sub: c.razonSocial ?? c.email, count: c.pedidos,
-  search: `${c.email} ${c.razonSocial ?? ''}`,
-})))
 onMounted(async () => {
   if (!vende.value) return
-  try { clientes.value = (await $fetch<{ clientes: ClienteOpt[] }>('/api/clients')).clientes } catch { /* sin lista, sin selector */ }
+  await cargarClientes()
+  // Sin cliente elegido, se arma para "Mostrador · Público en general" y después se asigna
+  if (!clienteId.value && mostrador.value) clienteId.value = mostrador.value.id
 })
 
 // Precios del cliente elegido (su descuento); sin cliente se usan los del catálogo
@@ -744,6 +746,7 @@ function precioDe(item: { product: { id: string; price: number } }) {
 }
 const totalCarrito  = computed(() => cart.items.reduce((s, i) => s + precioDe(i) * i.quantity, 0))
 const envio         = computed(() => envioDe(totalCarrito.value, shippingCfg.value))
+const envioBasico   = computed(() => esEnvioBasico(totalCarrito.value, shippingCfg.value))
 const faltaEnvio    = computed(() => Math.max(0, minimoEnvioConIva(shippingCfg.value) - totalCarrito.value))
 // Los precios ya incluyen IVA: el total es la suma + envío y el IVA solo se desglosa
 const totales       = computed(() => desgloseTotales(totalCarrito.value + envio.value))
@@ -760,10 +763,11 @@ async function confirmarPedido() {
   accion.value = 'confirmar'; accionError.value = ''
   try {
     await $fetch('/api/orders', {
-      method: 'POST', body: { items: cartItems(), priority: priority.value, notes: notes.value || undefined, quoteId: cart.quote?.id },
+      method: 'POST', body: { items: cartItems(), priority: priority.value, notes: notes.value || undefined, purchaseOrder: purchaseOrder.value || undefined, quoteId: cart.quote?.id },
     })
     await cart.clearCart()
     notes.value = ''
+    purchaseOrder.value = ''
     pedidoConfirmado.value = true
   } catch (e: any) {
     accionError.value = e?.data?.message ?? 'No se pudo enviar tu pedido'
@@ -774,10 +778,11 @@ async function guardarCotizacion() {
   accion.value = 'cotizacion'; accionError.value = ''
   try {
     const r = await $fetch<{ quote: { id: string } }>('/api/quotes', {
-      method: 'POST', body: { items: cartItems(), clientId: clienteId.value || undefined, notes: notes.value || undefined, name: nombreCotizacion.value || undefined },
+      method: 'POST', body: { items: cartItems(), clientId: clienteId.value || undefined, notes: notes.value || undefined, purchaseOrder: purchaseOrder.value || undefined, name: nombreCotizacion.value || undefined },
     })
     await cart.clearCart()
     notes.value = ''
+    purchaseOrder.value = ''
     nombreCotizacion.value = ''
     clienteId.value = ''
     await navigateTo(`/quotes/${r.quote.id}`)
@@ -791,10 +796,11 @@ async function generarPedidoCliente() {
   accion.value = 'pedido'; accionError.value = ''
   try {
     await $fetch('/api/orders', {
-      method: 'POST', body: { items: cartItems(), clientId: clienteId.value, priority: priority.value, notes: notes.value || undefined },
+      method: 'POST', body: { items: cartItems(), clientId: clienteId.value, priority: priority.value, notes: notes.value || undefined, purchaseOrder: purchaseOrder.value || undefined },
     })
     await cart.clearCart()
     notes.value = ''
+    purchaseOrder.value = ''
     clienteId.value = ''
     await navigateTo('/orders')
   } catch (e: any) {
@@ -981,6 +987,7 @@ async function handlePayCard() {
               items:           cartItems(),
               priority:        priority.value,
               notes:           notes.value || undefined,
+              purchaseOrder:   purchaseOrder.value || undefined,
               quoteId:         cart.quote?.id,
             },
           })
@@ -1051,6 +1058,7 @@ async function handlePaySpei() {
         items:    cartItems(),
         priority: priority.value,
         notes:    notes.value || undefined,
+        purchaseOrder: purchaseOrder.value || undefined,
         quoteId:  cart.quote?.id,
       },
     })

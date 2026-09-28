@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   const esCliente = quote.userId === session.userId
   if (!esCliente && !vendeAClientes(session.role)) throw createError({ statusCode: 403, message: 'Sin autorización para convertir esta cotización' })
   if (quote.status !== 'open') throw createError({ statusCode: 400, message: 'La cotización ya no está abierta' })
-  if (quote.user.status !== 'active') throw createError({ statusCode: 400, message: 'La cuenta del cliente no está activa' })
+  if (quote.user.status === 'inactive') throw createError({ statusCode: 400, message: 'La cuenta del cliente está dada de baja' })
 
   // Reservar la cotización primero para que no se convierta dos veces
   const reservada = await prisma.quote.updateMany({ where: { id, status: 'open' }, data: { status: 'converted' } })
@@ -33,6 +33,7 @@ export default defineEventHandler(async (event) => {
       items:       quote.items as unknown as OrderItem[],
       priority:    body.priority,
       notes:       [quote.notes, body.notes].filter(Boolean).join('\n') || null,
+      purchaseOrder: quote.purchaseOrder,
       quoteNumber: quote.number,
     })
     await prisma.quote.update({ where: { id }, data: { orderId: order.id } })

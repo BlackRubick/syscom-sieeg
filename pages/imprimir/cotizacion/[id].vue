@@ -13,8 +13,8 @@ import type { OrderItem } from '~/types'
 definePageMeta({ layout: false, middleware: 'auth' })
 
 interface Quote {
-  folio: string; name: string | null; status: 'open' | 'converted' | 'cancelled'; items: OrderItem[]; total: number; notes: string | null; createdAt: string
-  cliente: { name: string; email: string; clientNumber: number | null; razonSocial: string | null; rfc: string | null; telefono: string | null; direccion: string | null }
+  folio: string; name: string | null; status: 'open' | 'converted' | 'cancelled'; items: OrderItem[]; total: number; notes: string | null; purchaseOrder: string | null; createdAt: string
+  cliente: { name: string; email: string; clientNumber: number | null; mostrador: boolean; razonSocial: string | null; rfc: string | null; telefono: string | null; direccion: string | null }
   vendedor: { name: string; email: string } | null
 }
 interface Precios { items: Array<OrderItem & { disponible: boolean }>; envio: number; total: number }
@@ -43,12 +43,13 @@ const doc = computed(() => {
     estado: ESTADO[q.status],
     referencia: precios ? `Cotizada el ${new Date(q.createdAt).toLocaleDateString('es-MX')}` : undefined,
     titulo: q.name,
-    cliente: { nombre: q.cliente.name, razonSocial: q.cliente.razonSocial, rfc: q.cliente.rfc, email: q.cliente.email, telefono: q.cliente.telefono, direccion: q.cliente.direccion, numero: formatClientNumber(q.cliente.clientNumber) || null },
+    cliente: { nombre: q.cliente.mostrador ? 'PUBLICO EN GENERAL' : q.cliente.name, razonSocial: q.cliente.razonSocial, rfc: q.cliente.rfc, email: q.cliente.mostrador ? null : q.cliente.email, telefono: q.cliente.telefono, direccion: q.cliente.direccion, numero: q.cliente.mostrador ? null : formatClientNumber(q.cliente.clientNumber) || null },
     atiende: q.vendedor ? { nombre: q.vendedor.name, email: q.vendedor.email } : null,
     items: fuente.map(i => ({ codigo: i.sku, descripcion: i.name, cantidad: i.quantity, precio: i.price, imagen: i.images?.[0] })),
     envio: precios?.envio ?? Math.max(0, total - totalDe(fuente)),
     total,
     notas: q.notes,
+    ordenCompra: q.purchaseOrder,
     condiciones: [
       'Precios en pesos mexicanos con IVA incluido.',
       'Precios sujetos a existencias y a cambio sin previo aviso; al confirmar el pedido se aplica el precio del día.',

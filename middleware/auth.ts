@@ -1,7 +1,7 @@
 import type { User } from '~/types'
 
-const BUYER_ALLOWED  = ['/catalog', '/cart', '/orders', '/quotes', '/perfil', '/fiscal', '/imprimir']
-const SELLER_ALLOWED = ['/catalog', '/cart', '/orders', '/quotes', '/clientes', '/fiscal', '/perfil', '/imprimir']
+const BUYER_ALLOWED  = ['/catalog', '/cart', '/orders', '/quotes', '/garantias', '/perfil', '/fiscal', '/imprimir']
+const SELLER_ALLOWED = ['/catalog', '/cart', '/orders', '/quotes', '/garantias', '/clientes', '/fiscal', '/perfil', '/imprimir']
 const VIEWER_ALLOWED = ['/catalog', '/orders', '/perfil', '/dashboard', '/imprimir']
 
 export default defineNuxtRouteMiddleware(async (to) => {

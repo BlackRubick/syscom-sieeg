@@ -17,7 +17,6 @@ export async function resolverCliente(session: { userId: string; role: string },
   }
   const cliente = await prisma.user.findUnique({ where: { id: clientId }, select: { id: true, role: true, status: true } })
   if (!cliente) throw createError({ statusCode: 404, message: 'Cliente no encontrado' })
-  if (cliente.role !== 'buyer') throw createError({ statusCode: 400, message: 'Solo se pueden asignar pedidos a cuentas de cliente' })
-  if (cliente.status !== 'active') throw createError({ statusCode: 400, message: 'La cuenta del cliente no está activa' })
+  if (cliente.status === 'inactive') throw createError({ statusCode: 400, message: 'La cuenta del cliente está dada de baja' })
   return { clientId: cliente.id, sellerId: session.userId }
 }

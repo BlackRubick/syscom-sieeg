@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client'
+import { esMostrador } from '~/server/utils/mostrador'
 
 /* Forma única en que la API devuelve un pedido (lista, aprobación, reintento…). */
 
@@ -97,6 +98,7 @@ export function serializeOrder(o: OrderWithUser, isManager: boolean) {
     userName:      u.name,
     userEmail:     u.email,
     clientNumber:  u.clientNumber,
+    mostrador:     esMostrador(u.email),
     vendedor:      o.seller ? { id: o.seller.id, name: o.seller.name } : null,
     quoteNumber:   o.quoteNumber,
     status:        o.status,
@@ -105,6 +107,7 @@ export function serializeOrder(o: OrderWithUser, isManager: boolean) {
     shippingFee:   o.shippingFee,
     priority:      o.priority,
     notes:         o.notes,
+    purchaseOrder: o.purchaseOrder,
     syscomFolio:   o.syscomFolio,
     syscomEstado,
     cfdiUid:       o.cfdiUid,

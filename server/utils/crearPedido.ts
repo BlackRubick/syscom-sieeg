@@ -4,6 +4,7 @@ import { totalDe, envioDe } from '~/utils/orderTotals'
 import { getShippingConfig } from '~/server/utils/shipping'
 import { formatClientNumber } from '~/utils/clientNumber'
 import { formatQuoteNumber } from '~/utils/quoteNumber'
+import { esMostrador } from '~/server/utils/mostrador'
 import type { OrderItem } from '~/types'
 
 /* Crea un pedido pendiente (sin pago en línea): precios del día para el cliente, envío y avisos.
@@ -14,6 +15,7 @@ export async function crearPedido(opts: {
   items:        OrderItem[]
   priority?:    string
   notes?:       string | null
+  purchaseOrder?: string | null
   quoteNumber?: number | null
 }) {
   if (!opts.items?.length) throw createError({ statusCode: 400, message: 'El pedido no tiene productos' })
@@ -33,6 +35,7 @@ export async function crearPedido(opts: {
       shippingFee,
       priority:    opts.priority ?? 'normal',
       notes:       opts.notes ?? null,
+      purchaseOrder: opts.purchaseOrder ?? null,
     },
     include: {
       user:   { select: { id: true, name: true, email: true, clientNumber: true } },
@@ -58,7 +61,7 @@ export async function crearPedido(opts: {
       message: `${cliente} — ${monto} IVA incl. (${items.length} art.)${origen ? ` · ${origen}` : ''}`,
       orderId: order.id,
     }))
-  if (opts.sellerId) {
+  if (opts.sellerId && !esMostrador(order.user.email)) {
     avisos.push({
       userId:  opts.clientId,
       type:    'order',

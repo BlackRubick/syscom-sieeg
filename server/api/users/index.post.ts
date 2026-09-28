@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody<{
     name?: string; email?: string; password?: string
-    role?: string; status?: string
+    role?: string; status?: string; discountPct?: number
   }>(event)
 
   const { name, email, password } = body
@@ -42,6 +42,8 @@ export default defineEventHandler(async (event) => {
     status:    status as UserStatus,
     createdAt: today,
     avatar,
+    // El descuento solo lo asigna administración
+    discountPct: esVendedor ? 0 : Math.max(0, Math.min(100, Number(body.discountPct) || 0)),
   }, { id:true, name:true, email:true, role:true, status:true, createdAt:true, lastLogin:true, avatar:true, clientNumber:true })
 
   return { user }

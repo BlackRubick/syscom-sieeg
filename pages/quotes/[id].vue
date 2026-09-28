@@ -39,12 +39,16 @@
           <div v-if="quote.cliente.rfc" class="qd-kv"><span>RFC</span><b>{{ quote.cliente.rfc }}</b></div>
           <div class="qd-kv"><span>Correo</span><b>{{ quote.cliente.email }}</b></div>
           <div v-if="quote.cliente.telefono" class="qd-kv"><span>Teléfono</span><b>{{ quote.cliente.telefono }}</b></div>
+          <button v-if="puedeAsignar" type="button" class="qd-btn qd-btn-ghost qd-assign no-print" @click="asignando = true">
+            <UserCheck :size="15" /> {{ quote.cliente.mostrador ? 'Asignar a cliente' : 'Cambiar cliente' }}
+          </button>
         </section>
         <section class="qd-card qd-box">
           <h3>Atiende</h3>
           <div class="qd-kv"><span>Vendedor</span><b>{{ quote.vendedor?.name ?? 'Compra directa' }}</b></div>
           <div v-if="quote.vendedor" class="qd-kv"><span>Correo</span><b>{{ quote.vendedor.email }}</b></div>
           <div class="qd-kv"><span>Precios</span><b>{{ quote.status === 'open' ? `Del día (${fechaCorta(hoy)})` : 'Al momento de cotizar' }}</b></div>
+          <div v-if="quote.purchaseOrder" class="qd-kv"><span>Orden de compra</span><b>{{ quote.purchaseOrder }}</b></div>
           <div v-if="quote.orderId" class="qd-kv no-print"><span>Pedido</span><b><NuxtLink :to="`/orders?pedido=${quote.orderId}`">#{{ quote.orderId.slice(-8).toUpperCase() }}</NuxtLink></b></div>
         </section>
       </div>
@@ -77,7 +81,7 @@
           <div v-if="precios?.noDisponibles" class="qd-warn no-print">{{ precios.noDisponibles }} producto{{ precios.noDisponibles !== 1 ? 's' : '' }} ya no {{ precios.noDisponibles !== 1 ? 'tienen' : 'tiene' }} precio en SYSCOM y no se incluiría{{ precios.noDisponibles !== 1 ? 'n' : '' }} en el pedido.</div>
           <div class="qd-trow"><span>Subtotal (sin IVA)</span><span>{{ fmt(desglose.subtotal) }}</span></div>
           <div class="qd-trow"><span>IVA (16%)</span><span>{{ fmt(desglose.iva) }}</span></div>
-          <div class="qd-trow"><span>Envío</span><span>{{ envio > 0 ? fmt(envio) : 'Sin costo' }}</span></div>
+          <div class="qd-trow"><span>Envío</span><span>{{ fmt(envio) }}</span></div>
           <div class="qd-trow qd-total"><span>Total (IVA incluido)</span><span>{{ fmt(total) }}</span></div>
           <div v-if="quote.status === 'open' && Math.abs(total - quote.total) >= 0.01" class="qd-note no-print">
             Al cotizar el total era {{ fmt(quote.total) }}; SYSCOM actualizó precios desde entonces.
@@ -86,7 +90,7 @@
       </section>
 
       <section v-if="quote.notes" class="qd-card qd-box">
-        <h3>Notas</h3>
+        <h3>Comentarios</h3>
         <p class="qd-notes">{{ quote.notes }}</p>
       </section>
 
@@ -100,6 +104,8 @@
         </button>
         <NuxtLink :to="`/imprimir/cotizacion/${quote.id}`" class="qd-btn qd-btn-ghost"><Download :size="16" /> Descargar PDF</NuxtLink>
         <button v-if="puedeCotizar" class="qd-btn qd-btn-ghost" :disabled="!!accion" @click="alCarrito"><ShoppingCart :size="16" /> {{ quote.status === 'open' ? 'Editar en el carrito' : 'Volver a cotizar' }}</button>
+        <AsignarClienteModal v-model="asignando" :actual="quote.cliente.id" :asignar="asignar"
+          :titulo="`Asignar ${quote.folio} a un cliente`" descripcion="La cotización pasa a nombre del cliente elegido, con sus precios, y le llega un aviso para que la revise y haga su pedido." />
         <button v-if="quote.status === 'open' && puedeCotizar" class="qd-btn qd-btn-danger" :disabled="!!accion" @click="cancelar">{{ accion === 'cancelar' ? 'Cancelando…' : 'Cancelar cotización' }}</button>
       </div>
     </template>
@@ -107,16 +113,16 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeft, CheckCircle, Download, ShoppingCart } from '@lucide/vue'
+import { ArrowLeft, CheckCircle, Download, ShoppingCart, UserCheck } from '@lucide/vue'
 import type { OrderItem, Product } from '~/types'
 
 definePageMeta({ middleware: 'auth' })
 
 interface ItemPrecio extends OrderItem { disponible: boolean }
 interface Quote {
-  id: string; folio: string; name: string | null; status: 'open' | 'converted' | 'cancelled'; items: OrderItem[]; total: number; notes: string | null
+  id: string; folio: string; name: string | null; status: 'open' | 'converted' | 'cancelled'; items: OrderItem[]; total: number; notes: string | null; purchaseOrder: string | null
   orderId: string | null; createdAt: string
-  cliente: { id: string; name: string; email: string; clientNumber: number | null; razonSocial: string | null; rfc: string | null; telefono: string | null }
+  cliente: { id: string; name: string; email: string; clientNumber: number | null; mostrador: boolean; razonSocial: string | null; rfc: string | null; telefono: string | null }
   vendedor: { id: string; name: string; email: string } | null
 }
 interface Precios { items: ItemPrecio[]; subtotal: number; envio: number; total: number; noDisponibles: number }
@@ -199,7 +205,13 @@ async function alCarrito() {
   await navigateTo('/cart')
 }
 
-function imprimir() { window.print() }
+// ── Asignar a cliente (p. ej. cotización de mostrador) ──
+const asignando    = ref(false)
+const puedeAsignar = computed(() => quote.value?.status === 'open' && ['admin', 'seller'].includes(auth.user?.role ?? ''))
+async function asignar(clientId: string) {
+  await $fetch(`/api/quotes/${quote.value!.id}`, { method: 'PATCH', body: { clientId } })
+  await cargar()
+}
 
 // ── Nombre de la cotización ──
 const editandoNombre  = ref(false)
@@ -260,6 +272,7 @@ useHead(() => ({ title: quote.value ? `${quote.value.name ?? quote.value.folio} 
 .qd-box { padding: 18px 20px; }
 .qd-box h3 { margin: 0 0 12px; font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #5B6B82; }
 .qd-kv { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; font-size: 13px; border-bottom: 1px dashed #EEF1F6; }
+.qd-assign { margin-top: 12px; width: 100%; }
 .qd-kv:last-child { border-bottom: none; }
 .qd-kv span { color: #5B6B82; flex-shrink: 0; }
 .qd-kv b { font-weight: 600; text-align: right; overflow-wrap: anywhere; }

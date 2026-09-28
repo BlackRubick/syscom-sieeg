@@ -21,17 +21,28 @@ export function precioSinIva(precioConIva: number): number {
   return Math.round((precioConIva / (1 + IVA_RATE)) * 1e6) / 1e6
 }
 
-export interface ShippingConfig { freeShippingMin: number; shippingFee: number }
+export interface ShippingConfig { freeShippingMin: number; shippingFee: number; basicShippingFee?: number }
+
+/** Envío básico por omisión (IVA incl.), como lo cobra SYSCOM: el SAT no admite un concepto de envío en $0. */
+export const ENVIO_BASICO = 1.75
 
 /** Mínimo para envío sin costo expresado con IVA (freeShippingMin se captura sin IVA: $1,000 + IVA = $1,160). */
 export function minimoEnvioConIva(cfg: ShippingConfig): number {
   return round2(cfg.freeShippingMin * (1 + IVA_RATE))
 }
 
-/** Envío cobrado al cliente (IVA incluido): si la compra (IVA incl.) no llega al mínimo + IVA se cobra el cargo, si no, es sin costo. */
+/** Envío cobrado al cliente (IVA incluido): si la compra (IVA incl.) no llega al mínimo + IVA se cobra el cargo;
+    si lo alcanza, solo el envío básico (nunca $0, para que el concepto de envío lleve precio en el CFDI). */
 export function envioDe(totalArticulos: number, cfg: ShippingConfig): number {
-  if (!(totalArticulos > 0) || !(cfg.shippingFee > 0)) return 0
-  return totalArticulos < minimoEnvioConIva(cfg) ? round2(cfg.shippingFee) : 0
+  if (!(totalArticulos > 0)) return 0
+  const basico = round2(cfg.basicShippingFee ?? ENVIO_BASICO)
+  if (cfg.shippingFee > 0 && totalArticulos < minimoEnvioConIva(cfg)) return round2(cfg.shippingFee)
+  return basico
+}
+
+/** true si el envío cobrado es solo el básico (la compra alcanzó el mínimo). */
+export function esEnvioBasico(totalArticulos: number, cfg: ShippingConfig): boolean {
+  return totalArticulos > 0 && !(cfg.shippingFee > 0 && totalArticulos < minimoEnvioConIva(cfg))
 }
 
 /** Concepto de CFDI para el cargo de envío (servicio de transporte de carga, unidad de servicio). */

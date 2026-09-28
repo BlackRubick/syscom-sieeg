@@ -2,8 +2,8 @@ import { createHmac, timingSafeEqual } from 'crypto'
 import type { H3Event } from 'h3'
 
 export const SESSION_COOKIE = 'sieeg_sess'
-export const TTL_MS        = 15 * 60 * 1000  // 15 min inactividad
-export const COOKIE_MAX_AGE = 15 * 60         // segundos
+export const TTL_MS        = 2 * 60 * 60 * 1000  // 2 h de inactividad
+export const COOKIE_MAX_AGE = 2 * 60 * 60         // segundos
 
 // En producción el sitio solo se sirve por HTTPS (nginx redirige el puerto 80)
 export const SESSION_COOKIE_OPTS = {
@@ -60,6 +60,6 @@ export function getSession(event: H3Event): SessionPayload | null {
 
 export function requireSession(event: H3Event): SessionPayload {
   const session = getSession(event)
-  if (!session) throw createError({ statusCode: 401, message: 'No autorizado' })
+  if (!session) throw createError({ statusCode: 401, message: 'Tu sesión expiró. Vuelve a iniciar sesión.' })
   return session
 }

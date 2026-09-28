@@ -18,7 +18,7 @@ async function lookupUser(id: string) {
 /* En cada request autenticado:
    - revoca la sesión si el usuario ya no existe o no está activo
    - toma el rol/nombre actuales de la BD (un cambio de rol aplica de inmediato)
-   - renueva el cookie → 15 min de inactividad */
+   - renueva el cookie → 2 h de inactividad */
 export default defineEventHandler(async (event) => {
   const token = getCookie(event, SESSION_COOKIE)
   if (!token) return

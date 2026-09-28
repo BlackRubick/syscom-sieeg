@@ -1,7 +1,8 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { resolverCliente } from '~/server/utils/roles'
-import { normalizarItems, preciosDelDia, crearCotizacion, limpiarNombre, QUOTE_INCLUDE, serializeQuote } from '~/server/utils/cotizacion'
+import { normalizarItems, preciosDelDia, crearCotizacion, limpiarNombre, limpiarFolio, QUOTE_INCLUDE, serializeQuote } from '~/server/utils/cotizacion'
+import { getMostradorId } from '~/server/utils/mostrador'
 import { formatQuoteNumber } from '~/utils/quoteNumber'
 
 /* Guarda el carrito como cotización (pedido previo) con folio COT-0001. */
@@ -9,7 +10,7 @@ export default defineEventHandler(async (event) => {
   const session = requireSession(event)
   if (session.role === 'viewer') throw createError({ statusCode: 403, message: 'Tu cuenta es de solo consulta' })
 
-  const body = await readBody<{ items?: unknown; clientId?: string; notes?: string; name?: string }>(event)
+  const body = await readBody<{ items?: unknown; clientId?: string; notes?: string; name?: string; purchaseOrder?: string }>(event)
   const items = normalizarItems(body.items)
   const { clientId, sellerId } = await resolverCliente(session, body.clientId)
 
@@ -18,10 +19,10 @@ export default defineEventHandler(async (event) => {
   const guardados = cot.items.map(({ disponible: _d, existencia: _e, ...i }) => i)
   const notes = typeof body.notes === 'string' && body.notes.trim() ? body.notes.trim().slice(0, 1000) : null
 
-  const nueva = await crearCotizacion({ userId: clientId, sellerId, name: limpiarNombre(body.name), items: guardados, total: cot.total, notes })
+  const nueva = await crearCotizacion({ userId: clientId, sellerId, name: limpiarNombre(body.name), items: guardados, total: cot.total, notes, purchaseOrder: limpiarFolio(body.purchaseOrder) })
   const quote = await prisma.quote.findUniqueOrThrow({ where: { id: nueva.id }, include: QUOTE_INCLUDE })
 
-  if (sellerId) {
+  if (sellerId && clientId !== await getMostradorId()) {
     await prisma.notification.create({
       data: {
         userId:  clientId,

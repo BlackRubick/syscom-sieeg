@@ -120,7 +120,7 @@
           </div>
           <div>
             <div style="font-size:15px;font-weight:700;color:#0B1B33;">Envío</div>
-            <div style="font-size:12px;color:#5B6B82;margin-top:2px;">Compras menores al mínimo pagan el cargo de envío. El pedido a SYSCOM se envía igual.</div>
+            <div style="font-size:12px;color:#5B6B82;margin-top:2px;">Compras menores al mínimo pagan el cargo de envío; las demás, el envío básico. El pedido a SYSCOM se envía igual.</div>
           </div>
         </div>
 
@@ -133,10 +133,14 @@
             <span style="display:block;font-size:12px;font-weight:600;color:#5B6B82;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Cargo de envío ($, IVA incl.)</span>
             <input v-model.number="inputFee" type="number" min="0" step="10" class="adm-input" />
           </label>
+          <label style="display:block;">
+            <span style="display:block;font-size:12px;font-weight:600;color:#5B6B82;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Envío básico ($, IVA incl.)</span>
+            <input v-model.number="inputBasic" type="number" min="0.01" step="0.25" class="adm-input" />
+          </label>
         </div>
 
         <div style="font-size:12px;color:#5B6B82;margin-bottom:16px;line-height:1.6;">
-          Compras menores a <strong style="color:#0B1B33;">{{ money(inputMin) }} + IVA</strong> ({{ money(inputMin * 1.16) }} con IVA) pagan <strong style="color:#B45309;">{{ money(inputFee) }}</strong> de envío; desde ahí el envío es sin costo.
+          Compras menores a <strong style="color:#0B1B33;">{{ money(inputMin) }} + IVA</strong> ({{ money(inputMin * 1.16) }} con IVA) pagan <strong style="color:#B45309;">{{ money(inputFee) }}</strong> de envío; desde ahí solo se cobra el envío básico de <strong style="color:#0B1B33;">{{ money(inputBasic) }}</strong> (el SAT no permite el concepto de envío sin precio, igual que SYSCOM).
         </div>
 
         <button
@@ -184,16 +188,19 @@ const currentMin = ref(1000)
 const currentFee = ref(200)
 const inputMin   = ref(1000)
 const inputFee   = ref(200)
+const currentBasic = ref(1.75)
+const inputBasic   = ref(1.75)
 const savingShip = ref(false)
 const savedShip  = ref(false)
 const shipError  = ref('')
-const shipDirty  = computed(() => inputMin.value !== currentMin.value || inputFee.value !== currentFee.value)
+const shipDirty  = computed(() => inputMin.value !== currentMin.value || inputFee.value !== currentFee.value || inputBasic.value !== currentBasic.value)
 const money = (n: number) => (Number(n) || 0).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })
 
-type SiteCfg = { markupPct: number; freeShippingMin: number; shippingFee: number }
+type SiteCfg = { markupPct: number; freeShippingMin: number; shippingFee: number; basicShippingFee: number }
 function applyShipping(d: SiteCfg) {
   currentMin.value = inputMin.value = d.freeShippingMin
   currentFee.value = inputFee.value = d.shippingFee
+  currentBasic.value = inputBasic.value = d.basicShippingFee
 }
 
 async function saveShipping() {
@@ -203,7 +210,7 @@ async function saveShipping() {
   try {
     applyShipping(await $fetch<SiteCfg>('/api/admin/config', {
       method: 'PATCH',
-      body: { freeShippingMin: inputMin.value, shippingFee: inputFee.value },
+      body: { freeShippingMin: inputMin.value, shippingFee: inputFee.value, basicShippingFee: inputBasic.value },
     }))
     savedShip.value = true
     setTimeout(() => { savedShip.value = false }, 3000)

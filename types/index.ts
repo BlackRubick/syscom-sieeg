@@ -76,6 +76,7 @@ export interface Order {
   userName?: string
   userEmail?: string
   clientNumber?: number | null
+  mostrador?: boolean
   vendedor?: { id: string; name: string } | null
   quoteNumber?: number | null
   status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'processing' | 'shipped' | 'delivered'
@@ -84,6 +85,7 @@ export interface Order {
   shippingFee?: number
   priority: string
   notes?: string
+  purchaseOrder?: string | null
   syscomFolio?: string | null
   syscomEstado?: { estado: string; label: string; detalle: string; fletera: string | null; guia: string | null; consultado: string | null; factura?: string | null; pasos?: Array<{ paso: string; mensaje: string; fecha: string }> } | null
   cfdiUid?: string | null

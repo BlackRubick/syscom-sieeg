@@ -4,6 +4,7 @@ import { syscomGet } from '~/server/utils/syscom'
 import { totalDe, envioDe } from '~/utils/orderTotals'
 import { getShippingConfig } from '~/server/utils/shipping'
 import { formatQuoteNumber } from '~/utils/quoteNumber'
+import { esMostrador } from '~/server/utils/mostrador'
 import type { OrderItem, SyscomProducto } from '~/types'
 import type { Prisma } from '@prisma/client'
 
@@ -55,7 +56,7 @@ export async function preciosDelDia(clientId: string, items: OrderItem[]) {
 }
 
 /** Guarda la cotización con el siguiente folio (reintenta si dos se guardan al mismo tiempo). */
-export async function crearCotizacion(data: { userId: string; sellerId: string | null; name: string | null; items: OrderItem[]; total: number; notes: string | null }) {
+export async function crearCotizacion(data: { userId: string; sellerId: string | null; name: string | null; items: OrderItem[]; total: number; notes: string | null; purchaseOrder: string | null }) {
   for (let intento = 0; intento < 5; intento++) {
     const { _max } = await prisma.quote.aggregate({ _max: { number: true } })
     try {
@@ -92,6 +93,7 @@ export function serializeQuote(q: QuoteRow) {
     items:     q.items as unknown as OrderItem[],
     total:     q.total,
     notes:     q.notes,
+    purchaseOrder: q.purchaseOrder,
     orderId:   q.orderId,
     createdAt: q.createdAt.toISOString(),
     updatedAt: q.updatedAt.toISOString(),
@@ -100,6 +102,7 @@ export function serializeQuote(q: QuoteRow) {
       name:         q.user.name,
       email:        q.user.email,
       clientNumber: q.user.clientNumber,
+      mostrador:    esMostrador(q.user.email),
       razonSocial:  q.user.fiscalRazonSocial,
       rfc:          q.user.fiscalRfc,
       telefono:     q.user.fiscalTelefono,
@@ -108,6 +111,11 @@ export function serializeQuote(q: QuoteRow) {
     },
     vendedor: q.seller ? { id: q.seller.id, name: q.seller.name, email: q.seller.email } : null,
   }
+}
+
+/** Folio interno / orden de compra del cliente (opcional). */
+export function limpiarFolio(v: unknown): string | null {
+  return typeof v === 'string' && v.trim() ? v.trim().replace(/\s+/g, ' ').slice(0, 60) : null
 }
 
 /** Nombre de la cotización tal como lo escribió el usuario (vacío = sin nombre). */

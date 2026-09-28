@@ -28,6 +28,16 @@ enum UserStatus {
   pending
 }
 
+enum RmaStatus {
+  recibido
+  en_revision
+  enviado_proveedor
+  reparado
+  reemplazado
+  rechazado
+  entregado
+}
+
 enum OrderStatus {
   pending
   approved
@@ -54,6 +64,8 @@ model User {
   sellerOrders  Order[]        @relation("OrderSeller")
   quotes        Quote[]        @relation("QuoteClient")
   sellerQuotes  Quote[]        @relation("QuoteSeller")
+  rmas          Rma[]          @relation("RmaClient")
+  rmasAtendidos Rma[]          @relation("RmaSeller")
   notifications Notification[]
 
   // Datos fiscales
@@ -101,7 +113,10 @@ model Order {
   // Cargo de envío cobrado al cliente (IVA incluido, ya sumado en total); 0 = envío sin costo
   shippingFee    Float       @default(0) @map("shipping_fee")
   priority       String      @default("normal")
+  // Comentarios del cliente al vendedor
   notes          String?
+  // Folio interno / orden de compra del cliente (opcional)
+  purchaseOrder  String?     @map("purchase_order") @db.VarChar(60)
   syscomFolio    String?     @map("syscom_folio")
   syscomData     Json?       @map("syscom_data")
   // Último estado consultado en SYSCOM (facturación / entrega) y cuándo se consultó
@@ -121,23 +136,24 @@ model Order {
 
 // Cotización (pedido previo). Guarda productos y cantidades; el precio siempre se recalcula al del día.
 model Quote {
-  id        String      @id @default(cuid())
+  id            String      @id @default(cuid())
   // Folio consecutivo (se muestra como COT-0001)
-  number    Int         @unique
+  number        Int         @unique
   // Nombre libre para identificarla (ej. "Casa de Fulanito")
-  name      String?     @db.VarChar(120)
-  userId    String      @map("user_id")
-  user      User        @relation("QuoteClient", fields: [userId], references: [id], onDelete: Cascade)
-  sellerId  String?     @map("seller_id")
-  seller    User?       @relation("QuoteSeller", fields: [sellerId], references: [id], onDelete: SetNull)
-  items     Json
+  name          String?     @db.VarChar(120)
+  userId        String      @map("user_id")
+  user          User        @relation("QuoteClient", fields: [userId], references: [id], onDelete: Cascade)
+  sellerId      String?     @map("seller_id")
+  seller        User?       @relation("QuoteSeller", fields: [sellerId], references: [id], onDelete: SetNull)
+  items         Json
   // Total (IVA incl.) al momento de guardarla; solo de referencia
-  total     Float
-  notes     String?     @db.Text
-  status    QuoteStatus @default(open)
-  orderId   String?     @map("order_id")
-  createdAt DateTime    @default(now()) @map("created_at")
-  updatedAt DateTime    @updatedAt @map("updated_at")
+  total         Float
+  notes         String?     @db.Text
+  purchaseOrder String?     @map("purchase_order") @db.VarChar(60)
+  status        QuoteStatus @default(open)
+  orderId       String?     @map("order_id")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
 
   @@index([userId])
   @@index([sellerId])
@@ -145,11 +161,13 @@ model Quote {
 }
 
 model SiteConfig {
-  id              Int   @id @default(1)
-  markupPct       Float @default(0) @map("markup_pct")
+  id               Int   @id @default(1)
+  markupPct        Float @default(0) @map("markup_pct")
   // Compras menores a freeShippingMin + IVA pagan shippingFee (IVA incl.); a SYSCOM se pide igual
-  freeShippingMin Float @default(1000) @map("free_shipping_min")
-  shippingFee     Float @default(200) @map("shipping_fee")
+  freeShippingMin  Float @default(1000) @map("free_shipping_min")
+  shippingFee      Float @default(200) @map("shipping_fee")
+  // Envío básico (IVA incl.) cuando la compra alcanza el mínimo: el SAT no admite el concepto de envío en $0
+  basicShippingFee Float @default(1.75) @map("basic_shipping_fee")
 
   @@map("site_config")
 }
@@ -166,4 +184,34 @@ model Notification {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("notifications")
+}
+
+// Garantía (RMA-0001): el cliente entrega un producto para revisión, reparación o cambio
+model Rma {
+  id             String    @id @default(cuid())
+  number         Int       @unique
+  userId         String    @map("user_id")
+  user           User      @relation("RmaClient", fields: [userId], references: [id], onDelete: Cascade)
+  // Quién la registró / la atiende
+  sellerId       String?   @map("seller_id")
+  seller         User?     @relation("RmaSeller", fields: [sellerId], references: [id], onDelete: SetNull)
+  // Pedido donde se compró (opcional: puede venir de una compra de mostrador)
+  orderId        String?   @map("order_id")
+  productId      String?   @map("product_id")
+  sku            String    @db.VarChar(80)
+  productName    String    @map("product_name") @db.VarChar(300)
+  serie          String?   @db.VarChar(120)
+  quantity       Int       @default(1)
+  falla          String    @db.Text
+  accesorios     String?   @db.VarChar(300)
+  status         RmaStatus @default(recibido)
+  // Folio de RMA que asigne SYSCOM / el proveedor
+  folioProveedor String?   @map("folio_proveedor") @db.VarChar(60)
+  resolucion     String?   @db.Text
+  historial      Json?
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("rmas")
 }

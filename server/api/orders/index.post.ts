@@ -1,7 +1,7 @@
 import { requireSession } from '~/server/utils/session'
 import { crearPedido } from '~/server/utils/crearPedido'
 import { resolverCliente } from '~/server/utils/roles'
-import { reservarCotizacion, liberarCotizacion, ligarCotizacion } from '~/server/utils/cotizacion'
+import { reservarCotizacion, liberarCotizacion, ligarCotizacion, limpiarFolio } from '~/server/utils/cotizacion'
 import type { OrderItem } from '~/types'
 
 /* Pedido sin pago en línea (queda pendiente para aprobación manual).
@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
     total?:    number   // ignorado — calculamos server-side (#2)
     priority?: string
     notes?:    string
+    purchaseOrder?: string
     clientId?: string
     quoteId?:  string
   }>(event)
@@ -34,6 +35,7 @@ export default defineEventHandler(async (event) => {
   try {
     order = await crearPedido({
       clientId, sellerId: sellerId ?? cot?.sellerId ?? null, items: body.items, priority: body.priority, notes: body.notes,
+      purchaseOrder: limpiarFolio(body.purchaseOrder),
       quoteNumber: cot?.number ?? null,
     })
   } catch (e) {
@@ -54,6 +56,7 @@ export default defineEventHandler(async (event) => {
       shippingFee: order.shippingFee,
       priority:    order.priority,
       notes:       order.notes,
+      purchaseOrder: order.purchaseOrder,
       createdAt:   order.createdAt.toISOString(),
       updatedAt:   order.updatedAt.toISOString(),
     },

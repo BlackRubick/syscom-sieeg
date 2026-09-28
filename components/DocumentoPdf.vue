@@ -18,6 +18,7 @@
           <tr><th>Fecha</th><td>{{ fecha }}</td></tr>
           <tr v-if="estado"><th>Estado</th><td>{{ estado }}</td></tr>
           <tr v-if="referencia"><th>Referencia</th><td>{{ referencia }}</td></tr>
+          <tr v-if="ordenCompra"><th>Orden de compra</th><td>{{ ordenCompra }}</td></tr>
         </table>
       </div>
     </header>
@@ -27,13 +28,12 @@
     <!-- Cliente y datos de atención -->
     <section class="doc-parties">
       <div class="doc-party">
-        <div class="doc-label">Cliente</div>
+        <div class="doc-label doc-label-row"><span>Cliente</span><span v-if="cliente.numero" class="doc-clnum">{{ cliente.numero }}</span></div>
         <div class="doc-party-name">{{ cliente.razonSocial || cliente.nombre }}</div>
         <div v-if="cliente.razonSocial && cliente.razonSocial !== cliente.nombre">Atención: {{ cliente.nombre }}</div>
         <div v-if="cliente.rfc">RFC: {{ cliente.rfc }}</div>
         <div v-if="cliente.direccion">{{ cliente.direccion }}</div>
         <div>{{ [cliente.email, cliente.telefono].filter(Boolean).join(' · ') }}</div>
-        <div v-if="cliente.numero" class="doc-muted">No. de cliente {{ cliente.numero }}</div>
       </div>
       <div class="doc-party">
         <div class="doc-label">Atendido por</div>
@@ -77,14 +77,14 @@
         <div class="doc-label">Importe con letra</div>
         <div class="doc-words-text">{{ importeConLetra(total) }}</div>
         <template v-if="notas">
-          <div class="doc-label" style="margin-top:12px;">Notas</div>
+          <div class="doc-label" style="margin-top:12px;">Comentarios</div>
           <div class="doc-notes">{{ notas }}</div>
         </template>
       </div>
       <table class="doc-totals">
         <tr><th>Subtotal</th><td>{{ money(desglose.subtotal) }}</td></tr>
         <tr><th>IVA 16%</th><td>{{ money(desglose.iva) }}</td></tr>
-        <tr><th>Envío</th><td>{{ envio > 0 ? money(envio) : 'Sin costo' }}</td></tr>
+        <tr><th>Envío</th><td>{{ money(envio) }}</td></tr>
         <tr class="doc-total"><th>Total</th><td>{{ money(total) }}</td></tr>
       </table>
     </section>
@@ -122,6 +122,7 @@ const props = defineProps<{
   envio: number
   total: number
   notas?: string | null
+  ordenCompra?: string | null
   condiciones: string[]
 }>()
 
@@ -155,7 +156,8 @@ const money = (n: number) => new Intl.NumberFormat('es-MX', { style: 'currency',
 .doc-party { padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--soft); color: #33445C; font-size: 10.5px; }
 .doc-party-name { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
 .doc-label { font-size: 9.5px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
-.doc-muted { color: var(--muted); }
+.doc-label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.doc-clnum { font-size: 12px; letter-spacing: .5px; color: var(--ink); font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; }
 
 .doc-items { width: 100%; border-collapse: collapse; margin-top: 18px; }
 .doc-items thead th { background: var(--ink); color: #fff; font-size: 9.5px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; padding: 8px 8px; text-align: left; }

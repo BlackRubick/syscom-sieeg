@@ -28,9 +28,10 @@
           <span class="cl-avatar">{{ iniciales(c.name) }}</span>
           <div class="cl-item-id">
             <strong>{{ c.name }}</strong>
-            <span>{{ c.email }}</span>
+            <span>{{ c.mostrador ? 'Ventas al público en general' : c.email }}</span>
           </div>
-          <span v-if="c.clientNumber" class="cl-num">{{ formatClientNumber(c.clientNumber) }}</span>
+          <span v-if="c.mostrador" class="cl-num">MOSTRADOR</span>
+          <span v-else-if="c.clientNumber" class="cl-num">{{ formatClientNumber(c.clientNumber) }}</span>
         </div>
         <div class="cl-item-data">
           <div><span>Empresa</span><b>{{ c.razonSocial || '—' }}</b></div>
@@ -39,9 +40,10 @@
           <div><span>Cotizaciones</span><b>{{ c.cotizaciones }}</b></div>
         </div>
         <div class="cl-item-badges">
+          <span v-if="ROL[c.role]" class="cl-badge off">{{ ROL[c.role] }}</span>
           <span :class="['cl-badge', c.status === 'active' ? 'ok' : 'off']">{{ c.status === 'active' ? 'Activo' : c.status === 'pending' ? 'Pendiente' : 'Inactivo' }}</span>
-          <NuxtLink v-if="!c.fiscalCompleted" :to="`/fiscal?buscar=${encodeURIComponent(c.email)}`" class="cl-badge warn">Faltan datos fiscales →</NuxtLink>
-          <span v-else class="cl-badge ok">Datos fiscales completos</span>
+          <NuxtLink v-if="!c.fiscalCompleted && !c.mostrador" :to="`/fiscal?buscar=${encodeURIComponent(c.email)}`" class="cl-badge warn">Faltan datos fiscales →</NuxtLink>
+          <span v-else-if="!c.mostrador" class="cl-badge ok">Datos fiscales completos</span>
         </div>
         <div class="cl-item-actions">
           <button class="cl-btn cl-btn-primary" :disabled="c.status !== 'active'" @click="venderA(c)"><ShoppingCart :size="14" /> Cotizar / pedir</button>
@@ -101,10 +103,11 @@ import { Search, UserPlus, ShoppingCart } from '@lucide/vue'
 definePageMeta({ middleware: 'auth' })
 
 interface Cliente {
-  id: string; name: string; email: string; clientNumber: number | null; status: string
+  id: string; name: string; email: string; clientNumber: number | null; status: string; role: string; mostrador?: boolean
   fiscalCompleted: boolean; razonSocial: string | null; rfc: string | null; pedidos: number; cotizaciones: number
 }
 
+const ROL: Record<string, string> = { admin: 'Administrador', seller: 'Vendedor', approver: 'Aprobador', viewer: 'Visor' }
 const route  = useRoute()
 const auth   = useAuthStore()
 const clientes = ref<Cliente[]>([])

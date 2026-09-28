@@ -287,6 +287,11 @@
                 <div v-if="detail.cliente?.razonSocial" class="od-kv"><span>Razón social</span><b>{{ detail.cliente.razonSocial }}</b></div>
                 <div v-if="detail.cliente?.regimen" class="od-kv"><span>Régimen</span><b>{{ detail.cliente.regimen }}</b></div>
                 <div v-if="detail.cliente?.usoCfdi" class="od-kv"><span>Uso CFDI</span><b>{{ detail.cliente.usoCfdi }}</b></div>
+                <button v-if="puedeAsignar" class="od-btn od-btn-ghost" style="margin-top:10px;width:100%;" @click="asignando = true">
+                  {{ detail.mostrador ? 'Asignar a cliente' : 'Cambiar cliente' }}
+                </button>
+                <AsignarClienteModal v-model="asignando" :actual="detail.userId" :asignar="asignarCliente"
+                  :titulo="`Asignar el pedido #${detail.id.slice(-8).toUpperCase()}`" descripcion="El pedido pasa a nombre del cliente elegido y los precios se recalculan con su descuento. Se envía a su dirección fiscal." />
               </section>
               <section class="od-card">
                 <div class="od-row-between" style="margin-bottom:10px;">
@@ -370,10 +375,14 @@
               <div v-if="isManager && detail.paymentMethod === 'spei' && detail.paymentStatus !== 'paid'" class="od-reason" style="color:rgba(251,191,36,0.9);">Verifica la recepción de la transferencia antes de aprobar.</div>
             </section>
 
-            <!-- Notas -->
-            <section v-if="detail.notes" class="od-card">
-              <div class="od-card-title" style="margin-bottom:6px;">Notas del cliente</div>
-              <p class="od-text" style="margin:0;white-space:pre-wrap;">{{ detail.notes }}</p>
+            <!-- Información adicional -->
+            <section v-if="detail.notes || detail.purchaseOrder" class="od-card">
+              <div class="od-card-title" style="margin-bottom:6px;">Información adicional</div>
+              <div v-if="detail.purchaseOrder" class="od-kv"><span>Folio interno / Orden de compra</span><b class="od-mono">{{ detail.purchaseOrder }}</b></div>
+              <template v-if="detail.notes">
+                <div class="od-muted" style="margin-top:6px;">Comentarios a vendedor</div>
+                <p class="od-text" style="margin:2px 0 0;white-space:pre-wrap;">{{ detail.notes }}</p>
+              </template>
             </section>
 
             <!-- Historial -->
@@ -384,7 +393,7 @@
                   <span class="od-status-dot" :style="{ background: statusCfg[entry.status]?.dot ?? '#5B6B82' }" />
                   <div style="min-width:0;flex:1;">
                     <div class="od-row-between" style="gap:8px;">
-                      <span class="od-text"><b>{{ entry.retry ? 'Reintento SYSCOM' : (statusCfg[entry.status]?.label ?? entry.status) }}</b> <span class="od-muted">por {{ entry.byName }}</span></span>
+                      <span class="od-text"><b>{{ entry.retry ? 'Reintento SYSCOM' : (entry.status === 'reasignado' ? 'Asignado a otro cliente' : statusCfg[entry.status]?.label ?? entry.status) }}</b> <span class="od-muted">por {{ entry.byName }}</span></span>
                       <span class="od-muted" style="white-space:nowrap;">{{ fmtDateLong(entry.at) }}</span>
                     </div>
                     <div v-if="entry.syscomFolio" class="od-log-note" style="color:#16A34A;">Folio SYSCOM {{ entry.syscomFolio }}</div>
@@ -644,6 +653,17 @@ async function retrySyscom(order: Order) {
   } finally {
     retrying.value = null
   }
+}
+
+// Asignar a otro cliente (p. ej. pedido de mostrador): solo pendientes y sin pago
+const asignando    = ref(false)
+const puedeAsignar = computed(() => !!detail.value && ['admin', 'seller'].includes(auth.user?.role ?? '')
+  && detail.value.status === 'pending' && detail.value.paymentStatus === 'unpaid' && !detail.value.syscomFolio)
+async function asignarCliente(clientId: string) {
+  const res = await $fetch<{ order: Order }>(`/api/orders/${detail.value!.id}/asignar`, { method: 'POST', body: { clientId } })
+  orders.value = orders.value.map(o => o.id === res.order.id ? res.order : o)
+  detail.value = res.order
+  actionSuccess.value = `Pedido asignado a ${res.order.userName}.`
 }
 
 // #14 — Cancelar pedido

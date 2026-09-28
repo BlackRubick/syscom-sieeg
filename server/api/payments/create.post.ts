@@ -6,7 +6,7 @@ import { repriceItems } from '~/server/utils/pricing'
 import { totalDe, envioDe } from '~/utils/orderTotals'
 import { getShippingConfig } from '~/server/utils/shipping'
 import type { OrderItem } from '~/types'
-import { reservarCotizacion, liberarCotizacion, ligarCotizacion } from '~/server/utils/cotizacion'
+import { reservarCotizacion, liberarCotizacion, ligarCotizacion, limpiarFolio } from '~/server/utils/cotizacion'
 
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
     items:            OrderItem[]
     priority?:        string
     notes?:           string
+    purchaseOrder?:   string
     quoteId?:         string
   }>(event)
 
@@ -125,6 +126,7 @@ export default defineEventHandler(async (event) => {
       shippingFee,
       priority:      body.priority ?? 'normal',
       notes:         body.notes ?? null,
+      purchaseOrder: limpiarFolio(body.purchaseOrder),
       paymentId,
       paymentStatus,
       paymentMethod: body.method,

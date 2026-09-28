@@ -59,6 +59,10 @@
             </div>
           </div>
 
+          <div v-if="expirada && !error" style="padding:10px 14px;border-radius:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);font-size:13px;color:#B45309;">
+            Tu sesión expiró por inactividad. Vuelve a entrar para continuar.
+          </div>
+
           <!-- Error -->
           <Transition name="fade">
             <div v-if="error" style="padding:10px 14px;border-radius:10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);font-size:13px;color:#EF4444;">
@@ -99,6 +103,13 @@ definePageMeta({ layout: 'auth' })
 
 const auth   = useAuthStore()
 const router = useRouter()
+const route  = useRoute()
+const expirada = computed(() => !!route.query.expirada)
+// Regresar a donde estaba cuando expiró la sesión (solo rutas internas)
+const volver = computed(() => {
+  const v = String(route.query.volver ?? '')
+  return v.startsWith('/') && !v.startsWith('//') ? v : '/dashboard'
+})
 
 const email     = ref('')
 const password  = ref('')
@@ -123,7 +134,7 @@ async function handleLogin() {
       body: { email: email.value, password: password.value },
     })
     auth.setUser(data.user as never)
-    router.push('/dashboard')
+    router.push(volver.value)
   } catch (e: unknown) {
     const msg = (e as { data?: { message?: string } })?.data?.message
     error.value = msg ?? 'Error al iniciar sesión'

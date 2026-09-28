@@ -146,7 +146,7 @@
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div style="grid-column:1/-1;"><FormField label="Nombre completo" v-model="form.name" placeholder="Juan Pérez García" :required="true" /></div>
                 <div style="grid-column:1/-1;"><FormField label="Correo electrónico" type="email" v-model="form.email" placeholder="juan@empresa.com" :required="true" /></div>
-                <div v-if="modal==='create'" style="grid-column:1/-1;"><FormField label="Contraseña" type="password" v-model="form.password" placeholder="Mínimo 6 caracteres" :required="true" /></div>
+                <div v-if="modal==='create'" style="grid-column:1/-1;"><FormField label="Contraseña" type="password" v-model="form.password" placeholder="Mínimo 8 caracteres" :required="true" /></div>
                 <FormSelect label="Rol" v-model="form.role" :options="ROLES.map(r=>({value:r,label:roleCfg[r].label}))" />
                 <FormSelect label="Estado" v-model="form.status" :options="STATUSES.map(s=>({value:s,label:statusCfg[s].label}))" />
                 <div style="grid-column:1/-1;">
@@ -312,7 +312,7 @@ async function handleSave() {
   try {
     const body: Record<string,unknown> = { name:form.value.name, email:form.value.email, role:form.value.role, status:form.value.status, discountPct:form.value.discountPct }
     if (modal.value === 'create') {
-      if (!form.value.password) { formError.value = 'La contraseña es requerida'; saving.value=false; return }
+      if ((form.value.password ?? '').length < 8) { formError.value = 'La contraseña debe tener al menos 8 caracteres'; saving.value=false; return }
       body.password = form.value.password
       const data = await $fetch<{ user:User }>('/api/users', { method:'POST', body })
       users.value.push(data.user)
