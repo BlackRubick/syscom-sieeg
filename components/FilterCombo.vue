@@ -22,7 +22,8 @@
             <span v-if="o.count != null">{{ o.count }} {{ countLabel ?? 'pedido' }}{{ o.count !== 1 ? 's' : '' }}</span>
           </div>
         </li>
-        <li v-if="!filtradas.length" class="fc-empty">Sin resultados</li>
+        <li v-if="faltaTexto" class="fc-empty">Escribe el nombre, empresa o número para buscar</li>
+        <li v-else-if="!filtradas.length" class="fc-empty">Sin resultados</li>
       </ul>
     </div>
   </div>
@@ -31,7 +32,8 @@
 <script setup lang="ts">
 export interface ComboOption { value: string; label: string; sub?: string; badge?: string; count?: number; search?: string }
 
-const props = defineProps<{ modelValue: string; options: ComboOption[]; label: string; placeholder?: string; emptyLabel?: string; countLabel?: string }>()
+// buscarAlEscribir: con listas grandes (clientes) no se despliega todo, solo lo que coincide con lo que se escribe
+const props = defineProps<{ modelValue: string; options: ComboOption[]; label: string; placeholder?: string; emptyLabel?: string; countLabel?: string; buscarAlEscribir?: boolean }>()
 const emit  = defineEmits<{ (e: 'update:modelValue', v: string): void }>()
 
 const open   = ref(false)
@@ -42,9 +44,11 @@ const input  = ref<HTMLInputElement | null>(null)
 
 const seleccionado = computed(() => props.options.find(o => o.value === props.modelValue))
 
+const faltaTexto = computed(() => !!props.buscarAlEscribir && !texto.value.trim())
 const normalizar = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 const filtradas = computed(() => {
   const q = normalizar(texto.value.trim())
+  if (faltaTexto.value) return []
   const lista = q ? props.options.filter(o => normalizar(`${o.label} ${o.sub ?? ''} ${o.badge ?? ''} ${o.search ?? ''}`).includes(q)) : props.options
   return lista.slice(0, 80)
 })

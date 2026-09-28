@@ -230,7 +230,7 @@
       <!-- Cliente (vendedor / admin): el pedido o la cotización quedan a su nombre, con su precio -->
       <div v-if="vende" class="ct-client">
         <div class="ct-client-pick">
-          <FilterCombo v-model="clienteId" :options="opcionesClientes" label="Cliente" empty-label="Sin elegir" count-label="pedido" placeholder="Buscar por nombre, empresa o número…" />
+          <FilterCombo v-model="clienteId" :options="opcionesClientes" label="Cliente" buscar-al-escribir empty-label="Sin elegir" count-label="pedido" placeholder="Buscar por nombre, empresa o número…" />
           <NuxtLink to="/clientes?nuevo=1" class="ct-client-new">+ Nuevo cliente</NuxtLink>
         </div>
         <div v-if="clienteSel && !clienteSel.mostrador && !clienteSel.fiscalCompleted" class="ct-client-warn">Este cliente no tiene datos fiscales: captúralos en Datos Fiscales antes de aprobar el pedido.</div>

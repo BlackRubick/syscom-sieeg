@@ -107,6 +107,7 @@ model Order {
   seller         User?       @relation("OrderSeller", fields: [sellerId], references: [id], onDelete: SetNull)
   // Cotización de la que salió el pedido (COT-0001)
   quoteNumber    Int?        @map("quote_number")
+  quote          Quote?      @relation(fields: [quoteNumber], references: [number], onDelete: SetNull)
   status         OrderStatus @default(pending)
   items          Json
   total          Float
@@ -152,6 +153,7 @@ model Quote {
   purchaseOrder String?     @map("purchase_order") @db.VarChar(60)
   status        QuoteStatus @default(open)
   orderId       String?     @map("order_id")
+  orders        Order[]
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
 

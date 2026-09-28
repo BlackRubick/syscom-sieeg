@@ -112,7 +112,7 @@
                   <span style="font-size:11px;color:#5B6B82;">{{ order.userName }}</span>
                   <span v-if="order.clientNumber" class="cl-num">{{ formatClientNumber(order.clientNumber) }}</span>
                 </template>
-                <span v-if="order.quoteNumber" class="cl-num" title="Salió de esta cotización">{{ formatQuoteNumber(order.quoteNumber) }}</span>
+                <span v-if="order.quoteNumber" class="cl-num" title="Salió de esta cotización">{{ order.quoteFolio }}</span>
                 <span v-if="order.vendedor" style="font-size:11px;color:#5B6B82;">· Vendedor: {{ order.vendedor.name }}</span>
               </div>
             </div>
@@ -180,7 +180,7 @@
                   <Clock :size="12" /> {{ fmtDateLong(detail.createdAt) }}
                   <template v-if="veTodos && detail.userName"><span class="od-dot">·</span><User :size="12" /> {{ detail.userName }}<span v-if="detail.clientNumber" class="cl-num">{{ formatClientNumber(detail.clientNumber) }}</span></template>
                   <template v-if="detail.vendedor"><span class="od-dot">·</span>Vendedor: {{ detail.vendedor.name }}</template>
-                  <template v-if="detail.quoteNumber"><span class="od-dot">·</span><NuxtLink :to="`/quotes?search=${formatQuoteNumber(detail.quoteNumber)}`" class="cl-num">{{ formatQuoteNumber(detail.quoteNumber) }}</NuxtLink></template>
+                  <template v-if="detail.quoteNumber"><span class="od-dot">·</span><NuxtLink :to="`/quotes?search=${detail.quoteFolio}`" class="cl-num">{{ detail.quoteFolio }}</NuxtLink></template>
                 </div>
               </div>
               <div class="od-head-right">

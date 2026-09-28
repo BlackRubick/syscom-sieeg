@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
         data: {
           userId:  clientId,
           type:    'system',
-          title:   `Nueva cotización ${actualizada.name ? `«${actualizada.name}»` : formatQuoteNumber(actualizada.number)}`,
+          title:   `Nueva cotización ${actualizada.name ? `«${actualizada.name}»` : formatQuoteNumber(actualizada.number, actualizada.createdAt)}`,
           message: `${actualizada.seller?.name ?? 'Tu vendedor'} te asignó una cotización. Entra, revísala y haz tu pedido.`,
         },
       })

@@ -59,7 +59,7 @@
 
           <div class="rm-field">
             <span>Cliente</span>
-            <FilterCombo v-model="form.clientId" :options="opcionesClientes" label="Cliente" empty-label="Elegir…" count-label="pedido" placeholder="Buscar por nombre, empresa o número…" class="rm-combo" />
+            <FilterCombo v-model="form.clientId" :options="opcionesClientes" label="Cliente" buscar-al-escribir empty-label="Elegir…" count-label="pedido" placeholder="Buscar por nombre, empresa o número…" class="rm-combo" />
           </div>
 
           <div v-if="form.clientId" class="rm-field">

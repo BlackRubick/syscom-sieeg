@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
   if (user?.cartQuoteId) {
     const q = await prisma.quote.findUnique({ where: { id: user.cartQuoteId }, include: { seller: { select: { name: true } } } })
     if (q && q.userId === session.userId && q.status === 'open') {
-      quote = { id: q.id, folio: formatQuoteNumber(q.number), name: q.name, vendedor: q.seller?.name ?? null }
+      quote = { id: q.id, folio: formatQuoteNumber(q.number, q.createdAt), name: q.name, vendedor: q.seller?.name ?? null }
     } else {
       await prisma.user.update({ where: { id: session.userId }, data: { cartQuoteId: null } })
     }

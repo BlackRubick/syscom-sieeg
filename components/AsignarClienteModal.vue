@@ -4,7 +4,7 @@
       <div class="ac-modal" role="dialog" aria-modal="true" aria-labelledby="ac-title">
         <h2 id="ac-title">{{ titulo }}</h2>
         <p class="ac-muted">{{ descripcion }}</p>
-        <FilterCombo v-model="elegido" :options="opcionesSinActual" label="Cliente" empty-label="Elegir…" count-label="pedido" placeholder="Buscar por nombre, empresa o número…" class="ac-combo" />
+        <FilterCombo v-model="elegido" :options="opcionesSinActual" label="Cliente" buscar-al-escribir empty-label="Elegir…" count-label="pedido" placeholder="Buscar por nombre, empresa o número…" class="ac-combo" />
         <p v-if="error" class="ac-error">{{ error }}</p>
         <div class="ac-actions">
           <NuxtLink to="/clientes?nuevo=1" class="ac-link">+ Nuevo cliente</NuxtLink>

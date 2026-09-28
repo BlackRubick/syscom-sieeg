@@ -40,7 +40,7 @@ const doc = computed(() => {
     folio: `PED-${o.id.slice(-8).toUpperCase()}`,
     fecha: new Date(o.createdAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' }),
     estado: ESTADO[o.status] ?? o.status,
-    referencia: o.quoteNumber ? `Cotización ${formatQuoteNumber(o.quoteNumber)}` : undefined,
+    referencia: o.quoteNumber ? `Cotización ${o.quoteFolio}` : undefined,
     cliente: {
       nombre: o.mostrador ? 'PUBLICO EN GENERAL' : o.userName ?? '', razonSocial: o.cliente?.razonSocial, rfc: o.cliente?.rfc, email: o.mostrador ? null : o.userEmail,
       telefono: e?.telefono || null,

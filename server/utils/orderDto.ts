@@ -1,5 +1,6 @@
 import type { Prisma } from '@prisma/client'
 import { esMostrador } from '~/server/utils/mostrador'
+import { formatQuoteNumber } from '~/utils/quoteNumber'
 
 /* Forma única en que la API devuelve un pedido (lista, aprobación, reintento…). */
 
@@ -13,6 +14,7 @@ export const ORDER_INCLUDE = {
     },
   },
   seller: { select: { id: true, name: true } },
+  quote:  { select: { number: true, createdAt: true } },
 } satisfies Prisma.OrderInclude
 
 type OrderWithUser = Prisma.OrderGetPayload<{ include: typeof ORDER_INCLUDE }>
@@ -101,6 +103,7 @@ export function serializeOrder(o: OrderWithUser, isManager: boolean) {
     mostrador:     esMostrador(u.email),
     vendedor:      o.seller ? { id: o.seller.id, name: o.seller.name } : null,
     quoteNumber:   o.quoteNumber,
+    quoteFolio:    o.quote ? formatQuoteNumber(o.quote.number, o.quote.createdAt) : formatQuoteNumber(o.quoteNumber),
     status:        o.status,
     items:         o.items,
     total:         o.total,

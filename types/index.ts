@@ -79,6 +79,7 @@ export interface Order {
   mostrador?: boolean
   vendedor?: { id: string; name: string } | null
   quoteNumber?: number | null
+  quoteFolio?: string
   status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'processing' | 'shipped' | 'delivered'
   items: OrderItem[]
   total: number

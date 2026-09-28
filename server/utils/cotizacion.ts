@@ -87,7 +87,7 @@ export function serializeQuote(q: QuoteRow) {
   return {
     id:        q.id,
     number:    q.number,
-    folio:     formatQuoteNumber(q.number),
+    folio:     formatQuoteNumber(q.number, q.createdAt),
     name:      q.name,
     status:    q.status,
     items:     q.items as unknown as OrderItem[],
@@ -127,7 +127,7 @@ export function limpiarNombre(v: unknown): string | null {
     Si ya no aplica (es de otro cliente, ya se convirtió o se canceló) se ignora y el pedido sale normal. */
 export async function reservarCotizacion(quoteId: unknown, clientId: string) {
   if (typeof quoteId !== 'string' || !quoteId) return null
-  const q = await prisma.quote.findUnique({ where: { id: quoteId }, select: { id: true, userId: true, sellerId: true, number: true, name: true, status: true } })
+  const q = await prisma.quote.findUnique({ where: { id: quoteId }, select: { id: true, userId: true, sellerId: true, number: true, name: true, status: true, createdAt: true } })
   if (!q || q.userId !== clientId || q.status !== 'open') return null
   const r = await prisma.quote.updateMany({ where: { id: quoteId, status: 'open' }, data: { status: 'converted' } })
   return r.count ? q : null
@@ -138,7 +138,7 @@ export async function liberarCotizacion(quoteId: string) {
 }
 
 /** Liga el pedido a la cotización, la saca del carrito del cliente y avisa al vendedor. */
-export async function ligarCotizacion(q: { id: string; userId: string; sellerId: string | null; number: number; name: string | null }, orderId: string, clienteNombre: string) {
+export async function ligarCotizacion(q: { id: string; userId: string; sellerId: string | null; number: number; name: string | null; createdAt: Date }, orderId: string, clienteNombre: string) {
   await prisma.quote.update({ where: { id: q.id }, data: { orderId } })
   await prisma.user.updateMany({ where: { id: q.userId, cartQuoteId: q.id }, data: { cartQuoteId: null } })
   if (q.sellerId) {
@@ -146,7 +146,7 @@ export async function ligarCotizacion(q: { id: string; userId: string; sellerId:
       data: {
         userId:  q.sellerId,
         type:    'approval',
-        title:   `Cotización ${formatQuoteNumber(q.number)} comprada`,
+        title:   `Cotización ${formatQuoteNumber(q.number, q.createdAt)} comprada`,
         message: `${clienteNombre} hizo el pedido de la cotización${q.name ? ` «${q.name}»` : ''} desde su carrito.`,
         orderId,
       },

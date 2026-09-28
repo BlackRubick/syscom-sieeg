@@ -40,6 +40,7 @@ export async function crearPedido(opts: {
     include: {
       user:   { select: { id: true, name: true, email: true, clientNumber: true } },
       seller: { select: { name: true } },
+      quote:  { select: { number: true, createdAt: true } },
     },
   })
 
@@ -47,7 +48,7 @@ export async function crearPedido(opts: {
   const cliente = `${order.user.name}${order.user.clientNumber ? ` (${formatClientNumber(order.user.clientNumber)})` : ''}`
   const origen  = [
     order.seller ? `levantado por ${order.seller.name}` : '',
-    opts.quoteNumber ? `desde la cotización ${formatQuoteNumber(opts.quoteNumber)}` : '',
+    opts.quoteNumber ? `desde la cotización ${formatQuoteNumber(opts.quoteNumber, order.quote?.createdAt)}` : '',
   ].filter(Boolean).join(', ')
 
   // Avisar a los admins; si lo hizo un vendedor, también al cliente

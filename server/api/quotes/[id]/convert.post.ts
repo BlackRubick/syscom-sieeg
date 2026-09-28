@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
         data: {
           userId:  quote.sellerId,
           type:    'approval',
-          title:   `Cotización ${formatQuoteNumber(quote.number)} aceptada`,
+          title:   `Cotización ${formatQuoteNumber(quote.number, quote.createdAt)} aceptada`,
           message: `${order.user.name} aceptó la cotización y se generó el pedido.`,
           orderId: order.id,
         },

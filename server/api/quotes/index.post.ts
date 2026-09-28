@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
       data: {
         userId:  clientId,
         type:    'system',
-        title:   `Nueva cotización ${quote.name ? `«${quote.name}»` : formatQuoteNumber(quote.number)}`,
+        title:   `Nueva cotización ${quote.name ? `«${quote.name}»` : formatQuoteNumber(quote.number, quote.createdAt)}`,
         message: `${quote.seller?.name ?? 'Tu vendedor'} te preparó una cotización. Ya la tienes en tu carrito: entra, revísala y haz tu pedido.`,
       },
     })
