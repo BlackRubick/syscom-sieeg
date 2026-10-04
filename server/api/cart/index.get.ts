@@ -2,6 +2,7 @@ import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { syscomGet } from '~/server/utils/syscom'
 import { getPricing, precioVenta } from '~/server/utils/pricing'
+import { formatGarantia } from '~/utils/garantia'
 import type { SyscomProducto } from '~/types'
 import { formatQuoteNumber } from '~/utils/quoteNumber'
 
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
     where: { id: session.userId },
     select: { cartItems: true, cartQuoteId: true },
   })
-  const items = JSON.parse(JSON.stringify((user?.cartItems as any[]) ?? [])) as Array<{ product: { id: string; price: number }; quantity: number }>
+  const items = JSON.parse(JSON.stringify((user?.cartItems as any[]) ?? [])) as Array<{ product: { id: string; price: number; garantia?: string }; quantity: number }>
 
   // El carrito guarda una copia del producto: actualizamos el precio vigente (margen, descuento e IVA)
   if (items.length) {
@@ -22,6 +23,8 @@ export default defineEventHandler(async (event) => {
         const prod = await syscomGet<SyscomProducto>(`/productos/${it.product.id}`, { moneda: 'MXN' })
         const price = precioVenta(prod, pricing)
         if (price > 0) it.product.price = price
+        const garantia = formatGarantia(prod.garantia)
+        if (garantia) it.product.garantia = garantia
       } catch { /* si SYSCOM falla se queda el precio guardado; el pedido se recalcula en servidor */ }
     }))
   }

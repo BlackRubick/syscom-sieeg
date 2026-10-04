@@ -48,7 +48,7 @@ const doc = computed(() => {
       numero: o.mostrador ? null : formatClientNumber(o.clientNumber) || null,
     },
     atiende: o.vendedor ? { nombre: o.vendedor.name } : null,
-    items: o.items.map(i => ({ codigo: i.sku, descripcion: i.name, cantidad: i.quantity, precio: i.price, imagen: i.images?.[0] })),
+    items: o.items.map(i => ({ codigo: i.sku, descripcion: i.name, cantidad: i.quantity, precio: i.price, imagen: i.images?.[0], garantia: i.garantia })),
     envio: o.shippingFee ?? 0,
     total: o.total,
     notas: o.notes,
@@ -57,7 +57,7 @@ const doc = computed(() => {
       'Precios en pesos mexicanos con IVA incluido.',
       'El pedido se surte una vez confirmado el pago.',
       e ? 'Se entrega en la dirección indicada arriba; el tiempo de entrega depende de la paquetería.' : 'El tiempo de entrega se confirma al aprobar el pedido.',
-      'La garantía de cada producto es la que otorga su fabricante.',
+      'La garantía de cada producto es la que otorga su fabricante (se indica en cada partida); se tramita en SIEEG presentando este documento.',
     ],
   }
 })

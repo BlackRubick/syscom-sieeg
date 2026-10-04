@@ -1,5 +1,6 @@
 import prisma from '~/server/utils/prisma'
 import { syscomGet } from '~/server/utils/syscom'
+import { formatGarantia } from '~/utils/garantia'
 import type { OrderItem, SyscomProducto } from '~/types'
 
 /* Precios de venta calculados siempre en servidor:
@@ -67,6 +68,7 @@ export async function repriceItems(userId: string, items: OrderItem[]): Promise<
     if (!(price > 0)) throw createError({ statusCode: 400, message: `"${item.name}" no tiene precio disponible` })
     const quantity = Math.floor(Number(item.quantity))
     if (!(quantity >= 1)) throw createError({ statusCode: 400, message: `Cantidad inválida para "${item.name}"` })
-    return { ...item, price, quantity }
+    const garantia = formatGarantia(prod.garantia) || item.garantia
+    return { ...item, price, quantity, ...(garantia ? { garantia } : {}) }
   }))
 }

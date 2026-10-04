@@ -230,7 +230,7 @@
       <!-- Cliente (vendedor / admin): el pedido o la cotización quedan a su nombre, con su precio -->
       <div v-if="vende" class="ct-client">
         <div class="ct-client-pick">
-          <FilterCombo v-model="clienteId" :options="opcionesClientes" label="Cliente" buscar-al-escribir empty-label="Sin elegir" count-label="pedido" placeholder="Buscar por nombre, empresa o número…" />
+          <FilterCombo v-model="clienteId" :options="opcionesClientes" label="Asignar cliente" buscar-al-escribir empty-label="Sin asignar" count-label="pedido" placeholder="Buscar por nombre, empresa o número…" />
           <NuxtLink to="/clientes?nuevo=1" class="ct-client-new">+ Nuevo cliente</NuxtLink>
         </div>
         <div v-if="clienteSel && !clienteSel.mostrador && !clienteSel.fiscalCompleted" class="ct-client-warn">Este cliente no tiene datos fiscales: captúralos en Datos Fiscales antes de aprobar el pedido.</div>
@@ -261,6 +261,7 @@
                 <div style="font-size:11px;color:#7A889C;margin-top:2px;display:flex;gap:6px;">
                   <span>{{ item.product?.supplier ?? '' }}</span>
                   <span v-if="item.product?.sku" style="font-family:monospace;">{{ item.product.sku }}</span>
+                  <span v-if="item.product?.garantia">· Garantía {{ item.product.garantia }}</span>
                 </div>
               </div>
             </div>
@@ -393,11 +394,11 @@
               <CreditCard :size="15" /> Elegir método de pago
             </button>
             <div class="ct-sep"><span>o guárdalo para después</span></div>
-            <input v-model="nombreCotizacion" class="ct-name" maxlength="120" :placeholder="clienteSel && !clienteSel.mostrador ? `Nombre de la cotización (ej. Casa de ${clienteSel.name.split(' ')[0]})` : 'Nombre de la cotización (ej. Casa de Fulanito)'" aria-label="Nombre de la cotización" />
+            <input v-model="nombreCotizacion" class="ct-name" maxlength="120" :placeholder="clienteSel && !clienteSel.mostrador ? `Nombre de proyecto (ej. Casa de ${clienteSel.name.split(' ')[0]})` : 'Nombre de proyecto (ej. Casa de Fulanito)'" aria-label="Nombre de proyecto" />
             <button class="ct-btn ct-btn-ghost" :disabled="!!accion || (esVendedor && !clienteId)" @click="guardarCotizacion">
               <FileText :size="15" /> {{ accion === 'cotizacion' ? 'Guardando…' : 'Guardar como cotización' }}
             </button>
-            <div v-if="esVendedor && !clienteId" class="ct-note">Elige un cliente arriba para cotizar o generar el pedido.</div>
+            <div v-if="esVendedor && !clienteId" class="ct-note">Asigna un cliente arriba para cotizar o generar el pedido.</div>
             <div v-else class="ct-note">La cotización guarda los productos con un número de folio; el precio se actualiza al del día cuando se acepta.</div>
           </div>
         </div>
@@ -852,6 +853,7 @@ function cartItems() {
     quantity:  i.quantity,
     images:    i.product?.images?.slice(0, 1) ?? [],
     satKey:    i.product?.satKey,
+    garantia:  i.product?.garantia,
   }))
 }
 

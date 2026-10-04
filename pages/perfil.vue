@@ -30,7 +30,7 @@
             {{ auth.user?.email }}
           </div>
           <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-            <span v-if="auth.user?.clientNumber" title="Tu número de cliente: menciónalo al contactarnos" style="font-size:11px;font-weight:700;font-family:ui-monospace,monospace;padding:4px 12px;border-radius:20px;color:#0B5BD3;background:rgba(21,112,239,0.12);border:1px solid rgba(21,112,239,0.3);">No. cliente {{ formatClientNumber(auth.user.clientNumber) }}</span>
+            <span v-if="auth.user?.clientNumber" title="Tu número de cliente: menciónalo al contactarnos" style="font-size:11px;font-weight:700;font-family:ui-monospace,monospace;padding:4px 12px;border-radius:20px;color:#0B5BD3;background:rgba(21,112,239,0.12);border:1px solid rgba(21,112,239,0.3);">{{ formatClientNumber(auth.user.clientNumber) }}</span>
             <span :style="{ ...roleBadgeStyle, padding:'4px 12px', fontSize:'11px' }">{{ roleLabel }}</span>
             <span :style="{ fontSize:'11px', fontWeight:600, padding:'4px 12px', borderRadius:'20px', background: auth.user?.status==='active'?'rgba(34,197,94,0.15)':'rgba(239,68,68,0.15)', color: auth.user?.status==='active'?'#16A34A':'#EF4444', border:`1px solid ${auth.user?.status==='active'?'rgba(34,197,94,0.25)':'rgba(239,68,68,0.25)'}`, display:'flex', alignItems:'center', gap:'5px' }">
               <span :style="{ width:'5px', height:'5px', borderRadius:'50%', background: auth.user?.status==='active'?'#16A34A':'#f43f5e', display:'inline-block' }" />

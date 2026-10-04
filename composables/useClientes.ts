@@ -1,4 +1,5 @@
 /* Lista de clientes para vendedores y administración (selector del carrito y asignación de cotizaciones/pedidos). */
+import { esIntegrador } from '~/utils/integrador'
 export interface ClienteOpt {
   id: string; name: string; email: string; clientNumber: number | null; role: string; status: string
   razonSocial: string | null; fiscalCompleted: boolean; discountPct: number; pedidos: number; mostrador: boolean
@@ -22,7 +23,7 @@ export function useClientes() {
     label: c.name,
     badge: c.mostrador ? 'MOSTRADOR' : formatClientNumber(c.clientNumber),
     sub:   c.mostrador ? 'Se asigna después al cliente real'
-      : [c.razonSocial ?? c.email, ROL[c.role], c.status === 'pending' ? 'Pendiente' : ''].filter(Boolean).join(' · '),
+      : [c.razonSocial ?? c.email, ROL[c.role], esIntegrador(c.discountPct) ? 'Integrador' : '', c.status === 'pending' ? 'Pendiente' : ''].filter(Boolean).join(' · '),
     count: c.mostrador ? undefined : c.pedidos,
     search: `${c.email} ${c.razonSocial ?? ''}`,
   })))

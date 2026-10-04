@@ -79,6 +79,11 @@
               <span style="font-size:12px;font-family:monospace;color:#5B6B82;">{{ displayProduct.sku }}</span>
             </div>
 
+            <div v-if="displayProduct.garantia" style="display:flex;align-items:center;gap:6px;font-size:12px;color:#15803D;font-weight:600;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+              Garantía: {{ displayProduct.garantia }}
+            </div>
+
             <div>
               <div style="font-size:28px;font-weight:800;color:#0B1B33;letter-spacing:-0.5px;line-height:1;">
                 {{ displayProduct.price > 0 ? fmtCurrency(displayProduct.price) : 'Consultar precio' }}

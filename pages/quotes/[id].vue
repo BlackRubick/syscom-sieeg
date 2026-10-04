@@ -19,10 +19,10 @@
         <div class="qd-folio-box">
           <span class="qd-doc">Cotización</span>
           <span class="qd-folio">{{ quote.folio }}</span>
-          <span v-if="quote.name && !editandoNombre" class="qd-name">{{ quote.name }}</span>
-          <button v-if="!editandoNombre && puedeCotizar" type="button" class="qd-rename no-print" @click="editarNombre">{{ quote.name ? 'Cambiar nombre' : '+ Ponerle nombre' }}</button>
+          <span v-if="quote.name && !editandoNombre" class="qd-name">Proyecto: {{ quote.name }}</span>
+          <button v-if="!editandoNombre && puedeCotizar" type="button" class="qd-rename no-print" @click="editarNombre">{{ quote.name ? 'Cambiar nombre de proyecto' : '+ Nombre de proyecto' }}</button>
           <form v-if="editandoNombre" class="qd-rename-form no-print" @submit.prevent="guardarNombre">
-            <input ref="nombreInput" v-model="nombre" maxlength="120" placeholder="Ej. Casa de Fulanito" aria-label="Nombre de la cotización" />
+            <input ref="nombreInput" v-model="nombre" maxlength="120" placeholder="Nombre de proyecto (ej. Casa de Fulanito)" aria-label="Nombre de proyecto" />
             <button type="submit" :disabled="guardandoNombre">{{ guardandoNombre ? '…' : 'Guardar' }}</button>
             <button type="button" class="ghost" @click="editandoNombre = false">Cancelar</button>
           </form>
@@ -40,7 +40,7 @@
           <div class="qd-kv"><span>Correo</span><b>{{ quote.cliente.email }}</b></div>
           <div v-if="quote.cliente.telefono" class="qd-kv"><span>Teléfono</span><b>{{ quote.cliente.telefono }}</b></div>
           <button v-if="puedeAsignar" type="button" class="qd-btn qd-btn-ghost qd-assign no-print" @click="asignando = true">
-            <UserCheck :size="15" /> {{ quote.cliente.mostrador ? 'Asignar a cliente' : 'Cambiar cliente' }}
+            <UserCheck :size="15" /> Asignar cliente
           </button>
         </section>
         <section class="qd-card qd-box">
@@ -66,7 +66,7 @@
                   <img v-if="it.images?.[0]" :src="it.images[0]" alt="" />
                   <div>
                     <div class="qd-prod-name">{{ it.name }}</div>
-                    <div class="qd-prod-sku">{{ it.sku }}<span v-if="!it.disponible" class="qd-off">No disponible hoy</span></div>
+                    <div class="qd-prod-sku">{{ it.sku }}<span v-if="it.garantia" class="qd-gar">Garantía: {{ it.garantia }}</span><span v-if="!it.disponible" class="qd-off">No disponible hoy</span></div>
                   </div>
                 </div>
               </td>
@@ -96,6 +96,21 @@
 
       <p class="qd-legal">Precios en pesos mexicanos con IVA incluido, sujetos a existencias y a cambio sin previo aviso. Al confirmar el pedido se aplica el precio del día.</p>
 
+      <!-- Envío por correo: se ve y se elige a qué correo llega -->
+      <form v-if="correo.abierto" class="qd-card qd-mail no-print" @submit.prevent="enviarCorreo">
+        <label for="qd-mail-to">Se enviará la cotización a:</label>
+        <div class="qd-mail-row">
+          <input id="qd-mail-to" ref="correoInput" v-model="correo.to" type="email" required maxlength="160" placeholder="correo@cliente.com" />
+          <button type="submit" class="qd-btn qd-btn-primary" :disabled="correo.enviando">{{ correo.enviando ? 'Enviando…' : 'Enviar' }}</button>
+          <button type="button" class="qd-btn qd-btn-ghost" :disabled="correo.enviando" @click="correo.abierto = false">Cancelar</button>
+        </div>
+        <div v-if="sugerenciasCorreo.length" class="qd-mail-sug">
+          <button v-for="s in sugerenciasCorreo" :key="s.email" type="button" :class="{ on: correo.to === s.email }" @click="correo.to = s.email">{{ s.label }}: {{ s.email }}</button>
+        </div>
+        <p class="qd-mail-note">Le llega desde el correo de SIEEG con el resumen, los precios del día y la liga para ver la cotización y descargar el PDF. Si responde, la respuesta te llega a ti.</p>
+      </form>
+      <div v-if="correo.enviadoA" class="qd-ok no-print">Cotización enviada a <b>{{ correo.enviadoA }}</b>.</div>
+
       <!-- Acciones -->
       <div class="qd-actions no-print">
         <div v-if="accionError" class="qd-error">{{ accionError }}</div>
@@ -103,6 +118,7 @@
           <CheckCircle :size="16" /> {{ accion === 'convertir' ? 'Generando pedido…' : esCliente ? 'Aceptar y generar pedido' : 'Convertir en pedido' }}
         </button>
         <NuxtLink :to="`/imprimir/cotizacion/${quote.id}`" class="qd-btn qd-btn-ghost"><Download :size="16" /> Descargar PDF</NuxtLink>
+        <button v-if="puedeEnviar" class="qd-btn qd-btn-ghost" :disabled="!!accion" @click="abrirCorreo"><Mail :size="16" /> Enviar por correo</button>
         <button v-if="puedeCotizar" class="qd-btn qd-btn-ghost" :disabled="!!accion" @click="alCarrito"><ShoppingCart :size="16" /> {{ quote.status === 'open' ? 'Editar en el carrito' : 'Volver a cotizar' }}</button>
         <AsignarClienteModal v-model="asignando" :actual="quote.cliente.id" :asignar="asignar"
           :titulo="`Asignar la cotización ${quote.folio} a un cliente`" descripcion="La cotización pasa a nombre del cliente elegido, con sus precios, y le llega un aviso para que la revise y haga su pedido." />
@@ -113,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeft, CheckCircle, Download, ShoppingCart, UserCheck } from '@lucide/vue'
+import { ArrowLeft, CheckCircle, Download, ShoppingCart, UserCheck, Mail } from '@lucide/vue'
 import type { OrderItem, Product } from '~/types'
 
 definePageMeta({ middleware: 'auth' })
@@ -122,7 +138,7 @@ interface ItemPrecio extends OrderItem { disponible: boolean }
 interface Quote {
   id: string; folio: string; name: string | null; status: 'open' | 'converted' | 'cancelled'; items: OrderItem[]; total: number; notes: string | null; purchaseOrder: string | null
   orderId: string | null; createdAt: string
-  cliente: { id: string; name: string; email: string; clientNumber: number | null; mostrador: boolean; razonSocial: string | null; rfc: string | null; telefono: string | null }
+  cliente: { id: string; name: string; email: string; clientNumber: number | null; mostrador: boolean; razonSocial: string | null; rfc: string | null; telefono: string | null; emailFacturacion: string | null }
   vendedor: { id: string; name: string; email: string } | null
 }
 interface Precios { items: ItemPrecio[]; subtotal: number; envio: number; total: number; noDisponibles: number }
@@ -195,7 +211,7 @@ async function alCarrito() {
   await cart.clearCart()
   for (const it of filas.value) {
     const producto: Product = {
-      id: it.productId, name: it.name, sku: it.sku, price: it.price, images: it.images ?? [], satKey: it.satKey,
+      id: it.productId, name: it.name, sku: it.sku, price: it.price, images: it.images ?? [], satKey: it.satKey, garantia: it.garantia,
       description: '', currency: 'MXN', category: '', supplier: '', supplierId: '', stock: 0, unit: 'pieza',
       tags: [], rating: 0, reviewCount: 0, leadTime: 0, featured: false,
     }
@@ -203,6 +219,33 @@ async function alCarrito() {
   }
   if (!esCliente.value) clienteCarrito.value = quote.value.cliente.id
   await navigateTo('/cart')
+}
+
+// ── Enviar por correo ──
+const puedeEnviar = computed(() => ['admin', 'seller'].includes(auth.user?.role ?? ''))
+const correo      = reactive({ abierto: false, to: '', enviando: false, enviadoA: '' })
+const correoInput = ref<HTMLInputElement | null>(null)
+const sugerenciasCorreo = computed(() => {
+  const c = quote.value?.cliente
+  if (!c || c.mostrador) return []
+  const lista = [{ label: 'Correo del cliente', email: c.email }]
+  if (c.emailFacturacion && c.emailFacturacion.toLowerCase() !== c.email.toLowerCase()) lista.push({ label: 'Correo de facturación', email: c.emailFacturacion })
+  return lista
+})
+function abrirCorreo() {
+  correo.to = sugerenciasCorreo.value[0]?.email ?? ''
+  correo.abierto = true; correo.enviadoA = ''; accionError.value = ''
+  nextTick(() => correoInput.value?.focus())
+}
+async function enviarCorreo() {
+  if (!quote.value) return
+  correo.enviando = true; accionError.value = ''
+  try {
+    const r = await $fetch<{ to: string }>(`/api/quotes/${quote.value.id}/email`, { method: 'POST', body: { to: correo.to } })
+    correo.enviadoA = r.to; correo.abierto = false
+  } catch (e: any) {
+    accionError.value = e?.data?.message ?? 'No se pudo enviar el correo'
+  } finally { correo.enviando = false }
 }
 
 // ── Asignar a cliente (p. ej. cotización de mostrador) ──
@@ -290,6 +333,7 @@ useHead(() => ({ title: quote.value ? `${quote.value.name ?? `Cotización ${quot
 .qd-prod img { width: 44px; height: 44px; object-fit: contain; border-radius: 8px; border: 1px solid #EEF1F6; background: #fff; flex-shrink: 0; }
 .qd-prod-name { font-weight: 600; line-height: 1.35; }
 .qd-prod-sku { margin-top: 2px; font-size: 11.5px; color: #5B6B82; font-family: ui-monospace, Menlo, monospace; }
+.qd-gar { margin-left: 8px; font-family: 'Inter', sans-serif; font-weight: 600; color: #15803D; }
 .qd-off { margin-left: 8px; font-family: 'Inter', sans-serif; font-weight: 700; color: #DC2626; }
 
 .qd-totals { display: flex; flex-direction: column; gap: 6px; margin-left: auto; width: min(360px, 100%); padding: 16px 18px 18px; }
@@ -308,6 +352,16 @@ useHead(() => ({ title: quote.value ? `${quote.value.name ?? `Cotización ${quot
 .qd-btn-ghost { background: #fff; color: #0B1B33; border: 1px solid #D5DEEA; }
 .qd-btn-ghost:hover:not(:disabled) { background: #F5F8FC; }
 .qd-btn-danger { background: #fff; color: #DC2626; border: 1px solid rgba(220,38,38,0.3); }
+.qd-mail { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.qd-mail label { font-size: 13px; font-weight: 700; }
+.qd-mail-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.qd-mail-row input { flex: 1; min-width: 220px; height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid #D5DEEA; font-size: 14px; font-family: inherit; color: #0B1B33; outline: none; }
+.qd-mail-row input:focus { border-color: #1570EF; }
+.qd-mail-sug { display: flex; gap: 6px; flex-wrap: wrap; }
+.qd-mail-sug button { font-size: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid #D5DEEA; background: #fff; color: #5B6B82; cursor: pointer; font-family: inherit; }
+.qd-mail-sug button.on { border-color: #1570EF; color: #0B5BD3; background: #EAF2FF; }
+.qd-mail-note { margin: 0; font-size: 12px; color: #7A889C; line-height: 1.5; }
+.qd-ok { padding: 10px 12px; border-radius: 10px; background: #ECFDF3; color: #15803D; font-size: 13px; }
 .qd-error { width: 100%; padding: 10px 12px; border-radius: 10px; background: #FEF2F2; color: #B91C1C; font-size: 13px; }
 
 @media (max-width: 700px) {

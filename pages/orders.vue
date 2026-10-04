@@ -32,12 +32,12 @@
       <div class="of-row">
       <div style="position:relative;flex:1;min-width:220px;max-width:380px;">
         <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#1570EF':'#7A889C'" />
-        <input v-model="search" :placeholder="veTodos ? 'Buscar por pedido, cliente o número CL-…' : 'Buscar por número de pedido…'"
+        <input v-model="search" :placeholder="veTodos ? 'Buscar por pedido, cliente o número de cliente' : 'Buscar por número de pedido…'"
           @focus="searchFocus=true" @blur="searchFocus=false"
           :style="{ width:'100%', height:'40px', background:searchFocus?'rgba(21,112,239,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${searchFocus?'rgba(21,112,239,0.45)':'rgba(11,27,51,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
       </div>
       <template v-if="veTodos">
-        <FilterCombo v-model="filtroCliente" label="Cliente" placeholder="Nombre, CL-…, correo o empresa" :options="opcionesClientes" />
+        <FilterCombo v-model="filtroCliente" label="Cliente" placeholder="Nombre, número, correo o empresa" :options="opcionesClientes" />
         <FilterCombo v-model="filtroEmpresa" label="Empresa" placeholder="Razón social o RFC" :options="opcionesEmpresas" />
         <button v-if="filtroCliente || filtroEmpresa" type="button" class="of-clear" @click="filtroCliente = ''; filtroEmpresa = ''">Quitar filtros</button>
       </template>
@@ -260,6 +260,7 @@
                   <div class="od-item-name" :title="item.name">{{ item.name }}</div>
                   <div class="od-item-meta">
                     <span v-if="item.sku" class="od-mono">{{ item.sku }}</span>
+                    <span v-if="item.garantia">· Garantía {{ item.garantia }}</span>
                     <span v-if="almacenesDe(item.productId)" class="od-tag">{{ almacenesDe(item.productId) }}</span>
                   </div>
                 </div>
@@ -280,15 +281,14 @@
             <div class="od-grid2">
               <section class="od-card">
                 <div class="od-card-title" style="margin-bottom:10px;"><User :size="13" /> Cliente</div>
-                <div v-if="detail.clientNumber" class="od-kv"><span>No. de cliente</span><b class="od-mono" style="color:#0B5BD3;">{{ formatClientNumber(detail.clientNumber) }}</b></div>
-                <div class="od-kv"><span>Nombre</span><b>{{ detail.userName || '—' }}</b></div>
+                <div class="od-kv"><span>Nombre</span><b>{{ detail.userName || '—' }}<span v-if="detail.clientNumber && !detail.mostrador" class="cl-num">{{ formatClientNumber(detail.clientNumber) }}</span></b></div>
                 <div v-if="detail.userEmail" class="od-kv"><span>Correo</span><b class="od-break">{{ detail.userEmail }}</b></div>
                 <div class="od-kv"><span>RFC</span><b class="od-mono">{{ detail.cliente?.rfc || '—' }}</b></div>
                 <div v-if="detail.cliente?.razonSocial" class="od-kv"><span>Razón social</span><b>{{ detail.cliente.razonSocial }}</b></div>
                 <div v-if="detail.cliente?.regimen" class="od-kv"><span>Régimen</span><b>{{ detail.cliente.regimen }}</b></div>
                 <div v-if="detail.cliente?.usoCfdi" class="od-kv"><span>Uso CFDI</span><b>{{ detail.cliente.usoCfdi }}</b></div>
                 <button v-if="puedeAsignar" class="od-btn od-btn-ghost" style="margin-top:10px;width:100%;" @click="asignando = true">
-                  {{ detail.mostrador ? 'Asignar a cliente' : 'Cambiar cliente' }}
+                  Asignar cliente
                 </button>
                 <AsignarClienteModal v-model="asignando" :actual="detail.userId" :asignar="asignarCliente"
                   :titulo="`Asignar el pedido #${detail.id.slice(-8).toUpperCase()}`" descripcion="El pedido pasa a nombre del cliente elegido y los precios se recalculan con su descuento. Se envía a su dirección fiscal." />
@@ -393,12 +393,13 @@
                   <span class="od-status-dot" :style="{ background: statusCfg[entry.status]?.dot ?? '#5B6B82' }" />
                   <div style="min-width:0;flex:1;">
                     <div class="od-row-between" style="gap:8px;">
-                      <span class="od-text"><b>{{ entry.retry ? 'Reintento SYSCOM' : (entry.status === 'reasignado' ? 'Asignado a otro cliente' : statusCfg[entry.status]?.label ?? entry.status) }}</b> <span class="od-muted">por {{ entry.byName }}</span></span>
+                      <span class="od-text"><b>{{ entry.retry ? 'Reintento SYSCOM' : (entry.status === 'reasignado' ? 'Asignado a otro cliente' : entry.status === 'precio_actualizado' ? 'Precio actualizado' : statusCfg[entry.status]?.label ?? entry.status) }}</b> <span class="od-muted">por {{ entry.byName }}</span></span>
                       <span class="od-muted" style="white-space:nowrap;">{{ fmtDateLong(entry.at) }}</span>
                     </div>
                     <div v-if="entry.syscomFolio" class="od-log-note" style="color:#16A34A;">Folio SYSCOM {{ entry.syscomFolio }}</div>
                     <div v-if="entry.syscomError" class="od-log-note" style="color:#DC2626;">{{ entry.syscomError }}</div>
                     <div v-if="entry.note" class="od-log-note">{{ entry.note }}</div>
+                    <div v-if="entry.status === 'precio_actualizado' && typeof entry.from === 'number' && typeof entry.to === 'number'" class="od-log-note">{{ fmtCurrency(entry.from) }} → {{ fmtCurrency(entry.to) }}</div>
                   </div>
                 </li>
               </ol>
@@ -444,7 +445,7 @@ const lastSyscomError = computed(() => {
   const log = (detail.value?.auditLog ?? []) as Array<{ syscomError?: string }>
   return [...log].reverse().find(e => e.syscomError)?.syscomError ?? ''
 })
-type AuditEntry = { status: string; byName: string; at: string; retry?: boolean; syscomFolio?: string; syscomError?: string; note?: string }
+type AuditEntry = { status: string; byName: string; at: string; retry?: boolean; syscomFolio?: string; syscomError?: string; note?: string; from?: unknown; to?: unknown }
 
 const totalPiezas = computed(() => (detail.value?.items ?? []).reduce((s, i) => s + i.quantity, 0))
 
@@ -689,7 +690,7 @@ async function cancelOrder(order: Order) {
 
 // #16 — Exportar CSV
 function exportCSV() {
-  const headers = ['ID','No. cliente','Usuario','Email','Estado','Subtotal','IVA','Total con IVA','Artículos','Folio SYSCOM','Fecha']
+  const headers = ['ID','Cliente #','Usuario','Email','Estado','Subtotal','IVA','Total con IVA','Artículos','Folio SYSCOM','Fecha']
   const rows = orders.value.map(o => {
     const t = desgloseTotales(o.total)
     return [
@@ -719,6 +720,18 @@ function openDetail(order: Order) {
   detail.value        = order
   actionError.value   = null
   actionSuccess.value = null
+  // Pendiente y sin pagar: el servidor lo trae al precio del día de SYSCOM
+  if (order.status === 'pending' && order.paymentStatus === 'unpaid' && !order.syscomFolio) refrescarPrecio(order.id)
+}
+
+async function refrescarPrecio(id: string) {
+  try {
+    const res = await $fetch<{ order: Order; precioActualizado?: boolean }>(`/api/orders/${id}`)
+    if (!res.precioActualizado) return
+    const antes = orders.value.find(o => o.id === id)?.total
+    reemplazarOrden(res.order)
+    if (detail.value?.id === id && antes != null) actionSuccess.value = `SYSCOM cambió precios: el total se actualizó de ${fmtCurrency(antes)} a ${fmtCurrency(res.order.total)}.`
+  } catch { /* se queda con lo que ya tenía */ }
 }
 
 async function handleAction(action: 'approve' | 'reject') {

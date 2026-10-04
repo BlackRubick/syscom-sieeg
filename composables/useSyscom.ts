@@ -1,4 +1,5 @@
 import type { Product, SyscomProducto, SyscomCategoria, SyscomFactura } from '~/types'
+import { formatGarantia } from '~/utils/garantia'
 
 interface CacheEntry { data: unknown; exp: number }
 const MEM: Map<string, CacheEntry> = new Map()
@@ -29,6 +30,7 @@ export function adaptProduct(p: SyscomProducto): Product {
     images: p.img_portada ? [p.img_portada] : [],
     tags: [], rating: 0, reviewCount: 0, leadTime: 0, featured: false, discount,
     satKey: p.sat_key || undefined,
+    garantia: formatGarantia(p.garantia) || undefined,
   }
 }
 

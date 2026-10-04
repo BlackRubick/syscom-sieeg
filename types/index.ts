@@ -51,10 +51,10 @@ export interface Product {
   featured: boolean
   discount?: number
   specs?: Record<string, string>
+  specs?: Record<string, string>
   satKey?: string
-}
-
-export interface CartItem {
+  garantia?: string
+} {
   product: Product
   quantity: number
   notes?: string
@@ -68,6 +68,8 @@ export interface OrderItem {
   quantity: number
   images: string[]
   satKey?: string
+  // Garantía del fabricante según SYSCOM (ej. "5 años")
+  garantia?: string
 }
 
 export interface Order {
@@ -120,6 +122,7 @@ export interface SyscomProducto {
   titulo: string
   total_existencia: number
   marca: string
+  garantia?: string
   sat_key?: string
   img_portada?: string
   categorias?: SyscomCategoria[]

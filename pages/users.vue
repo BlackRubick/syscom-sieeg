@@ -31,7 +31,7 @@
     <div style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:12px;">
       <div style="position:relative;max-width:380px;">
         <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#1570EF':'#7A889C'" />
-        <input v-model="search" placeholder="Buscar por nombre, correo o número CL-…"
+        <input v-model="search" placeholder="Buscar por nombre, correo o número de cliente"
           @focus="searchFocus=true" @blur="searchFocus=false"
           :style="{ width:'100%', height:'40px', background: searchFocus?'rgba(21,112,239,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${searchFocus?'rgba(21,112,239,0.45)':'rgba(11,27,51,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
       </div>
@@ -99,7 +99,7 @@
             {{ statusCfg[user.status]?.label }}
           </span>
           <span v-if="user.discountPct && user.discountPct > 0" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(34,197,94,0.12);color:#16A34A;border:1px solid rgba(34,197,94,0.25);">
-            -{{ user.discountPct }}%
+            {{ esIntegrador(user.discountPct) ? 'Integrador ' : '' }}-{{ user.discountPct }}%
           </span>
         </div>
 
@@ -150,7 +150,15 @@
                 <FormSelect label="Rol" v-model="form.role" :options="ROLES.map(r=>({value:r,label:roleCfg[r].label}))" />
                 <FormSelect label="Estado" v-model="form.status" :options="STATUSES.map(s=>({value:s,label:statusCfg[s].label}))" />
                 <div style="grid-column:1/-1;">
-                  <div style="font-size:11px;font-weight:600;color:#5B6B82;margin-bottom:6px;letter-spacing:0.3px;">Descuento en catálogo (%)</div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                    <span style="font-size:11px;font-weight:600;color:#5B6B82;letter-spacing:0.3px;">Descuento en catálogo (%)</span>
+                    <button type="button" :aria-pressed="esIntegrador(form.discountPct)" @click="form.discountPct = esIntegrador(form.discountPct) ? 0 : DESCUENTO_INTEGRADOR"
+                      :style="{ height:'28px', padding:'0 12px', borderRadius:'8px', fontSize:'12px', fontWeight:700, fontFamily:'inherit', cursor:'pointer',
+                        border: esIntegrador(form.discountPct) ? '1px solid #1570EF' : '1px dashed rgba(11,27,51,0.25)',
+                        background: esIntegrador(form.discountPct) ? '#EAF2FF' : 'transparent', color: esIntegrador(form.discountPct) ? '#0B5BD3' : '#5B6B82' }">
+                      {{ esIntegrador(form.discountPct) ? '✓ Integrador' : `Integrador (${DESCUENTO_INTEGRADOR}%)` }}
+                    </button>
+                  </div>
                   <div style="position:relative;">
                     <input v-model.number="form.discountPct" type="number" min="0" max="100" step="0.5" placeholder="0"
                       style="width:100%;height:40px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:10px;padding:0 40px 0 14px;font-size:13px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.2s;"

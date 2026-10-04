@@ -60,7 +60,7 @@
       <div style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:10px;">
         <div style="position:relative;max-width:360px;">
           <Search :size="13" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="orderSearchFocus?'#6366f1':'#7A889C'" />
-          <input v-model="orderSearch" placeholder="Buscar por cliente, número CL-…, RFC o folio SYSCOM…"
+          <input v-model="orderSearch" placeholder="Buscar por cliente, número de cliente, RFC o folio SYSCOM…"
             @focus="orderSearchFocus=true" @blur="orderSearchFocus=false"
             :style="{ width:'100%', height:'38px', background: orderSearchFocus?'rgba(99,102,241,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${orderSearchFocus?'rgba(99,102,241,0.4)':'rgba(11,27,51,0.08)'}`, borderRadius:'9px', paddingLeft:'36px', paddingRight:'12px', fontSize:'12px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
         </div>

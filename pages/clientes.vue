@@ -11,7 +11,7 @@
     <div class="cl-card cl-filters">
       <div class="cl-search">
         <Search :size="15" />
-        <input v-model="search" placeholder="Buscar por nombre, correo, empresa, RFC o CL-…" />
+        <input v-model="search" placeholder="Buscar por nombre, correo, empresa, RFC o número" />
       </div>
     </div>
 
@@ -41,12 +41,15 @@
         </div>
         <div class="cl-item-badges">
           <span v-if="ROL[c.role]" class="cl-badge off">{{ ROL[c.role] }}</span>
+          <span v-if="esIntegrador(c.discountPct)" class="cl-badge int">Integrador −{{ DESCUENTO_INTEGRADOR }}%</span>
+          <span v-else-if="c.discountPct > 0" class="cl-badge int">−{{ c.discountPct }}%</span>
           <span :class="['cl-badge', c.status === 'active' ? 'ok' : 'off']">{{ c.status === 'active' ? 'Activo' : c.status === 'pending' ? 'Pendiente' : 'Inactivo' }}</span>
           <NuxtLink v-if="!c.fiscalCompleted && !c.mostrador" :to="`/fiscal?buscar=${encodeURIComponent(c.email)}`" class="cl-badge warn">Faltan datos fiscales →</NuxtLink>
           <span v-else-if="!c.mostrador" class="cl-badge ok">Datos fiscales completos</span>
         </div>
         <div class="cl-item-actions">
           <button class="cl-btn cl-btn-primary" :disabled="c.status !== 'active'" @click="venderA(c)"><ShoppingCart :size="14" /> Cotizar / pedir</button>
+          <button class="cl-btn cl-btn-ghost" @click="abrirFicha(c.id)"><IdCard :size="14" /> Ver / editar</button>
           <NuxtLink :to="`/quotes?search=${encodeURIComponent(c.email)}`" class="cl-btn cl-btn-ghost">Cotizaciones</NuxtLink>
           <NuxtLink :to="`/orders?cliente=${c.id}`" class="cl-btn cl-btn-ghost">Pedidos</NuxtLink>
         </div>
@@ -68,6 +71,11 @@
                   <FormField label="Contraseña inicial" v-model="form.password" placeholder="Mínimo 8 caracteres" :required="true" />
                   <button type="button" class="cl-btn cl-btn-ghost" @click="generarPassword">Generar</button>
                 </div>
+                <button type="button" :class="['cl-int', { on: form.integrador }]" :aria-pressed="form.integrador" @click="form.integrador = !form.integrador">
+                  <BadgePercent :size="16" />
+                  <span><b>Integrador</b> · se le asigna {{ DESCUENTO_INTEGRADOR }}% de descuento automáticamente</span>
+                  <span class="cl-int-check">{{ form.integrador ? '✓' : '' }}</span>
+                </button>
                 <p v-if="formError" class="cl-error">{{ formError }}</p>
                 <div class="cl-modal-actions">
                   <button type="button" class="cl-btn cl-btn-ghost" :disabled="guardando" @click="cerrar">Cancelar</button>
@@ -79,7 +87,7 @@
               <h2 id="cl-modal-title">Cliente creado</h2>
               <p class="cl-muted">Comparte estos datos de acceso con tu cliente para que pueda ver y aceptar sus cotizaciones:</p>
               <div class="cl-cred">
-                <div><span>Número</span><b>{{ formatClientNumber(creado.clientNumber) }}</b></div>
+                <div><span>Cliente</span><b>{{ formatClientNumber(creado.clientNumber) }}</b></div>
                 <div><span>Usuario</span><b>{{ creado.email }}</b></div>
                 <div><span>Contraseña</span><b>{{ creado.password }}</b></div>
                 <div><span>Acceso</span><b>{{ origen }}/login</b></div>
@@ -94,17 +102,119 @@
         </div>
       </Transition>
     </Teleport>
+
+    <!-- Ficha del cliente: todos sus datos y edición -->
+    <Teleport to="body">
+      <Transition name="fade">
+        <div v-if="ficha.abierta" class="cl-backdrop" @click.self="!ficha.guardando && (ficha.abierta = false)">
+          <div class="cl-modal cl-modal-lg" role="dialog" aria-modal="true" aria-labelledby="cl-ficha-title">
+            <p v-if="ficha.cargando" class="cl-muted">Cargando datos del cliente…</p>
+            <p v-else-if="ficha.error && !ficha.c" class="cl-error">{{ ficha.error }}</p>
+            <template v-else-if="ficha.c">
+              <div class="cl-ficha-head">
+                <span class="cl-avatar">{{ iniciales(ficha.c.name) }}</span>
+                <div class="cl-item-id">
+                  <h2 id="cl-ficha-title">{{ ficha.c.name }}</h2>
+                  <span>{{ ficha.c.mostrador ? 'Ventas al público en general' : ficha.c.email }}</span>
+                </div>
+                <span v-if="ficha.c.clientNumber && !ficha.c.mostrador" class="cl-num">{{ formatClientNumber(ficha.c.clientNumber) }}</span>
+              </div>
+
+              <!-- Edición -->
+              <form v-if="ficha.editando" class="cl-form" @submit.prevent="guardarFicha">
+                <FormField label="Nombre completo" v-model="ficha.form.name" :required="true" />
+                <FormField v-if="!ficha.c.mostrador" label="Correo electrónico" type="email" v-model="ficha.form.email" :required="true" />
+                <FormField label="Teléfono" v-model="ficha.form.telefono" placeholder="961 000 0000" />
+                <template v-if="!ficha.c.mostrador">
+                  <button type="button" :class="['cl-int', { on: ficha.form.integrador }]" :aria-pressed="ficha.form.integrador" @click="toggleIntegradorFicha">
+                    <BadgePercent :size="16" />
+                    <span><b>Integrador</b> · {{ DESCUENTO_INTEGRADOR }}% de descuento automático</span>
+                    <span class="cl-int-check">{{ ficha.form.integrador ? '✓' : '' }}</span>
+                  </button>
+                  <label v-if="esAdmin" class="cl-disc">
+                    <span>Descuento (%)</span>
+                    <input v-model.number="ficha.form.discountPct" type="number" min="0" max="100" step="0.5" @input="ficha.form.integrador = esIntegrador(ficha.form.discountPct)" />
+                  </label>
+                </template>
+                <p v-if="ficha.error" class="cl-error">{{ ficha.error }}</p>
+                <div class="cl-modal-actions">
+                  <button type="button" class="cl-btn cl-btn-ghost" :disabled="ficha.guardando" @click="ficha.editando = false">Cancelar</button>
+                  <button type="submit" class="cl-btn cl-btn-primary" :disabled="ficha.guardando">{{ ficha.guardando ? 'Guardando…' : 'Guardar cambios' }}</button>
+                </div>
+              </form>
+
+              <!-- Datos -->
+              <template v-else>
+                <p v-if="ficha.ok" class="cl-ok">{{ ficha.ok }}</p>
+                <section class="cl-sec">
+                  <h3>Cuenta</h3>
+                  <dl class="cl-dl">
+                    <div><dt>Número de cliente</dt><dd>{{ ficha.c.mostrador ? 'Mostrador' : formatClientNumber(ficha.c.clientNumber) || '—' }}</dd></div>
+                    <div><dt>Correo</dt><dd>{{ ficha.c.mostrador ? '—' : ficha.c.email }}</dd></div>
+                    <div><dt>Teléfono</dt><dd>{{ ficha.c.fiscalTelefono || '—' }}</dd></div>
+                    <div><dt>Tipo</dt><dd>{{ ROL[ficha.c.role] ?? 'Cliente' }}{{ esIntegrador(ficha.c.discountPct) ? ' · Integrador' : '' }}</dd></div>
+                    <div><dt>Descuento</dt><dd>{{ ficha.c.discountPct > 0 ? `${ficha.c.discountPct}%` : 'Sin descuento' }}</dd></div>
+                    <div><dt>Estado</dt><dd>{{ ficha.c.status === 'active' ? 'Activo' : ficha.c.status === 'pending' ? 'Pendiente' : 'Inactivo' }}</dd></div>
+                    <div><dt>Alta</dt><dd>{{ fechaCorta(ficha.c.createdAt) }}</dd></div>
+                    <div><dt>Último acceso</dt><dd>{{ ficha.c.lastLogin ? fechaCorta(ficha.c.lastLogin) : 'Nunca' }}</dd></div>
+                  </dl>
+                </section>
+                <section v-if="!ficha.c.mostrador" class="cl-sec">
+                  <h3>Datos fiscales <span v-if="!ficha.c.fiscalCompleted" class="cl-badge warn">Incompletos</span></h3>
+                  <dl class="cl-dl">
+                    <div><dt>RFC</dt><dd>{{ ficha.c.fiscalRfc || '—' }}</dd></div>
+                    <div><dt>Razón social</dt><dd>{{ ficha.c.fiscalRazonSocial || '—' }}</dd></div>
+                    <div><dt>Régimen</dt><dd>{{ ficha.c.fiscalRegimen || '—' }}</dd></div>
+                    <div><dt>Uso CFDI</dt><dd>{{ ficha.c.fiscalUsocfdi || '—' }}</dd></div>
+                    <div><dt>Correo de facturación</dt><dd>{{ ficha.c.fiscalEmail || '—' }}</dd></div>
+                    <div><dt>Contacto</dt><dd>{{ [ficha.c.fiscalNombre, ficha.c.fiscalApellidos].filter(Boolean).join(' ') || '—' }}</dd></div>
+                    <div class="wide"><dt>Dirección</dt><dd>{{ direccionDe(ficha.c) || '—' }}</dd></div>
+                  </dl>
+                </section>
+                <section class="cl-sec">
+                  <h3>Actividad</h3>
+                  <dl class="cl-dl">
+                    <div><dt>Pedidos</dt><dd>{{ ficha.c.pedidos }}</dd></div>
+                    <div><dt>Cotizaciones</dt><dd>{{ ficha.c.cotizaciones }}</dd></div>
+                    <div><dt>Garantías</dt><dd>{{ ficha.c.garantias }}</dd></div>
+                  </dl>
+                  <ul v-if="ficha.c.ultimasCotizaciones.length || ficha.c.ultimosPedidos.length" class="cl-act">
+                    <li v-for="q in ficha.c.ultimasCotizaciones" :key="q.id"><NuxtLink :to="`/quotes/${q.id}`">Cotización {{ q.folio }}{{ q.name ? ` · ${q.name}` : '' }}</NuxtLink><span>{{ fechaCorta(q.createdAt) }} · {{ fmt(q.total) }}</span></li>
+                    <li v-for="o in ficha.c.ultimosPedidos" :key="o.id"><NuxtLink :to="`/orders?pedido=${o.id}`">Pedido {{ o.folio }}</NuxtLink><span>{{ fechaCorta(o.createdAt) }} · {{ fmt(o.total) }}</span></li>
+                  </ul>
+                </section>
+                <div class="cl-modal-actions">
+                  <NuxtLink v-if="!ficha.c.mostrador" :to="`/fiscal?buscar=${encodeURIComponent(ficha.c.email)}`" class="cl-btn cl-btn-ghost">Editar datos fiscales</NuxtLink>
+                  <button type="button" class="cl-btn cl-btn-ghost" @click="ficha.abierta = false">Cerrar</button>
+                  <button v-if="puedeEditar(ficha.c)" type="button" class="cl-btn cl-btn-primary" @click="editarFicha"><Pencil :size="14" /> Editar</button>
+                </div>
+              </template>
+            </template>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Search, UserPlus, ShoppingCart } from '@lucide/vue'
+import { Search, UserPlus, ShoppingCart, IdCard, Pencil, BadgePercent } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
 
 interface Cliente {
   id: string; name: string; email: string; clientNumber: number | null; status: string; role: string; mostrador?: boolean
-  fiscalCompleted: boolean; razonSocial: string | null; rfc: string | null; pedidos: number; cotizaciones: number
+  fiscalCompleted: boolean; razonSocial: string | null; rfc: string | null; pedidos: number; cotizaciones: number; discountPct: number
+}
+
+interface Ficha {
+  id: string; name: string; email: string; clientNumber: number | null; role: string; status: string; createdAt: string; lastLogin: string | null; discountPct: number; mostrador: boolean
+  fiscalCompleted: boolean; fiscalRfc: string | null; fiscalRazonSocial: string | null; fiscalCodpos: string | null; fiscalEmail: string | null; fiscalUsocfdi: string | null; fiscalRegimen: string | null
+  fiscalPais: string | null; fiscalCalle: string | null; fiscalNumExt: string | null; fiscalNumInt: string | null; fiscalColonia: string | null; fiscalCiudad: string | null; fiscalDelegacion: string | null
+  fiscalLocalidad: string | null; fiscalEstado: string | null; fiscalNombre: string | null; fiscalApellidos: string | null; fiscalTelefono: string | null
+  pedidos: number; cotizaciones: number; garantias: number
+  ultimosPedidos: Array<{ id: string; folio: string; total: number; status: string; createdAt: string }>
+  ultimasCotizaciones: Array<{ id: string; folio: string; name: string | null; total: number; status: string; createdAt: string }>
 }
 
 const ROL: Record<string, string> = { admin: 'Administrador', seller: 'Vendedor', approver: 'Aprobador', viewer: 'Visor' }
@@ -148,13 +258,13 @@ function venderA(c: { id: string }) {
 const modal     = ref(false)
 const guardando = ref(false)
 const formError = ref('')
-const form      = reactive({ name: '', email: '', password: '' })
+const form      = reactive({ name: '', email: '', password: '', integrador: false })
 const creado    = ref<(Cliente & { password: string }) | null>(null)
 const copiado   = ref(false)
 const origen    = computed(() => (import.meta.client ? window.location.origin : ''))
 
 function abrirNuevo() {
-  form.name = ''; form.email = ''; form.password = ''; formError.value = ''; creado.value = null
+  form.name = ''; form.email = ''; form.password = ''; form.integrador = false; formError.value = ''; creado.value = null
   modal.value = true
 }
 function cerrar() { modal.value = false }
@@ -169,9 +279,9 @@ async function crear() {
   guardando.value = true; formError.value = ''
   try {
     const r = await $fetch<{ user: Cliente }>('/api/users', {
-      method: 'POST', body: { name: form.name.trim(), email: form.email.trim(), password: form.password, role: 'buyer', status: 'active' },
+      method: 'POST', body: { name: form.name.trim(), email: form.email.trim(), password: form.password, role: 'buyer', status: 'active', integrador: form.integrador },
     })
-    creado.value = { ...r.user, fiscalCompleted: false, razonSocial: null, rfc: null, pedidos: 0, cotizaciones: 0, password: form.password }
+    creado.value = { ...r.user, fiscalCompleted: false, razonSocial: null, rfc: null, pedidos: 0, cotizaciones: 0, discountPct: r.user.discountPct ?? 0, password: form.password }
     await cargar()
   } catch (e: any) {
     formError.value = e?.data?.message ?? 'No se pudo crear el cliente'
@@ -183,6 +293,56 @@ async function copiarCredenciales() {
   const texto = `Acceso a SIEEG Integradores\n${origen.value}/login\nUsuario: ${creado.value.email}\nContraseña: ${creado.value.password}`
   try { await navigator.clipboard.writeText(texto); copiado.value = true; setTimeout(() => (copiado.value = false), 1500) } catch { /* sin portapapeles */ }
 }
+
+// ── Ficha del cliente ──
+const esAdmin = computed(() => auth.user?.role === 'admin')
+const ficha = reactive({
+  abierta: false, cargando: false, editando: false, guardando: false, error: '', ok: '',
+  c: null as Ficha | null,
+  form: { name: '', email: '', telefono: '', integrador: false, discountPct: 0 },
+})
+const puedeEditar = (c: Ficha) => esAdmin.value || c.role === 'buyer'
+
+async function abrirFicha(id: string) {
+  Object.assign(ficha, { abierta: true, cargando: true, editando: false, error: '', ok: '', c: null })
+  try { ficha.c = (await $fetch<{ cliente: Ficha }>(`/api/clients/${id}`)).cliente }
+  catch (e: any) { ficha.error = e?.data?.message ?? 'No se pudo cargar el cliente' }
+  finally { ficha.cargando = false }
+}
+function editarFicha() {
+  const c = ficha.c!
+  ficha.form = { name: c.name, email: c.email, telefono: c.fiscalTelefono ?? '', integrador: esIntegrador(c.discountPct), discountPct: c.discountPct }
+  ficha.error = ''; ficha.ok = ''; ficha.editando = true
+}
+function toggleIntegradorFicha() {
+  ficha.form.integrador = !ficha.form.integrador
+  ficha.form.discountPct = ficha.form.integrador ? DESCUENTO_INTEGRADOR : 0
+}
+async function guardarFicha() {
+  if (!ficha.c) return
+  ficha.guardando = true; ficha.error = ''
+  try {
+    await $fetch(`/api/clients/${ficha.c.id}`, {
+      method: 'PATCH',
+      body: {
+        name: ficha.form.name, telefono: ficha.form.telefono,
+        ...(ficha.c.mostrador ? {} : { email: ficha.form.email, integrador: ficha.form.integrador }),
+        ...(esAdmin.value && !ficha.c.mostrador ? { discountPct: ficha.form.discountPct } : {}),
+      },
+    })
+    await Promise.all([abrirFicha(ficha.c.id), cargar()])
+    ficha.ok = 'Cambios guardados.'
+  } catch (e: any) {
+    ficha.error = e?.data?.message ?? 'No se pudieron guardar los cambios'
+  } finally { ficha.guardando = false }
+}
+
+const direccionDe = (c: Ficha) => [
+  [c.fiscalCalle, c.fiscalNumExt, c.fiscalNumInt ? `int. ${c.fiscalNumInt}` : ''].filter(Boolean).join(' '),
+  c.fiscalColonia, c.fiscalCiudad || c.fiscalDelegacion, c.fiscalEstado, c.fiscalCodpos ? `C.P. ${c.fiscalCodpos}` : '',
+].filter(Boolean).join(', ')
+const fechaCorta = (d: string) => { const f = new Date(d.length === 10 ? `${d}T12:00:00` : d); return isNaN(+f) ? d : f.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) }
+const fmt = (n: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(n)
 
 const iniciales = (n: string) => n.split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase()
 </script>
@@ -224,6 +384,30 @@ const iniciales = (n: string) => n.split(' ').slice(0, 2).map(p => p[0]).join(''
 .cl-badge.ok { background: #ECFDF3; color: #15803D; }
 .cl-badge.off { background: #F1F3F6; color: #5B6B82; }
 .cl-badge.warn { background: #FFF7E6; color: #B45309; }
+.cl-badge.int { background: #EAF2FF; color: #0B5BD3; }
+.cl-int { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px dashed #B9C6DA; background: #F8FAFD; color: #33445C; font-size: 13px; font-family: inherit; text-align: left; cursor: pointer; }
+.cl-int.on { border: 1px solid #1570EF; background: #EAF2FF; color: #0B1B33; }
+.cl-int svg { color: #0B5BD3; flex-shrink: 0; }
+.cl-int > span:nth-child(2) { flex: 1; }
+.cl-int-check { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid #B9C6DA; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; flex-shrink: 0; }
+.cl-int.on .cl-int-check { background: #1570EF; border-color: #1570EF; }
+.cl-disc { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; color: #5B6B82; }
+.cl-disc input { width: 110px; height: 38px; padding: 0 10px; border-radius: 10px; border: 1px solid #D5DEEA; font-size: 14px; font-family: inherit; }
+.cl-modal-lg { max-width: 640px; max-height: calc(100vh - 32px); overflow-y: auto; }
+.cl-ficha-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; min-width: 0; }
+.cl-ficha-head h2 { margin: 0; }
+.cl-sec { padding: 14px 0; border-top: 1px solid #E4E9F1; }
+.cl-sec h3 { margin: 0 0 10px; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .6px; color: #5B6B82; display: flex; align-items: center; gap: 8px; }
+.cl-dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; margin: 0; }
+.cl-dl div { min-width: 0; }
+.cl-dl div.wide { grid-column: 1 / -1; }
+.cl-dl dt { font-size: 11.5px; color: #7A889C; }
+.cl-dl dd { margin: 2px 0 0; font-size: 13.5px; font-weight: 600; overflow-wrap: anywhere; }
+.cl-act { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.cl-act li { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 13px; padding: 8px 10px; border-radius: 9px; background: #F5F8FC; }
+.cl-act a { color: #0B5BD3; font-weight: 600; text-decoration: none; }
+.cl-act span { color: #5B6B82; }
+.cl-ok { margin: 0 0 6px; padding: 9px 11px; border-radius: 9px; background: #ECFDF3; color: #15803D; font-size: 12.5px; }
 .cl-item-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
 .cl-item-actions .cl-btn-primary { flex: 1; }
 
@@ -243,5 +427,6 @@ const iniciales = (n: string) => n.split(' ').slice(0, 2).map(p => p[0]).join(''
 
 @media (max-width: 480px) {
   .cl-grid { grid-template-columns: minmax(0, 1fr); }
+  .cl-dl { grid-template-columns: minmax(0, 1fr); }
 }
 </style>

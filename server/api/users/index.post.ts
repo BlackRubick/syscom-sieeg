@@ -3,6 +3,7 @@ import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { createUserWithClientNumber } from '~/server/utils/clientNumber'
 import { vendeAClientes } from '~/server/utils/roles'
+import { DESCUENTO_INTEGRADOR } from '~/utils/integrador'
 import type { UserRole, UserStatus } from '@prisma/client'
 
 export default defineEventHandler(async (event) => {
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody<{
     name?: string; email?: string; password?: string
-    role?: string; status?: string; discountPct?: number
+    role?: string; status?: string; discountPct?: number; integrador?: boolean
   }>(event)
 
   const { name, email, password } = body
@@ -42,9 +43,9 @@ export default defineEventHandler(async (event) => {
     status:    status as UserStatus,
     createdAt: today,
     avatar,
-    // El descuento solo lo asigna administración
-    discountPct: esVendedor ? 0 : Math.max(0, Math.min(100, Number(body.discountPct) || 0)),
-  }, { id:true, name:true, email:true, role:true, status:true, createdAt:true, lastLogin:true, avatar:true, clientNumber:true })
+    // Integrador: descuento fijo (lo puede marcar el vendedor); cualquier otro % solo lo asigna administración
+    discountPct: body.integrador ? DESCUENTO_INTEGRADOR : esVendedor ? 0 : Math.max(0, Math.min(100, Number(body.discountPct) || 0)),
+  }, { id:true, name:true, email:true, role:true, status:true, createdAt:true, lastLogin:true, avatar:true, clientNumber:true, discountPct:true })
 
   return { user }
 })

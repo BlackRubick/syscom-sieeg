@@ -62,7 +62,7 @@
           <td class="img"><img v-if="it.imagen" :src="it.imagen" alt="" /></td>
           <td>
             <div class="doc-item-name">{{ it.descripcion }}</div>
-            <div class="doc-item-code">Modelo: {{ it.codigo }}</div>
+            <div class="doc-item-code">Modelo: {{ it.codigo }}<template v-if="it.garantia"> · Garantía: {{ it.garantia }}</template></div>
           </td>
           <td class="c">{{ it.cantidad }}</td>
           <td class="r">{{ money(it.precio) }}</td>
@@ -106,7 +106,7 @@
 
 <script setup lang="ts">
 /* Documento imprimible (cotización o pedido) en tamaño carta. Solo presentación: recibe los datos ya calculados. */
-export interface DocItem { codigo: string; descripcion: string; cantidad: number; precio: number; imagen?: string }
+export interface DocItem { codigo: string; descripcion: string; cantidad: number; precio: number; imagen?: string; garantia?: string }
 export interface DocCliente { nombre: string; razonSocial?: string | null; rfc?: string | null; email?: string | null; telefono?: string | null; direccion?: string | null; numero?: string | null }
 
 const props = defineProps<{

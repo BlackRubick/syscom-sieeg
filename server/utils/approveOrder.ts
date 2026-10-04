@@ -3,6 +3,7 @@ import { enviarPedidoSyscom } from '~/server/utils/syscom'
 import type { OrderItem } from '~/types'
 import { ORDER_INCLUDE } from '~/server/utils/orderDto'
 import { trackingInicial } from '~/server/utils/syscomTracking'
+import { actualizarPreciosPendiente } from '~/server/utils/actualizarPrecios'
 
 const RFC_RE = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i
 
@@ -19,6 +20,10 @@ export async function approveOrder(
   if (existing.status === 'approved') {
     const order = await prisma.order.findUniqueOrThrow({ where: { id: orderId }, include: ORDER_INCLUDE })
     return { order, syscomError: undefined }
+  }
+  // Aún sin pagar: se aprueba con el precio del día (si SYSCOM subió el precio, se cobra el nuevo)
+  if (await actualizarPreciosPendiente(orderId).catch(() => false)) {
+    Object.assign(existing, await prisma.order.findUniqueOrThrow({ where: { id: orderId }, select: { items: true, total: true, shippingFee: true, auditLog: true } }))
   }
 
   const user = await prisma.user.findUnique({
