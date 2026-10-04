@@ -7,6 +7,9 @@ SERVER="root@66.179.242.92"
 PASS="${SIEEG_SSH_PASS:?Falta SIEEG_SSH_PASS (créalo en .deploy.env)}"
 REMOTE_DIR="/root/syscom-sieeg"
 
+echo "▶ Pruebas y tipos..."
+npm test
+
 echo "▶ Building..."
 npm run build
 
@@ -16,7 +19,8 @@ sshpass -p "$PASS" rsync -az --delete \
   .output/ "$SERVER:$REMOTE_DIR/.output/"
 
 echo "▶ Reloading PM2 (zero-downtime)..."
+# --update-env vuelve a leer el .env del servidor (ecosystem.config.cjs) por si cambió algún secreto
 sshpass -p "$PASS" ssh -o StrictHostKeyChecking=no "$SERVER" \
-  "cd $REMOTE_DIR && pm2 reload sieeg-syscom"
+  "cd $REMOTE_DIR && pm2 reload ecosystem.config.cjs --update-env && pm2 save >/dev/null"
 
 echo "✓ Deploy listo"

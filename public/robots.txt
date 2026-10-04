@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /catalog
+Disallow: /cart
+Disallow: /orders
+Disallow: /quotes
+Disallow: /garantias
+Disallow: /clientes
+Disallow: /users
+Disallow: /admin
+Disallow: /fiscal
+Disallow: /facturas
+Disallow: /perfil
+Disallow: /imprimir
+Disallow: /restablecer
