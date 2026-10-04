@@ -1,8 +1,9 @@
 import { requireSession } from '~/server/utils/session'
 import { syscomGet } from '~/server/utils/syscom'
-import { getPricing, precioVenta } from '~/server/utils/pricing'
+import { pricingParaVista, precioVenta } from '~/server/utils/pricing'
 import type { Pricing } from '~/server/utils/pricing'
 import type { SyscomProducto } from '~/types'
+import { formatGarantia } from '~/utils/garantia'
 
 function adaptWithDiscount(p: SyscomProducto, pricing: Pricing) {
   const price    = precioVenta(p, pricing)
@@ -17,18 +18,21 @@ function adaptWithDiscount(p: SyscomProducto, pricing: Pricing) {
     sku: p.modelo ?? '', stock: Number(p.total_existencia) || 0, unit: 'pieza',
     images: p.img_portada ? [p.img_portada] : [],
     tags: [], rating: 0, reviewCount: 0, leadTime: 0, featured: false,
-    discount, satKey: p.sat_key || undefined,
+    discount, satKey: p.sat_key || undefined, garantia: formatGarantia(p.garantia) || undefined,
   }
 }
 
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
 
-  const pricing = await getPricing(session.userId)
+  const query   = getQuery(event)
+  const pricing = await pricingParaVista(session, query.cliente)
 
+  // Solo los parámetros que entiende SYSCOM (y siempre en pesos)
+  const PERMITIDOS = ['busqueda', 'categoria', 'marca', 'pagina', 'orden', 'por_pagina']
   const params: Record<string, string> = {}
-  for (const [k, v] of Object.entries(getQuery(event))) if (v != null) params[k] = String(v)
-  params.moneda     ??= 'MXN'
+  for (const k of PERMITIDOS) if (query[k] != null) params[k] = String(query[k]).slice(0, 120)
+  params.moneda       = 'MXN'
   params.por_pagina ??= '50'
 
   let rawData: { productos?: SyscomProducto[]; cantidad?: number; pagina?: number; paginas?: number }

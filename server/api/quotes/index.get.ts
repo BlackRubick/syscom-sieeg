@@ -13,13 +13,11 @@ export default defineEventHandler(async (event) => {
   const q      = getQuery(event)
   const status = typeof q.status === 'string' && ['open', 'converted', 'cancelled'].includes(q.status) ? q.status : undefined
   const search = typeof q.search === 'string' ? q.search.trim().slice(0, 80) : ''
-  const mias   = q.mias === '1' && session.role === 'seller'
 
   const folio = search ? parseQuoteNumber(search) : null
   const cl    = search ? parseClientNumber(search) : null
   const where: Prisma.QuoteWhereInput = {
     ...(veTodas ? {} : { userId: session.userId }),
-    ...(mias ? { sellerId: session.userId } : {}),
     ...(status ? { status: status as Prisma.QuoteWhereInput['status'] } : {}),
     ...(search ? {
       OR: [

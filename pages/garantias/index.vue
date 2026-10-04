@@ -66,11 +66,14 @@
             <span>Producto</span>
             <select v-model="form.producto" class="rm-input">
               <option value="">Otro producto (capturar a mano)</option>
-              <optgroup v-for="o in pedidosCliente" :key="o.id" :label="`Pedido #${o.id.slice(-8).toUpperCase()} · ${fecha(o.createdAt)}`">
+              <optgroup v-for="o in pedidosCliente" :key="o.id" :label="`Pedido PED-${o.id.slice(-8).toUpperCase()} · ${fecha(o.createdAt)}`">
                 <option v-for="it in o.items" :key="`${o.id}|${it.productId}`" :value="`${o.id}|${it.productId}`">{{ it.sku }} — {{ it.name.slice(0, 70) }}</option>
               </optgroup>
             </select>
             <small v-if="cargandoPedidos">Cargando pedidos del cliente…</small>
+            <small v-else-if="vigencia" :class="['rm-vig', vigencia.vencida ? 'off' : 'ok']">
+              Comprado el {{ vigencia.compra }} · Garantía {{ vigencia.garantia ?? 'no indicada' }}<template v-if="vigencia.vence"> · {{ vigencia.vencida ? 'venció' : 'vigente hasta' }} el {{ vigencia.vence }}</template>
+            </small>
           </div>
 
           <div v-if="!form.producto" class="rm-grid">
@@ -102,6 +105,7 @@ import type { Order } from '~/types'
 import type { RmaEstado } from '~/utils/rma'
 
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Garantías — SIEEG' })
 
 interface RmaRow {
   id: string; folio: string; status: RmaEstado; sku: string; productName: string; serie: string | null; folioProveedor: string | null; createdAt: string
@@ -160,6 +164,20 @@ watch(() => form.clientId, async (id) => {
   } catch { /* sin pedidos: captura manual */ } finally { cargandoPedidos.value = false }
 })
 
+// Si el producto viene de un pedido: ¿sigue en garantía? (fecha de compra + garantía del fabricante)
+const vigencia = computed(() => {
+  if (!form.producto) return null
+  const [orderId, productId] = form.producto.split('|')
+  const o = pedidosCliente.value.find(x => x.id === orderId)
+  const it = o?.items.find(i => i.productId === productId)
+  if (!o || !it) return null
+  const compra = new Date(o.createdAt)
+  const m = /^(\d+)\s*(año|mes)/i.exec(it.garantia ?? '')
+  let vence: Date | null = null
+  if (m) { vence = new Date(compra); if (/año/i.test(m[2])) vence.setFullYear(vence.getFullYear() + Number(m[1])); else vence.setMonth(vence.getMonth() + Number(m[1])) }
+  return { compra: fecha(o.createdAt), garantia: it.garantia ?? null, vence: vence ? fecha(vence.toISOString()) : null, vencida: !!vence && vence.getTime() < Date.now() }
+})
+
 async function guardar() {
   guardando.value = true; formError.value = ''
   const [orderId, productId] = form.producto ? form.producto.split('|') : [undefined, undefined]
@@ -194,7 +212,7 @@ const fecha = (iso: string) => new Date(iso).toLocaleDateString('es-MX', { day: 
 .rm-btn-ghost { background: #fff; color: #0B1B33; border: 1px solid #D5DEEA; }
 
 .rm-filters { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; }
-.rm-search { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; background: #F5F8FC; border: 1px solid #E4E9F1; color: #7A889C; max-width: 560px; }
+.rm-search { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; background: #F5F8FC; border: 1px solid #E4E9F1; color: #5F6E84; max-width: 560px; }
 .rm-search:focus-within { border-color: #1570EF; background: #fff; }
 .rm-search input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font-size: 13.5px; color: #0B1B33; font-family: inherit; }
 .rm-tabs { display: flex; gap: 4px; padding: 4px; background: #F5F8FC; border: 1px solid #E4E9F1; border-radius: 10px; overflow-x: auto; max-width: 100%; }
@@ -215,14 +233,14 @@ const fecha = (iso: string) => new Date(iso).toLocaleDateString('es-MX', { day: 
 .rm-row-sub { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px; font-size: 12.5px; color: #5B6B82; }
 .rm-mono { font-family: ui-monospace, Menlo, monospace; color: #0B5BD3; font-weight: 600; }
 .rm-row-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 12px; color: #5B6B82; white-space: nowrap; }
-.rm-chev { color: #7A889C; }
+.rm-chev { color: #5F6E84; }
 
 .rm-backdrop { position: fixed; inset: 0; z-index: 1050; background: rgba(11,27,51,0.45); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 16px; }
 .rm-modal { width: 100%; max-width: 560px; max-height: calc(100vh - 32px); overflow-y: auto; background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 32px 80px rgba(11,27,51,0.2); display: flex; flex-direction: column; gap: 14px; }
 .rm-modal h2 { margin: 0; font-size: 19px; font-weight: 800; }
 .rm-muted { margin: -8px 0 0; font-size: 13px; color: #5B6B82; line-height: 1.55; }
 .rm-field { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #5B6B82; min-width: 0; }
-.rm-field small { font-weight: 500; color: #7A889C; }
+.rm-field small { font-weight: 500; color: #5F6E84; }
 .rm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .rm-input { width: 100%; height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid #D5DEEA; background: #fff; font-size: 13.5px; color: #0B1B33; font-family: inherit; outline: none; box-sizing: border-box; }
 .rm-input:focus { border-color: rgba(21,112,239,0.5); }
@@ -237,4 +255,7 @@ const fecha = (iso: string) => new Date(iso).toLocaleDateString('es-MX', { day: 
   .rm-chev { display: none; }
   .rm-grid { grid-template-columns: 1fr; }
 }
+.rm-vig { display: block; margin-top: 6px; font-size: 12px; font-weight: 600; }
+.rm-vig.ok { color: #15803D; }
+.rm-vig.off { color: #B91C1C; }
 </style>

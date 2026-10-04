@@ -9,6 +9,11 @@ export function clientIp(event: H3Event): string {
     ?? 'unknown'
 }
 
+/** Borra el contador de una IP (p. ej. después de un login correcto). */
+export function limpiarLimite(event: H3Event, name: string) {
+  buckets.get(name)?.delete(clientIp(event))
+}
+
 export function rateLimit(event: H3Event, name: string, max: number, windowMs: number) {
   let b = buckets.get(name)
   if (!b) buckets.set(name, b = new Map())
@@ -20,5 +25,8 @@ export function rateLimit(event: H3Event, name: string, max: number, windowMs: n
     b.set(ip, { count: 1, resetAt: now + windowMs })
     return
   }
-  if (++cur.count > max) throw createError({ statusCode: 429, message: 'Demasiadas solicitudes. Intenta de nuevo en un momento.' })
+  if (++cur.count > max) {
+    const min = Math.ceil((cur.resetAt - now) / 60_000)
+    throw createError({ statusCode: 429, message: `Demasiados intentos. Espera ${min} minuto${min !== 1 ? 's' : ''} e intenta de nuevo.` })
+  }
 }

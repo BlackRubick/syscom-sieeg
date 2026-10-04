@@ -50,7 +50,7 @@
               @focus="focused=true"
               @blur="focused=false"
             />
-            <span style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:18px;font-weight:700;color:#7A889C;">%</span>
+            <span style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:18px;font-weight:700;color:#5F6E84;">%</span>
           </div>
         </div>
 
@@ -59,14 +59,14 @@
           <div style="font-size:11px;font-weight:600;color:rgba(21,112,239,0.8);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Vista previa</div>
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
             <div style="text-align:center;">
-              <div style="font-size:11px;color:#7A889C;margin-bottom:3px;">Costo SYSCOM (sin IVA)</div>
-              <div style="font-size:16px;font-weight:700;color:#7A889C;">$1,000</div>
+              <div style="font-size:11px;color:#5F6E84;margin-bottom:3px;">Precio SYSCOM (sin IVA)</div>
+              <div style="font-size:16px;font-weight:700;color:#5F6E84;">$1,000</div>
             </div>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(21,112,239,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
             </svg>
             <div style="text-align:center;">
-              <div style="font-size:11px;color:#7A889C;margin-bottom:3px;">Precio al cliente (IVA incluido)</div>
+              <div style="font-size:11px;color:#5F6E84;margin-bottom:3px;">Precio al cliente (IVA incluido)</div>
               <div style="font-size:16px;font-weight:700;color:#0B5BD3;">${{ previewPrice }}</div>
             </div>
           </div>
@@ -96,7 +96,7 @@
             background: saving || inputPct === currentPct
               ? 'rgba(11,27,51,0.06)'
               : 'linear-gradient(135deg,#1570EF,#0B5BD3)',
-            color: saving || inputPct === currentPct ? '#7A889C' : 'white',
+            color: saving || inputPct === currentPct ? '#5F6E84' : 'white',
             fontSize:'14px', fontWeight:600, cursor: saving || inputPct === currentPct ? 'not-allowed' : 'pointer',
             fontFamily:'inherit', transition:'all 0.2s',
             boxShadow: saving || inputPct === currentPct ? 'none' : '0 4px 16px rgba(21,112,239,0.3)',
@@ -108,6 +108,10 @@
         </button>
 
         <p v-if="error" style="font-size:12px;color:#EF4444;margin-top:10px;text-align:center;">{{ error }}</p>
+        <div style="margin-top:16px;padding:12px 14px;border-radius:12px;background:#F5F8FC;border:1px solid #E4E9F1;font-size:12px;color:#5B6B82;line-height:1.6;">
+          <b style="color:#0B1B33;">¿Cómo se calcula?</b> Precio SYSCOM (el público) + incremento − descuento del cliente (integrador 10/20/30 %), y al final + IVA 16 %.
+          Lo que SYSCOM te cobra a ti es tu precio de distribuidor, más bajo que el público: el margen real de cada pedido lo ves en <b style="color:#0B1B33;">Pedidos</b> antes de aprobarlo.
+        </div>
       </div>
 
       <!-- Envío -->
@@ -149,7 +153,7 @@
           :style="{
             width:'100%', height:'44px', borderRadius:'12px', border:'none',
             background: savingShip || !shipDirty ? 'rgba(11,27,51,0.06)' : 'linear-gradient(135deg,#1570EF,#0B5BD3)',
-            color: savingShip || !shipDirty ? '#7A889C' : 'white',
+            color: savingShip || !shipDirty ? '#5F6E84' : 'white',
             fontSize:'14px', fontWeight:600, cursor: savingShip || !shipDirty ? 'not-allowed' : 'pointer',
             fontFamily:'inherit', transition:'all 0.2s',
           }"
@@ -167,6 +171,7 @@
 
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Precios — SIEEG' })
 
 const auth = useAuthStore()
 if (auth.user?.role !== 'admin') navigateTo('/dashboard')

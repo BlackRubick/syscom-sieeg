@@ -47,6 +47,7 @@ export async function fetchCategorias(): Promise<SyscomCategoria[]> {
 }
 
 export interface FetchProductosOpts {
+  cliente?: string;
   busqueda?: string; categoria?: string; marca?: string; pagina?: number; orden?: string; porPagina?: number
 }
 export interface ProductosResult {
@@ -57,6 +58,7 @@ export async function fetchProductos(opts: FetchProductosOpts): Promise<Producto
   const empty = (error?: string): ProductosResult => ({ products: [], cantidad: 0, pagina: 1, paginas: 1, error })
   if (!opts.busqueda && !opts.categoria && !opts.marca) return empty()
   const params = new URLSearchParams()
+  if (opts.cliente)   params.set('cliente',   opts.cliente)
   if (opts.busqueda)  params.set('busqueda',  opts.busqueda.trim().split(/\s+/).join('+'))
   if (opts.categoria) params.set('categoria', opts.categoria)
   if (opts.marca)     params.set('marca',     opts.marca)

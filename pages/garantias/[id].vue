@@ -26,7 +26,7 @@
           <div class="rd-kv"><span>Número de serie</span><b class="rd-mono">{{ rma.serie || '—' }}</b></div>
           <div class="rd-kv"><span>Cantidad</span><b>{{ rma.quantity }}</b></div>
           <div v-if="rma.accesorios" class="rd-kv"><span>Accesorios</span><b>{{ rma.accesorios }}</b></div>
-          <div v-if="rma.orderId" class="rd-kv"><span>Pedido</span><b><NuxtLink :to="`/orders?pedido=${rma.orderId}`">#{{ rma.orderId.slice(-8).toUpperCase() }}</NuxtLink></b></div>
+          <div v-if="rma.orderId" class="rd-kv"><span>Pedido</span><b><NuxtLink :to="`/orders?pedido=${rma.orderId}`">PED-{{ rma.orderId.slice(-8).toUpperCase() }}</NuxtLink></b></div>
         </section>
         <section class="rd-card rd-box">
           <h3>Cliente</h3>

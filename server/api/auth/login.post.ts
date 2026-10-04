@@ -1,39 +1,14 @@
 import { createHash } from 'crypto'
 import bcrypt from 'bcryptjs'
 import prisma from '~/server/utils/prisma'
+import { rateLimit, limpiarLimite } from '~/server/utils/rateLimit'
 import { createToken, passwordVersion, SESSION_COOKIE, SESSION_COOKIE_OPTS } from '~/server/utils/session'
 
-// #4 — Rate limiting en memoria (por IP)
-interface RateBucket { count: number; resetAt: number }
-const rateBuckets = new Map<string, RateBucket>()
-const WINDOW_MS  = 15 * 60 * 1000  // 15 min
-const MAX_TRIES  = 10
-
-function checkRateLimit(ip: string) {
-  const now    = Date.now()
-  const bucket = rateBuckets.get(ip)
-  if (!bucket || bucket.resetAt < now) {
-    rateBuckets.set(ip, { count: 1, resetAt: now + WINDOW_MS })
-    return
-  }
-  bucket.count++
-  if (bucket.count > MAX_TRIES) {
-    const waitMin = Math.ceil((bucket.resetAt - now) / 60_000)
-    throw createError({ statusCode: 429, message: `Demasiados intentos. Espera ${waitMin} minuto${waitMin !== 1 ? 's' : ''} e intenta de nuevo.` })
-  }
-}
-
-function clearRateLimit(ip: string) {
-  rateBuckets.delete(ip)
-}
+const HASH_FICTICIO = '$2b$12$DGEfWW32xeZfA2ed2dg2wuvLt9deDVk51LBjNFCYFhyl24EITdz8S'
 
 export default defineEventHandler(async (event) => {
-  // X-Real-IP lo fija nginx con $remote_addr; X-Forwarded-For lo puede falsear el cliente
-  const ip = getHeader(event, 'x-real-ip')
-    ?? getHeader(event, 'x-forwarded-for')?.split(',').pop()?.trim()
-    ?? 'unknown'
-
-  checkRateLimit(ip)
+  // 10 intentos fallidos por IP cada 15 min (un login correcto reinicia la cuenta)
+  rateLimit(event, 'auth-login', 10, 15 * 60_000)
 
   const body = await readBody<{ email?: string; password?: string }>(event)
   if (!body.email || !body.password) {
@@ -49,15 +24,10 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // #1 — Verificar que el usuario exista y esté activo ANTES de validar contraseña
   if (!user) {
+    // Mismo tiempo de respuesta que con un correo existente (no revela qué cuentas existen)
+    await bcrypt.compare(body.password, HASH_FICTICIO)
     throw createError({ statusCode: 401, message: 'Correo o contraseña incorrectos' })
-  }
-  if (user.status === 'inactive') {
-    throw createError({ statusCode: 403, message: 'Esta cuenta está desactivada. Contacta al administrador.' })
-  }
-  if (user.status === 'pending') {
-    throw createError({ statusCode: 403, message: 'Esta cuenta está pendiente de activación.' })
   }
 
   // #3 — Validar contraseña: soporta bcrypt (nuevo) y SHA-256 (legado)
@@ -77,8 +47,15 @@ export default defineEventHandler(async (event) => {
   if (!passwordValid) {
     throw createError({ statusCode: 401, message: 'Correo o contraseña incorrectos' })
   }
+  // El estado se informa solo con la contraseña correcta: así no se revela qué correos tienen cuenta
+  if (user.status === 'inactive') {
+    throw createError({ statusCode: 403, message: 'Esta cuenta está desactivada. Contacta al administrador.' })
+  }
+  if (user.status === 'pending') {
+    throw createError({ statusCode: 403, message: 'Esta cuenta está pendiente de activación. Te avisaremos por correo cuando esté lista.' })
+  }
 
-  clearRateLimit(ip)
+  limpiarLimite(event, 'auth-login')
 
   // #3 — Migrar a bcrypt si venía de SHA-256
   if (needsRehash) {

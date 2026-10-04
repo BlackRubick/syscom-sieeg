@@ -47,3 +47,8 @@ a { text-decoration: none; color: inherit; }
   background: linear-gradient(90deg,rgba(11,27,51,0.04) 25%,rgba(11,27,51,0.09) 50%,rgba(11,27,51,0.04) 75%);
   background-size: 200% 100%;
 }
+
+/* Tablas hechas con grid (Datos fiscales, Facturación): en pantallas angostas se desplazan de lado
+   en lugar de aplastar las columnas */
+.tabla-ancha { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.tabla-ancha > * { min-width: 760px; }

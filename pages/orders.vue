@@ -4,9 +4,9 @@
     <!-- Header -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
       <div>
-        <h1 style="font-size:22px;font-weight:800;color:#0B1B33;margin:0;">{{ veTodos ? 'Todas las órdenes' : 'Mis órdenes' }}</h1>
+        <h1 style="font-size:22px;font-weight:800;color:#0B1B33;margin:0;">{{ veTodos ? 'Pedidos' : 'Mis pedidos' }}</h1>
         <p style="font-size:13px;color:#5B6B82;margin-top:4px;">
-          {{ loading ? 'Cargando…' : `${orders.length} orden${orders.length!==1?'es':''}` }}
+          {{ loading ? 'Cargando…' : `${totalCount} pedido${totalCount!==1?'s':''}` }}
         </p>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
@@ -15,8 +15,8 @@
           style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:9px;border:1px solid rgba(11,27,51,0.1);background:rgba(11,27,51,0.04);color:#5B6B82;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">
           <Download :size="13" /> CSV
         </button>
-        <NuxtLink to="/cart" style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border-radius:9px;border:none;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;box-shadow:0 3px 12px rgba(21,112,239,0.3);">
-          <ShoppingCart :size="13" /> Nueva orden
+        <NuxtLink v-if="puedeComprar" to="/cart" style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border-radius:9px;border:none;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;box-shadow:0 3px 12px rgba(21,112,239,0.3);">
+          <ShoppingCart :size="13" /> Nuevo pedido
         </NuxtLink>
       </div>
     </div>
@@ -31,7 +31,7 @@
     <div style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
       <div class="of-row">
       <div style="position:relative;flex:1;min-width:220px;max-width:380px;">
-        <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#1570EF':'#7A889C'" />
+        <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#1570EF':'#5F6E84'" />
         <input v-model="search" :placeholder="veTodos ? 'Buscar por pedido, cliente o número de cliente' : 'Buscar por número de pedido…'"
           @focus="searchFocus=true" @blur="searchFocus=false"
           :style="{ width:'100%', height:'40px', background:searchFocus?'rgba(21,112,239,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${searchFocus?'rgba(21,112,239,0.45)':'rgba(11,27,51,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
@@ -68,21 +68,25 @@
 
       <template v-else>
         <div v-for="order in filtered" :key="order.id"
-          @click="openDetail(order)"
+          role="button" tabindex="0" :aria-label="`Ver pedido PED-${order.id.slice(-8).toUpperCase()}`"
+          @click="openDetail(order)" @keydown.enter.prevent="openDetail(order)" @keydown.space.prevent="openDetail(order)"
           :style="{ borderRadius:'14px', background:'linear-gradient(160deg,#FFFFFF,#F5F8FC)', border:'1px solid rgba(11,27,51,0.07)', overflow:'hidden', boxShadow:'0 3px 14px rgba(11,27,51,0.105)', transition:'all 0.18s', cursor:'pointer' }"
           @mouseenter="e => { (e.currentTarget as HTMLElement).style.border='1px solid rgba(21,112,239,0.18)'; (e.currentTarget as HTMLElement).style.transform='translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow='0 8px 24px rgba(11,27,51,0.14)' }"
           @mouseleave="e => { (e.currentTarget as HTMLElement).style.border='1px solid rgba(11,27,51,0.07)'; (e.currentTarget as HTMLElement).style.transform='translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow='0 3px 14px rgba(11,27,51,0.105)' }">
 
-          <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;">
+          <div class="or-row" style="display:flex;align-items:center;gap:14px;padding:14px 18px;">
             <!-- Indicador estado -->
             <div :style="{ width:'9px', height:'9px', borderRadius:'50%', background:statusCfg[order.status].dot, boxShadow:`0 0 7px ${statusCfg[order.status].dot}80`, flexShrink:0 }" />
 
             <div style="flex:1;min-width:0;">
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
-                <span style="font-size:12px;font-weight:700;color:#0B1B33;font-family:monospace;">{{ order.id.slice(-8).toUpperCase() }}</span>
+                <span style="font-size:12px;font-weight:700;color:#0B1B33;font-family:monospace;">PED-{{ order.id.slice(-8).toUpperCase() }}</span>
                 <span :style="{ fontSize:'10px', fontWeight:600, padding:'2px 8px', borderRadius:'20px', background:statusCfg[order.status].bg, color:statusCfg[order.status].color }">{{ statusCfg[order.status].label }}</span>
                 <span :style="{ fontSize:'10px', fontWeight:600, padding:'2px 8px', borderRadius:'20px', background:priCfg[order.priority]?.bg??priCfg.normal.bg, color:priCfg[order.priority]?.color??priCfg.normal.color }">{{ priCfg[order.priority]?.label??'Normal' }}</span>
                 <!-- Pago -->
+                <span v-if="!order.paymentId && order.paymentStatus === 'paid'" style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(34,197,94,0.15);color:#15803D;">✓ Pagado</span>
+                <span v-else-if="order.paymentStatus === 'refunded'" style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(91,107,130,0.12);color:#475569;">Reembolsado</span>
+                <span v-if="['cancelled','rejected'].includes(order.status) && order.paymentStatus === 'paid'" style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(239,68,68,0.12);color:#B91C1C;">Por reembolsar</span>
                 <template v-if="order.paymentId">
                   <span :style="{ fontSize:'10px', fontWeight:700, padding:'2px 8px', borderRadius:'20px', background: order.paymentStatus==='paid' ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.12)', color: order.paymentStatus==='paid' ? '#16A34A' : '#B45309' }">
                     {{ order.paymentStatus === 'paid' ? '✓ Pagado' : 'Pago pendiente' }}
@@ -103,12 +107,12 @@
               <div v-else-if="isManager && order.status === 'approved'" class="sy-row">
                 <span class="sy-pill" style="background:rgba(239,68,68,0.12);color:#DC2626;">Sin folio SYSCOM</span>
               </div>
-              <div style="display:flex;align-items:center;gap:6px;">
-                <Clock :size="11" color="#7A889C" />
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <Clock :size="11" color="#5F6E84" />
                 <span style="font-size:11px;color:#5B6B82;">{{ fmtDate(order.createdAt) }}</span>
                 <template v-if="veTodos && order.userName">
-                  <span style="color:#7A889C;font-size:11px;">·</span>
-                  <User :size="11" color="#7A889C" />
+                  <span style="color:#5F6E84;font-size:11px;">·</span>
+                  <User :size="11" color="#5F6E84" />
                   <span style="font-size:11px;color:#5B6B82;">{{ order.userName }}</span>
                   <span v-if="order.clientNumber" class="cl-num">{{ formatClientNumber(order.clientNumber) }}</span>
                 </template>
@@ -117,27 +121,27 @@
               </div>
             </div>
 
-            <div style="text-align:center;flex-shrink:0;">
+            <div class="or-count" style="text-align:center;flex-shrink:0;">
               <div style="font-size:13px;font-weight:700;color:#0B1B33;">{{ order.items.length }}</div>
-              <div style="font-size:10px;color:#7A889C;">producto{{ order.items.length!==1?'s':'' }}</div>
+              <div style="font-size:10px;color:#5F6E84;">producto{{ order.items.length!==1?'s':'' }}</div>
             </div>
 
             <div style="text-align:right;flex-shrink:0;">
               <div style="font-size:14px;font-weight:700;color:#0B1B33;">{{ order.total > 0 ? fmtCurrency(order.total) : '—' }}</div>
-              <div style="font-size:10px;color:#7A889C;margin-top:1px;">MXN · IVA incl.</div>
+              <div style="font-size:10px;color:#5F6E84;margin-top:1px;">MXN · IVA incl.</div>
             </div>
 
-            <ChevronRight :size="15" color="#7A889C" style="flex-shrink:0;" />
+            <ChevronRight :size="15" color="#5F6E84" style="flex-shrink:0;" />
           </div>
         </div>
       </template>
 
       <div v-if="!loading && !error && !filtered.length" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);gap:12px;">
-        <Package :size="36" color="#7A889C" :stroke-width="1.5" />
-        <div style="font-size:14px;font-weight:600;color:#5B6B82;">Sin órdenes</div>
-        <div style="font-size:12px;color:#7A889C;">{{ activeTab==='all' ? 'Aún no tienes órdenes' : 'No hay órdenes con este estado' }}</div>
-        <NuxtLink v-if="activeTab==='all'" to="/cart" style="margin-top:4px;display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 18px;border-radius:9px;border:none;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;">
-          <ShoppingCart :size="13" /> Crear una orden
+        <Package :size="36" color="#5F6E84" :stroke-width="1.5" />
+        <div style="font-size:14px;font-weight:600;color:#5B6B82;">Sin pedidos</div>
+        <div style="font-size:12px;color:#5F6E84;">{{ search || filtroCliente || filtroEmpresa ? 'Ningún pedido coincide con la búsqueda' : activeTab==='all' ? 'Aún no hay pedidos' : 'No hay pedidos con este estado' }}</div>
+        <NuxtLink v-if="activeTab==='all' && puedeComprar" to="/cart" style="margin-top:4px;display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 18px;border-radius:9px;border:none;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;">
+          <ShoppingCart :size="13" /> Hacer un pedido
         </NuxtLink>
       </div>
     </div>
@@ -149,7 +153,7 @@
         :style="{ opacity: page===1 ? 0.4 : 1, cursor: page===1 ? 'not-allowed' : 'pointer' }">
         ← Anterior
       </button>
-      <span style="font-size:12px;color:#7A889C;">Página {{ page }} de {{ totalPages }} · {{ totalCount }} total</span>
+      <span style="font-size:12px;color:#5F6E84;">Página {{ page }} de {{ totalPages }} · {{ totalCount }} total</span>
       <button @click="nextPage" :disabled="page===totalPages"
         style="height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(11,27,51,0.1);background:rgba(11,27,51,0.04);color:#5B6B82;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;"
         :style="{ opacity: page===totalPages ? 0.4 : 1, cursor: page===totalPages ? 'not-allowed' : 'pointer' }">
@@ -172,7 +176,7 @@
             <div class="od-head-row">
               <div style="min-width:0;">
                 <div class="od-title-row">
-                  <span class="od-id">#{{ detail.id.slice(-8).toUpperCase() }}</span>
+                  <span class="od-id">PED-{{ detail.id.slice(-8).toUpperCase() }}</span>
                   <span class="od-pill" :style="{ background:statusCfg[detail.status].bg, color:statusCfg[detail.status].color }">{{ statusCfg[detail.status].label }}</span>
                   <span class="od-pill" :style="{ background:priCfg[detail.priority]?.bg??priCfg.normal.bg, color:priCfg[detail.priority]?.color??priCfg.normal.color }">Prioridad {{ (priCfg[detail.priority]?.label??'Normal').toLowerCase() }}</span>
                 </div>
@@ -203,7 +207,7 @@
                 <div class="od-tl-dot" :style="{ background: stepState(step.key,detail.status)==='pending' ? '#FFFFFF' : step.color+'30', borderColor: stepState(step.key,detail.status)!=='pending' ? step.color : 'rgba(11,27,51,0.12)', boxShadow: stepState(step.key,detail.status)==='active' ? `0 0 12px ${step.color}70` : 'none' }">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" :stroke="stepState(step.key,detail.status)!=='pending' ? step.color : 'rgba(91,107,130,0.4)'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" v-html="step.icon" />
                 </div>
-                <span class="od-tl-label" :style="{ color: stepState(step.key,detail.status)!=='pending' ? step.color : '#7A889C', fontWeight: stepState(step.key,detail.status)==='active' ? 700 : 500 }">{{ step.label }}</span>
+                <span class="od-tl-label" :style="{ color: stepState(step.key,detail.status)!=='pending' ? step.color : '#5F6E84', fontWeight: stepState(step.key,detail.status)==='active' ? 700 : 500 }">{{ step.label }}</span>
               </div>
             </div>
           </header>
@@ -216,8 +220,16 @@
 
             <!-- Acciones admin (pendiente) — arriba para que se vean sin hacer scroll -->
             <section v-if="isManager && detail.status === 'pending'" class="od-card od-card-warn">
-              <div class="od-card-title" style="color:rgba(251,191,36,0.85);">Acción requerida</div>
+              <div class="od-card-title" style="color:#B45309;">Acción requerida</div>
               <p class="od-muted" style="margin:0 0 12px;">Al aprobar se genera el pedido real en SYSCOM con cargo a tu cuenta.</p>
+              <div v-if="margen" class="od-margen" :class="margen.margen < 0 ? 'neg' : 'pos'">
+                <div class="od-kv"><span>Venta (sin IVA)</span><b>{{ fmtCurrency(margen.ventaSinIva) }}</b></div>
+                <div class="od-kv"><span>Costo SYSCOM estimado (sin IVA)</span><b>{{ fmtCurrency(margen.costoSinIva) }}</b></div>
+                <div class="od-kv"><span>Margen estimado</span><b>{{ fmtCurrency(margen.margen) }} ({{ margen.margenPct }}%)</b></div>
+                <div v-if="margen.margen < 0" class="od-reason" style="color:#B91C1C;">Se vendería por debajo del costo de SYSCOM.</div>
+                <div v-if="margen.sinCosto" class="od-muted">Sin costo para {{ margen.sinCosto }} producto(s).</div>
+              </div>
+              <div v-else-if="margenCargando" class="od-muted" style="margin-bottom:12px;">Calculando margen…</div>
               <div v-if="!detail.entrega" class="od-alert od-alert-err" style="margin-bottom:12px;">Este cliente no tiene dirección de entrega: SYSCOM rechazará el pedido. Captura sus datos en <b>Datos Fiscales</b> antes de aprobar.</div>
               <div class="od-actions">
                 <button class="od-btn od-btn-danger" :disabled="actionLoading" @click="handleAction('reject')">Rechazar</button>
@@ -287,11 +299,11 @@
                 <div v-if="detail.cliente?.razonSocial" class="od-kv"><span>Razón social</span><b>{{ detail.cliente.razonSocial }}</b></div>
                 <div v-if="detail.cliente?.regimen" class="od-kv"><span>Régimen</span><b>{{ detail.cliente.regimen }}</b></div>
                 <div v-if="detail.cliente?.usoCfdi" class="od-kv"><span>Uso CFDI</span><b>{{ detail.cliente.usoCfdi }}</b></div>
-                <button v-if="puedeAsignar" class="od-btn od-btn-ghost" style="margin-top:10px;width:100%;" @click="asignando = true">
+                <button v-if="puedeAsignar" class="od-btn od-btn-neutral" style="margin-top:10px;width:100%;" @click="asignando = true">
                   Asignar cliente
                 </button>
                 <AsignarClienteModal v-model="asignando" :actual="detail.userId" :asignar="asignarCliente"
-                  :titulo="`Asignar el pedido #${detail.id.slice(-8).toUpperCase()}`" descripcion="El pedido pasa a nombre del cliente elegido y los precios se recalculan con su descuento. Se envía a su dirección fiscal." />
+                  :titulo="`Asignar el pedido PED-${detail.id.slice(-8).toUpperCase()}`" descripcion="El pedido pasa a nombre del cliente elegido y los precios se recalculan con su descuento. Se envía a su dirección fiscal." />
               </section>
               <section class="od-card">
                 <div class="od-row-between" style="margin-bottom:10px;">
@@ -372,7 +384,68 @@
                 <div><div class="od-label">Banco</div><div class="od-text">{{ detail.paymentData.bank }}</div></div>
                 <div><div class="od-label">Convenio CIE</div><div class="od-mono od-strong" style="color:#16A34A;">{{ detail.paymentData.agreement }}</div></div>
               </div>
-              <div v-if="isManager && detail.paymentMethod === 'spei' && detail.paymentStatus !== 'paid'" class="od-reason" style="color:rgba(251,191,36,0.9);">Verifica la recepción de la transferencia antes de aprobar.</div>
+              <div v-if="isManager && detail.paymentMethod === 'spei' && detail.paymentStatus !== 'paid'" class="od-reason" style="color:#B45309;">Verifica la recepción de la transferencia antes de aprobar.</div>
+            </section>
+
+            <!-- Pago fuera de línea (transferencia, efectivo…) y reembolsos -->
+            <section v-if="!detail.paymentId || detail.paymentStatus === 'refunded' || (detail.paymentStatus === 'paid' && ['cancelled','rejected'].includes(detail.status))" class="od-card">
+              <div class="od-row-between">
+                <div style="min-width:0;">
+                  <div class="od-card-title" style="margin-bottom:4px;">Pago</div>
+                  <div v-if="detail.paymentData?.pago" class="od-muted">
+                    {{ detail.paymentData.pago.metodo }}<template v-if="detail.paymentData.pago.referencia"> · Ref. {{ detail.paymentData.pago.referencia }}</template> · {{ detail.paymentData.pago.fecha }}
+                  </div>
+                  <div v-else-if="detail.paymentStatus !== 'paid'" class="od-muted">Aún no se registra el pago.</div>
+                </div>
+                <span class="od-pill" :style="payStatus.style">{{ payStatus.label }}</span>
+              </div>
+              <div v-if="isManager" class="od-actions" style="margin-top:10px;">
+                <button v-if="detail.paymentStatus !== 'paid' && detail.paymentStatus !== 'refunded' && !['cancelled','rejected'].includes(detail.status)" class="od-btn od-btn-ok" :disabled="pagoGuardando" @click="registrarPago('pagado')">Registrar pago recibido</button>
+                <button v-if="detail.paymentStatus === 'paid' && ['cancelled','rejected'].includes(detail.status)" class="od-btn od-btn-danger" :disabled="pagoGuardando" @click="registrarPago('reembolsado')">Registrar reembolso</button>
+              </div>
+            </section>
+
+            <!-- Entregado (p. ej. se recogió en mostrador) -->
+            <section v-if="isManager && ['approved','processing','shipped'].includes(detail.status)" class="od-card">
+              <div class="od-row-between">
+                <div class="od-muted">¿El cliente ya recibió su pedido (o lo recogió en mostrador)?</div>
+                <button class="od-btn od-btn-green" :disabled="actionLoading" @click="marcarEntregado">Marcar como entregado</button>
+              </div>
+            </section>
+
+            <!-- Factura del cliente -->
+            <section v-if="detail.cfdiUid" class="od-card">
+              <div class="od-row-between">
+                <div class="od-card-title">Factura (CFDI)</div>
+                <div class="od-actions">
+                  <a class="od-btn od-btn-neutral" :href="`/api/orders/${detail.id}/factura/pdf`">PDF</a>
+                  <a class="od-btn od-btn-neutral" :href="`/api/orders/${detail.id}/factura/xml`">XML</a>
+                </div>
+              </div>
+            </section>
+
+            <!-- Garantía: el cliente reporta una falla -->
+            <section v-if="detail.userId === auth.user?.id && ['approved','processing','shipped','delivered'].includes(detail.status)" class="od-card">
+              <div class="od-row-between">
+                <div class="od-card-title">¿Un producto falló?</div>
+                <button v-if="!garantia.abierta && !garantia.enviada" class="od-btn od-btn-neutral" @click="garantia.abierta = true">Solicitar garantía</button>
+              </div>
+              <div v-if="garantia.enviada" class="od-muted" style="margin-top:8px;color:#15803D;">Recibimos tu solicitud. Te contactaremos para recibir el equipo.</div>
+              <form v-else-if="garantia.abierta" class="od-gar" @submit.prevent="solicitarGarantia">
+                <label>Producto
+                  <select v-model="garantia.productId" required>
+                    <option value="" disabled>Elige el producto</option>
+                    <option v-for="it in detail.items" :key="it.productId" :value="it.productId">{{ it.sku }} — {{ it.name.slice(0, 60) }}</option>
+                  </select>
+                </label>
+                <label>Número de serie (opcional)<input v-model="garantia.serie" maxlength="120" /></label>
+                <label>¿Qué falla?<textarea v-model="garantia.falla" rows="3" maxlength="1000" required /></label>
+                <div v-if="garantia.error" class="od-reason" style="color:#B91C1C;">{{ garantia.error }}</div>
+                <div class="od-actions">
+                  <button type="button" class="od-btn od-btn-neutral" @click="garantia.abierta = false">Cancelar</button>
+                  <button type="submit" class="od-btn od-btn-ok" :disabled="garantia.enviando">{{ garantia.enviando ? 'Enviando…' : 'Enviar solicitud' }}</button>
+                </div>
+              </form>
             </section>
 
             <!-- Información adicional -->
@@ -393,7 +466,7 @@
                   <span class="od-status-dot" :style="{ background: statusCfg[entry.status]?.dot ?? '#5B6B82' }" />
                   <div style="min-width:0;flex:1;">
                     <div class="od-row-between" style="gap:8px;">
-                      <span class="od-text"><b>{{ entry.retry ? 'Reintento SYSCOM' : (entry.status === 'reasignado' ? 'Asignado a otro cliente' : entry.status === 'precio_actualizado' ? 'Precio actualizado' : statusCfg[entry.status]?.label ?? entry.status) }}</b> <span class="od-muted">por {{ entry.byName }}</span></span>
+                      <span class="od-text"><b>{{ entry.retry ? 'Reintento SYSCOM' : (entry.status === 'reasignado' ? 'Asignado a otro cliente' : entry.status === 'precio_actualizado' ? 'Precio actualizado' : entry.status === 'pago_registrado' ? 'Pago registrado' : entry.status === 'reembolso' ? 'Reembolso registrado' : statusCfg[entry.status]?.label ?? entry.status) }}</b> <span class="od-muted">por {{ entry.byName }}</span></span>
                       <span class="od-muted" style="white-space:nowrap;">{{ fmtDateLong(entry.at) }}</span>
                     </div>
                     <div v-if="entry.syscomFolio" class="od-log-note" style="color:#16A34A;">Folio SYSCOM {{ entry.syscomFolio }}</div>
@@ -430,12 +503,15 @@
 import { Search, ChevronRight, Clock, Package, AlertCircle, ShoppingCart, User, X, Download, RefreshCw } from '@lucide/vue'
 import type { Order } from '~/types'
 
+const { confirmar } = useConfirmar()
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Pedidos — SIEEG' })
 
 const auth      = useAuthStore()
 const isManager = computed(() => auth.user?.role === 'admin' || auth.user?.role === 'approver')
 // El vendedor ve los pedidos de todos los clientes (sin costos ni aprobación)
 const veTodos   = computed(() => isManager.value || auth.user?.role === 'seller')
+const puedeComprar = computed(() => auth.user?.role !== 'viewer')
 
 const orders        = ref<Order[]>([])
 const loading       = ref(true)
@@ -471,9 +547,13 @@ const PAY_STATUS: Record<string, { label: string; ok?: boolean; bad?: boolean }>
   in_progress:  { label: 'En proceso' },
   failed:       { label: 'Fallido', bad: true },
   cancelled:    { label: 'Cancelado', bad: true },
+  unpaid:       { label: 'Pendiente de pago' },
+  refunded:     { label: 'Reembolsado' },
 }
 const payStatus = computed(() => {
-  const st = PAY_STATUS[detail.value?.paymentStatus ?? ''] ?? { label: detail.value?.paymentStatus ?? 'Pendiente' }
+  const d = detail.value
+  const porReembolsar = d && d.paymentStatus === 'paid' && ['cancelled', 'rejected'].includes(d.status)
+  const st = porReembolsar ? { label: 'Pagado · por reembolsar', bad: true } : PAY_STATUS[d?.paymentStatus ?? ''] ?? { label: d?.paymentStatus ?? 'Pendiente' }
   return {
     label: st.label,
     style: st.ok  ? { background: 'rgba(34,197,94,0.15)', color: '#16A34A' }
@@ -565,17 +645,19 @@ async function load(resetPage = false) {
   if (resetPage) page.value = 1
   loading.value = true; error.value = null
   try {
-    const data = await $fetch<{ orders: Order[]; pagination: { total: number; page: number; perPage: number; totalPages: number } }>('/api/orders', {
+    const data = await $fetch<{ orders: Order[]; pagination: { total: number; page: number; perPage: number; totalPages: number }; conteos?: Record<string, number> }>('/api/orders', {
       query: {
         page: page.value, per_page: perPage.value,
         ...(search.value.trim() ? { search: search.value.trim() } : {}),
         ...(filtroCliente.value ? { cliente: filtroCliente.value } : {}),
         ...(filtroEmpresa.value ? { empresa: filtroEmpresa.value } : {}),
+        ...(activeTab.value !== 'all' ? { status: activeTab.value } : {}),
       },
     })
     orders.value    = data.orders
     totalPages.value = data.pagination.totalPages
     totalCount.value = data.pagination.total
+    conteos.value    = data.conteos ?? {}
   } catch (e: unknown) {
     error.value = (e as { data?: { message?: string } })?.data?.message ?? 'Error al cargar órdenes'
   } finally { loading.value = false }
@@ -584,14 +666,18 @@ async function load(resetPage = false) {
 function prevPage() { if (page.value > 1) { page.value--; load() } }
 function nextPage() { if (page.value < totalPages.value) { page.value++; load() } }
 
-// Enlace directo a un pedido (desde una cotización): /orders?pedido=<id>
-onMounted(async () => {
+// Enlace directo a un pedido (desde una cotización o un aviso): /orders?pedido=<id>
+async function abrirPedidoDeRuta() {
   const pedido = typeof useRoute().query.pedido === 'string' ? useRoute().query.pedido as string : ''
-  if (pedido) search.value = pedido
+  if (pedido) {
+    try { const r = await $fetch<{ order: Order }>(`/api/orders/${pedido}`); openDetail(r.order); return } catch { /* no existe o no es suyo */ }
+  }
+}
+onMounted(async () => {
   await load()
-  const o = pedido ? orders.value.find(x => x.id === pedido) : undefined
-  if (o) openDetail(o)
+  await abrirPedidoDeRuta()
 })
+watch(() => useRoute().query.pedido, (p) => { if (p) abrirPedidoDeRuta() })
 
 /* ── Filtros por cliente y empresa (admin/approver) ── */
 const route  = useRoute()
@@ -671,12 +757,13 @@ async function asignarCliente(clientId: string) {
 const cancelling = ref(false)
 
 async function cancelOrder(order: Order) {
-  if (!confirm('¿Cancelar este pedido? Esta acción no se puede deshacer.')) return
+  const motivo = await confirmar({ titulo: '¿Cancelar este pedido?', mensaje: order.syscomFolio ? `Ya se compró en SYSCOM (folio ${order.syscomFolio}): cancelarlo aquí no lo cancela en SYSCOM.` : 'Esta acción no se puede deshacer.', aceptar: 'Sí, cancelar', cancelar: 'No', peligro: true, pedirMotivo: 'Motivo (opcional, se le avisa al cliente)' })
+  if (motivo === null) return
   cancelling.value  = true
   actionError.value = null
   try {
     const res = await $fetch<{ order: Order }>(`/api/orders/${order.id}`, {
-      method: 'PATCH', body: { status: 'cancelled' },
+      method: 'PATCH', body: { status: 'cancelled', motivo: motivo || undefined },
     })
     orders.value = orders.value.map(o => o.id === res.order.id ? res.order : o)
     detail.value = res.order
@@ -720,8 +807,66 @@ function openDetail(order: Order) {
   detail.value        = order
   actionError.value   = null
   actionSuccess.value = null
+  margen.value = null
+  Object.assign(garantia, { abierta: false, enviada: false, enviando: false, productId: '', serie: '', falla: '', error: '' })
   // Pendiente y sin pagar: el servidor lo trae al precio del día de SYSCOM
-  if (order.status === 'pending' && order.paymentStatus === 'unpaid' && !order.syscomFolio) refrescarPrecio(order.id)
+  if (order.status === 'pending' && order.paymentStatus === 'unpaid' && !order.syscomFolio) refrescarPrecio(order.id).then(() => cargarMargen(order.id))
+  else if (order.status === 'pending') cargarMargen(order.id)
+}
+
+// ── Margen estimado antes de aprobar (admin/aprobador) ──
+const margen = ref<{ ventaSinIva: number; costoSinIva: number; margen: number; margenPct: number; sinCosto: number } | null>(null)
+const margenCargando = ref(false)
+async function cargarMargen(id: string) {
+  if (!isManager.value) return
+  margenCargando.value = true
+  try { const m = await $fetch<NonNullable<typeof margen.value>>(`/api/orders/${id}/margen`); if (detail.value?.id === id) margen.value = m }
+  catch { /* sin margen: se aprueba igual */ } finally { margenCargando.value = false }
+}
+
+// ── Pago recibido / reembolso ──
+const pagoGuardando = ref(false)
+async function registrarPago(accion: 'pagado' | 'reembolsado') {
+  if (!detail.value) return
+  const referencia = await confirmar({
+    titulo: accion === 'pagado' ? 'Registrar pago recibido' : 'Registrar reembolso',
+    mensaje: `${fmtCurrency(detail.value.total)} · PED-${detail.value.id.slice(-8).toUpperCase()}`,
+    aceptar: 'Registrar', pedirMotivo: accion === 'pagado' ? 'Referencia o folio de la transferencia (opcional)' : 'Referencia del reembolso (opcional)',
+  })
+  if (referencia === null) return
+  pagoGuardando.value = true; actionError.value = null
+  try {
+    const res = await $fetch<{ order: Order }>(`/api/orders/${detail.value.id}/pago`, { method: 'POST', body: { accion, referencia } })
+    reemplazarOrden(res.order)
+    actionSuccess.value = accion === 'pagado' ? 'Pago registrado.' : 'Reembolso registrado.'
+  } catch (e: unknown) {
+    actionError.value = (e as { data?: { message?: string } })?.data?.message ?? 'No se pudo registrar'
+  } finally { pagoGuardando.value = false }
+}
+
+async function marcarEntregado() {
+  if (!detail.value || !await confirmar({ titulo: '¿Marcar como entregado?', mensaje: 'Se le avisa al cliente que su pedido fue entregado.', aceptar: 'Sí, entregado' })) return
+  actionLoading.value = true; actionError.value = null
+  try {
+    const res = await $fetch<{ order: Order }>(`/api/orders/${detail.value.id}`, { method: 'PATCH', body: { status: 'delivered' } })
+    reemplazarOrden(res.order)
+    actionSuccess.value = 'Pedido marcado como entregado.'
+  } catch (e: unknown) {
+    actionError.value = (e as { data?: { message?: string } })?.data?.message ?? 'No se pudo actualizar'
+  } finally { actionLoading.value = false }
+}
+
+// ── Solicitud de garantía del cliente ──
+const garantia = reactive({ abierta: false, enviada: false, enviando: false, productId: '', serie: '', falla: '', error: '' })
+async function solicitarGarantia() {
+  if (!detail.value) return
+  garantia.enviando = true; garantia.error = ''
+  try {
+    await $fetch('/api/rma/solicitud', { method: 'POST', body: { orderId: detail.value.id, productId: garantia.productId, serie: garantia.serie, falla: garantia.falla } })
+    garantia.enviada = true; garantia.abierta = false
+  } catch (e: unknown) {
+    garantia.error = (e as { data?: { message?: string } })?.data?.message ?? 'No se pudo enviar'
+  } finally { garantia.enviando = false }
 }
 
 async function refrescarPrecio(id: string) {
@@ -736,13 +881,28 @@ async function refrescarPrecio(id: string) {
 
 async function handleAction(action: 'approve' | 'reject') {
   if (!detail.value || actionLoading.value) return
+  const folio = `PED-${detail.value.id.slice(-8).toUpperCase()}`
+  let motivo: string | null = ''
+  if (action === 'approve') {
+    const m = margen.value
+    const ok = await confirmar({
+      titulo: `¿Aprobar ${folio}?`,
+      mensaje: `Se hará la compra real en SYSCOM con cargo a tu cuenta por los productos de este pedido (${fmtCurrency(detail.value.total)} al cliente, IVA incl.).`
+        + (m ? `\nMargen estimado: ${fmtCurrency(m.margen)} (${m.margenPct}%).` : '') + (m && m.margen < 0 ? '\n⚠ Se vendería por debajo del costo.' : ''),
+      aceptar: 'Sí, aprobar y comprar',
+    })
+    if (!ok) return
+  } else {
+    motivo = await confirmar({ titulo: `¿Rechazar ${folio}?`, mensaje: 'Se le avisa al cliente.', aceptar: 'Rechazar', peligro: true, pedirMotivo: 'Motivo (opcional, lo verá el cliente)' })
+    if (motivo === null) return
+  }
   actionLoading.value = true
   actionError.value   = null
   actionSuccess.value = null
   try {
     const res = await $fetch<{ order: Order; syscomError?: string }>(`/api/orders/${detail.value.id}`, {
       method: 'PATCH',
-      body: { status: action === 'approve' ? 'approved' : 'rejected' },
+      body: { status: action === 'approve' ? 'approved' : 'rejected', ...(motivo ? { motivo } : {}) },
     })
     const idx = orders.value.findIndex(o => o.id === res.order.id)
     if (idx >= 0) orders.value[idx] = res.order
@@ -762,7 +922,6 @@ async function handleAction(action: 'approve' | 'reject') {
 }
 
 const filtered = computed(() => orders.value.filter(o => {
-  if (activeTab.value !== 'all' && o.status !== activeTab.value) return false
   const q = search.value.toLowerCase()
   if (!q) return true
   const num = parseClientNumber(q)
@@ -772,9 +931,10 @@ const filtered = computed(() => orders.value.filter(o => {
     || (num !== null && o.clientNumber === num)
 }))
 
-function tabCount(key: string) {
-  return key === 'all' ? orders.value.length : orders.value.filter(o => o.status === key).length
-}
+// Conteos del servidor (todas las páginas), no solo de la página cargada
+const conteos = ref<Record<string, number>>({})
+function tabCount(key: string) { return conteos.value[key] ?? 0 }
+watch(activeTab, () => load(true))
 
 /* ════════════════════════════════
    ESTADO SYSCOM
@@ -927,6 +1087,11 @@ const fmtDateLong = (d: string) => new Intl.DateTimeFormat('es-MX', { day:'2-dig
 
 .od-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .od-folio { font-size:15px; font-weight:800; color:#059669; font-family:ui-monospace,monospace; }
+.od-margen { margin:0 0 12px; padding:10px 12px; border-radius:10px; background:#F5F8FC; border:1px solid #E4E9F1; }
+.od-margen.neg { background:#FEF2F2; border-color:rgba(239,68,68,0.3); }
+.od-gar { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+.od-gar label { display:flex; flex-direction:column; gap:5px; font-size:12px; font-weight:600; color:#5B6B82; }
+.od-gar select, .od-gar input, .od-gar textarea { border:1px solid #D5DEEA; border-radius:9px; padding:8px 10px; font-size:13px; font-family:inherit; color:#0B1B33; background:#fff; }
 .od-cost { margin-top:12px; padding-top:10px; border-top:1px solid rgba(34,197,94,0.15); }
 .od-margin { margin-top:4px; padding:6px 10px; border-radius:8px; font-weight:700; }
 .od-margin.pos { background:rgba(34,197,94,0.1); } .od-margin.pos > span { color:#16A34A !important; }
@@ -950,10 +1115,16 @@ const fmtDateLong = (d: string) => new Intl.DateTimeFormat('es-MX', { day:'2-dig
 .od-btn-green  { border:1px solid rgba(34,197,94,0.3); background:rgba(34,197,94,0.1); color:#16A34A; flex-shrink:0; }
 .od-btn-ghost  { width:100%; border:1px solid rgba(239,68,68,0.2); background:transparent; color:rgba(248,113,113,0.8); font-weight:600; }
 .od-btn-ghost:hover:not(:disabled) { background:rgba(239,68,68,0.06); }
+.od-btn-neutral { border:1px solid #D5DEEA; background:#fff; color:#0B1B33; text-decoration:none; flex-shrink:0; }
+.od-btn-neutral:hover:not(:disabled) { background:#F5F8FC; }
 .od-cancel { padding-top:2px; }
-.od-meta { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; font-size:10.5px; color:#7A889C; padding-top:4px; }
+.od-meta { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; font-size:10.5px; color:#5F6E84; padding-top:4px; }
 
 @media (max-width: 640px) {
+  .or-row { flex-wrap:wrap; gap:8px 12px !important; padding:12px 14px !important; }
+  .or-row > div:nth-child(2) { flex:1 1 calc(100% - 30px) !important; }
+  .or-count { margin-left:21px; text-align:left !important; display:flex; gap:4px; align-items:baseline; }
+  .or-row > div:nth-last-child(2) { margin-left:auto; }
   .od-wrap { padding:0; align-items:flex-end; }
   .od-modal { max-height:94vh; max-height:94dvh; border-radius:18px 18px 0 0; }
   .od-head { padding:16px 16px 12px; }

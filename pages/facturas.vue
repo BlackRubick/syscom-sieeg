@@ -51,7 +51,7 @@
         <span>{{ ordersError }}</span>
         <button type="button" aria-label="Cerrar" style="border:none;background:none;color:#B91C1C;cursor:pointer;font-size:16px;" @click="ordersError = ''">×</button>
       </div>
-      <div class="fa-kpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+      <div class="fa-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;">
         <div v-for="k in orderKpis" :key="k.label" style="border-radius:14px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:16px 18px;">
           <div :style="{ fontSize:'24px', fontWeight:800, background:k.grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', lineHeight:1 }">
             {{ loadingOrders ? '—' : k.value }}
@@ -63,7 +63,7 @@
       <!-- Filtros pedidos -->
       <div style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:10px;">
         <div style="position:relative;max-width:360px;">
-          <Search :size="13" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="orderSearchFocus?'#6366f1':'#7A889C'" />
+          <Search :size="13" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="orderSearchFocus?'#6366f1':'#5F6E84'" />
           <input v-model="orderSearch" placeholder="Buscar por cliente, número de cliente, RFC o folio SYSCOM…"
             @focus="orderSearchFocus=true" @blur="orderSearchFocus=false"
             :style="{ width:'100%', height:'38px', background: orderSearchFocus?'rgba(99,102,241,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${orderSearchFocus?'rgba(99,102,241,0.4)':'rgba(11,27,51,0.08)'}`, borderRadius:'9px', paddingLeft:'36px', paddingRight:'12px', fontSize:'12px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
@@ -85,10 +85,10 @@
       </div>
 
       <!-- Tabla pedidos -->
-      <div v-else-if="filteredOrders.length>0" style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);overflow:hidden;">
+      <div v-else-if="filteredOrders.length>0" class="tabla-ancha" style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);">
         <div style="display:grid;grid-template-columns:0.8fr 1.6fr 0.7fr 0.8fr 0.9fr 120px;gap:0;padding:10px 18px;border-bottom:1px solid rgba(11,27,51,0.07);">
           <span v-for="h in ['Pedido','Cliente','Artículos','Total','Estado fiscal','Acción']" :key="h"
-            style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;">{{ h }}</span>
+            style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;">{{ h }}</span>
         </div>
 
         <div v-for="(o, idx) in filteredOrders" :key="o.id"
@@ -97,7 +97,7 @@
           <!-- Pedido -->
           <div>
             <div style="font-size:12px;font-weight:600;color:#0B1B33;font-family:monospace;">{{ o.id.slice(-6).toUpperCase() }}</div>
-            <div style="font-size:10px;color:#7A889C;margin-top:2px;">{{ fmtDate(o.createdAt) }}</div>
+            <div style="font-size:10px;color:#5F6E84;margin-top:2px;">{{ fmtDate(o.createdAt) }}</div>
           </div>
 
           <!-- Cliente -->
@@ -114,7 +114,7 @@
           <!-- Total -->
           <div>
             <div style="font-size:12px;font-weight:700;color:#4F46E5;">{{ fmtMXN(o.total) }}</div>
-            <div style="font-size:9px;color:#7A889C;">IVA incl.</div>
+            <div style="font-size:9px;color:#5F6E84;">IVA incl.</div>
           </div>
 
           <!-- Estado fiscal -->
@@ -174,7 +174,7 @@
       <!-- Búsqueda CFDIs -->
       <div style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:14px 16px;margin-bottom:20px;">
         <div style="position:relative;max-width:360px;">
-          <Search :size="13" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="cfdiSearchFocus?'#6366f1':'#7A889C'" />
+          <Search :size="13" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="cfdiSearchFocus?'#6366f1':'#5F6E84'" />
           <input v-model="cfdiSearch" placeholder="Buscar por folio, RFC o nombre…"
             @focus="cfdiSearchFocus=true" @blur="cfdiSearchFocus=false"
             :style="{ width:'100%', height:'38px', background: cfdiSearchFocus?'rgba(99,102,241,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${cfdiSearchFocus?'rgba(99,102,241,0.4)':'rgba(11,27,51,0.08)'}`, borderRadius:'9px', paddingLeft:'36px', paddingRight:'12px', fontSize:'12px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
@@ -187,10 +187,10 @@
       </div>
 
       <!-- Tabla CFDIs -->
-      <div v-else-if="filteredCfdis.length>0" style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);overflow:hidden;">
+      <div v-else-if="filteredCfdis.length>0" class="tabla-ancha" style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);">
         <div style="display:grid;grid-template-columns:0.8fr 2fr 1fr 1fr 0.9fr 90px;gap:0;padding:10px 18px;border-bottom:1px solid rgba(11,27,51,0.07);">
           <span v-for="h in ['Folio','Cliente','Fecha','Total','Estado','']" :key="h"
-            style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;">{{ h }}</span>
+            style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;">{{ h }}</span>
         </div>
         <div v-for="(c, idx) in filteredCfdis" :key="c.UID"
           :style="{ display:'grid', gridTemplateColumns:'0.8fr 2fr 1fr 1fr 0.9fr 90px', gap:0, padding:'11px 18px', borderBottom: idx<filteredCfdis.length-1?'1px solid rgba(11,27,51,0.05)':'none', alignItems:'center' }">
@@ -209,7 +209,7 @@
 
           <div>
             <div style="font-size:13px;font-weight:700;color:#4F46E5;">{{ fmtMXN(Number(c.Total??0)) }}</div>
-            <div style="font-size:10px;color:#7A889C;">MXN</div>
+            <div style="font-size:10px;color:#5F6E84;">MXN</div>
           </div>
 
           <div><span :style="cfdiStatusStyle(c.Status)">{{ cfdiStatusLabel(c.Status) }}</span></div>
@@ -234,7 +234,7 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(99,102,241,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8H8"/><path d="M16 12H8"/><path d="M12 16H8"/></svg>
         </div>
         <div style="font-size:14px;font-weight:600;color:#5B6B82;">No hay CFDIs serie S emitidos</div>
-        <div style="font-size:12px;color:#7A889C;">Ve a la pestaña "Pedidos" para facturar a un cliente</div>
+        <div style="font-size:12px;color:#5F6E84;">Ve a la pestaña "Pedidos" para facturar a un cliente</div>
       </div>
 
       <!-- #18 — Paginación CFDIs -->
@@ -244,7 +244,7 @@
           :style="{ opacity: cfdiPage===1 ? 0.4 : 1, cursor: cfdiPage===1 ? 'not-allowed' : 'pointer' }">
           ← Anterior
         </button>
-        <span style="font-size:12px;color:#7A889C;">Página {{ cfdiPage }} de {{ cfdiTotalPages }}</span>
+        <span style="font-size:12px;color:#5F6E84;">Página {{ cfdiPage }} de {{ cfdiTotalPages }}</span>
         <button @click="nextCfdiPage" :disabled="cfdiPage===cfdiTotalPages"
           style="height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(11,27,51,0.1);background:rgba(11,27,51,0.04);color:#5B6B82;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;"
           :style="{ opacity: cfdiPage===cfdiTotalPages ? 0.4 : 1, cursor: cfdiPage===cfdiTotalPages ? 'not-allowed' : 'pointer' }">
@@ -286,6 +286,7 @@ import { Search, FileText } from '@lucide/vue'
 import type { OrderItem } from '~/types'
 
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Facturación — SIEEG' })
 
 const auth = useAuthStore()
 if (auth.user?.role !== 'admin') navigateTo('/catalog')
@@ -379,7 +380,7 @@ function billBadgeStyle(o: BillingOrder) {
   return {
     fontSize:'10px', fontWeight:600, padding:'2px 8px', borderRadius:'20px',
     background: ready   ? 'rgba(34,197,94,0.1)' : partial ? 'rgba(245,158,11,0.1)' : 'rgba(91,107,130,0.08)',
-    color:      ready   ? '#16A34A'              : partial ? '#B45309'              : '#7A889C',
+    color:      ready   ? '#16A34A'              : partial ? '#B45309'              : '#5F6E84',
   }
 }
 

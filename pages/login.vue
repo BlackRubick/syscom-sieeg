@@ -32,7 +32,7 @@
           <div>
             <label style="display:block;font-size:12px;font-weight:500;color:#5B6B82;margin-bottom:7px;">Correo electrónico</label>
             <div :style="fieldWrap(emailFocus)">
-              <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:15px;height:15px;flex-shrink:0;" :color="emailFocus?'#1570EF':'#7A889C'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:15px;height:15px;flex-shrink:0;" :color="emailFocus?'#1570EF':'#5F6E84'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/>
               </svg>
               <input v-model="email" type="email" placeholder="usuario@empresa.com" required
@@ -45,14 +45,14 @@
           <div>
             <label style="display:block;font-size:12px;font-weight:500;color:#5B6B82;margin-bottom:7px;">Contraseña</label>
             <div :style="fieldWrap(passFocus)">
-              <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:15px;height:15px;flex-shrink:0;" :color="passFocus?'#1570EF':'#7A889C'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:15px;height:15px;flex-shrink:0;" :color="passFocus?'#1570EF':'#5F6E84'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
               <input v-model="password" :type="showPass?'text':'password'" placeholder="••••••••" required
                 @focus="passFocus=true" @blur="passFocus=false"
                 style="width:100%;height:48px;background:transparent;border:none;outline:none;padding-left:40px;padding-right:48px;font-size:14px;color:#0B1B33;box-sizing:border-box;" />
               <button type="button" @click="showPass=!showPass"
-                style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#7A889C;display:flex;align-items:center;padding:4px;">
+                style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#5F6E84;display:flex;align-items:center;padding:4px;">
                 <EyeOff v-if="showPass" :size="15" />
                 <Eye v-else :size="15" />
               </button>
@@ -103,6 +103,7 @@
 import { Eye, EyeOff, ArrowRight } from '@lucide/vue'
 
 definePageMeta({ layout: 'auth' })
+useHead({ title: 'Iniciar sesión — SIEEG' })
 
 const auth   = useAuthStore()
 const router = useRouter()

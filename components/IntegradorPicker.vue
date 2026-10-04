@@ -13,6 +13,8 @@
 </template>
 
 <script setup lang="ts">
+// Importación explícita: el auto-import de Nuxt no registra esIntegrador
+import { esIntegrador, NIVELES_INTEGRADOR } from '~/utils/integrador'
 import { BadgePercent } from '@lucide/vue'
 
 /* Selector de nivel de integrador: sin descuento, 10, 20 o 30 %. */

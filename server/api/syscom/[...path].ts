@@ -1,6 +1,6 @@
 import { syscomGet, SyscomHttpError } from '~/server/utils/syscom'
 import { requireSession } from '~/server/utils/session'
-import { getPricing, sanitizeProductoPrecios } from '~/server/utils/pricing'
+import { pricingParaVista, sanitizeProductoPrecios } from '~/server/utils/pricing'
 
 /* Proxy de solo lectura a SYSCOM.
    - Solo GET y solo las rutas que usa la app: nunca debe poder generar pedidos
@@ -31,20 +31,24 @@ export default defineEventHandler(async (event) => {
   if (!isProduct && !isCatalog && !isFacturas) throw createError({ statusCode: 404, message: 'Ruta no disponible' })
   if (isFacturas && !FACTURAS_ROLES.includes(session.role)) throw createError({ statusCode: 403, message: 'Sin autorización' })
 
+  const query = getQuery(event)
   const params: Record<string, string> = {}
-  for (const [k, v] of Object.entries(getQuery(event))) if (v != null) params[k] = String(v)
+  // `cliente` es nuestro (precios del cliente elegido por el vendedor): no se manda a SYSCOM
+  for (const [k, v] of Object.entries(query)) if (v != null && k !== 'cliente') params[k] = String(v).slice(0, 120)
+  if (isProduct) params.moneda = 'MXN'
 
   let data: unknown
   try {
     data = await syscomGet(path, params)
   } catch (e) {
-    if (e instanceof SyscomHttpError) throw createError({ statusCode: e.status, data: e.data, message: e.message })
+    // No se reenvía el detalle interno de SYSCOM al navegador
+    if (e instanceof SyscomHttpError) throw createError({ statusCode: e.status === 404 ? 404 : 502, message: e.status === 404 ? 'No encontrado' : 'SYSCOM no respondió, intenta de nuevo' })
     throw createError({ statusCode: 502, message: 'Error al conectar con SYSCOM' })
   }
 
   if (!isProduct) return data
 
-  const pricing  = await getPricing(session.userId)
+  const pricing  = await pricingParaVista(session, query.cliente)
   const sanitize = (p: unknown) => sanitizeProductoPrecios(p as { precios?: unknown }, pricing)
 
   if (Array.isArray(data)) return data.map(sanitize)

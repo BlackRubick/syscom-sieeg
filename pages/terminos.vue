@@ -14,7 +14,7 @@
       <div style="margin-bottom:48px;">
         <div style="font-size:12px;font-weight:600;color:#0B5BD3;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;">Legal</div>
         <h1 style="font-size:clamp(28px,4vw,42px);font-weight:800;color:#0B1B33;letter-spacing:-1px;margin-bottom:14px;">Términos y Condiciones</h1>
-        <p style="font-size:14px;color:#5B6B82;">Última actualización: 26 de agosto de 2026</p>
+        <p style="font-size:14px;color:#5B6B82;">Última actualización: 4 de octubre de 2026</p>
       </div>
 
       <!-- Divisor -->
@@ -95,58 +95,19 @@
 
       <!-- Sección: Colocación de pedidos -->
       <section style="margin-bottom:44px;">
-        <h2 style="font-size:20px;font-weight:700;color:#0B1B33;letter-spacing:-0.4px;margin:0 0 20px 0;padding-bottom:12px;border-bottom:1px solid rgba(11,27,51,0.07);">Colocación de pedidos de mercancías</h2>
-        <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0 0 24px 0;">
-          Al realizar un Pedido de Bienes a través del Servicio, Usted garantiza que Usted es legalmente capaz de celebrar contratos vinculantes.
-        </p>
-
-        <h3 style="font-size:14px;font-weight:600;color:#0B5BD3;letter-spacing:0.5px;text-transform:uppercase;margin:0 0 12px 0;">Su información</h3>
+        <h2 style="font-size:20px;font-weight:700;color:#0B1B33;letter-spacing:-0.4px;margin:0 0 20px 0;padding-bottom:12px;border-bottom:1px solid rgba(11,27,51,0.07);">Cancelaciones, devoluciones y garantías</h2>
         <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0 0 14px 0;">
-          Si desea realizar un pedido de bienes disponibles en el Servicio, se le puede pedir que proporcione cierta información relevante para su pedido, incluido, entre otros, su nombre, su correo electrónico, su número de teléfono, su número de tarjeta de crédito, la fecha de vencimiento de su tarjeta de crédito, su dirección de facturación e información de envío.
+          Mientras su pedido esté <strong style="color:#0B1B33;">pendiente de aprobación</strong> puede cancelarlo desde su cuenta, sin costo.
         </p>
         <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0 0 14px 0;">
-          Usted declara y garantiza que: (i) Usted tiene el derecho legal de usar cualquier tarjeta de crédito o débito u otro método(s) de pago en relación con cualquier Pedido; y que (ii) la información que Usted nos proporciona es verdadera, correcta y completa.
-        </p>
-        <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0 0 24px 0;">
-          Al enviar dicha información, Usted nos otorga el derecho de proporcionar la información al procesamiento de pagos de terceros con el fin de facilitar la finalización de su pedido.
-        </p>
-
-        <h3 style="font-size:14px;font-weight:600;color:#0B5BD3;letter-spacing:0.5px;text-transform:uppercase;margin:0 0 12px 0;">Cancelación de pedido</h3>
-        <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0 0 12px 0;">
-          Nos reservamos el derecho de rechazar o cancelar su pedido en cualquier momento por ciertas razones, incluyendo, pero no limitado a:
-        </p>
-        <ul style="padding-left:20px;margin:0 0 14px 0;list-style:none;">
-          <li style="font-size:15px;line-height:1.85;color:#5B6B82;margin-bottom:8px;padding-left:12px;position:relative;"><span style="position:absolute;left:0;color:#0B5BD3;">—</span>Disponibilidad de mercancías</li>
-          <li style="font-size:15px;line-height:1.85;color:#5B6B82;margin-bottom:8px;padding-left:12px;position:relative;"><span style="position:absolute;left:0;color:#0B5BD3;">—</span>Errores en la descripción o precios de los bienes</li>
-          <li style="font-size:15px;line-height:1.85;color:#5B6B82;padding-left:12px;position:relative;"><span style="position:absolute;left:0;color:#0B5BD3;">—</span>Errores en su pedido</li>
-        </ul>
-        <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0 0 24px 0;">
-          Nos reservamos el derecho de rechazar o cancelar su pedido si se sospecha de fraude o una transacción no autorizada o ilegal.
-        </p>
-
-        <h3 style="font-size:14px;font-weight:600;color:#0B5BD3;letter-spacing:0.5px;text-transform:uppercase;margin:0 0 12px 0;">Derechos de cancelación de su pedido</h3>
-        <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0 0 14px 0;">
-          Cualquier Producto que compre solo puede ser devuelto de acuerdo con estos Términos y Condiciones y Nuestra Política de Devoluciones.
+          Una vez aprobado, el pedido se compra a nuestro proveedor y se envía; a partir de ese momento la cancelación o devolución está sujeta a las políticas del proveedor y del fabricante. Comuníquese con nosotros y le diremos las opciones.
         </p>
         <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0 0 14px 0;">
-          Nuestra Política de Devoluciones forma parte de estos Términos y Condiciones. Lea nuestra Política de devoluciones para obtener más información sobre su derecho a cancelar su pedido.
+          Los productos con defecto de fábrica se atienden con la garantía del fabricante, cuyo plazo se indica en cada producto, en su cotización y en su pedido. Puede solicitarla desde el detalle de su pedido; para tramitarla, entregue el equipo con sus accesorios y, de ser posible, su empaque.
         </p>
-        <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0 0 14px 0;">
-          Su derecho a cancelar un Pedido solo se aplica a los Bienes que se devuelven en las mismas condiciones en que Usted los recibió. También debe incluir todas las instrucciones, documentos y envolturas del producto. Los productos que están dañados o no en las mismas condiciones en que los recibió o que se usan simplemente más allá de abrir el embalaje original no serán reembolsados. Por lo tanto, debe tener un cuidado razonable de los Bienes comprados mientras estén en Su poder.
+        <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0;">
+          Si procede un reembolso, se hará por el mismo medio de pago en un plazo máximo de 14 días hábiles a partir de que se autorice.
         </p>
-        <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0 0 14px 0;">
-          Le reembolsaremos a más tardar 14 días a partir del día en que recibamos los Productos devueltos. Utilizaremos el mismo medio de pago que usted utilizó para el Pedido, y no incurrirá en ninguna tarifa por dicho reembolso.
-        </p>
-        <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0 0 12px 0;">
-          Usted no tendrá ningún derecho a cancelar un Pedido para el suministro de cualquiera de los siguientes Bienes:
-        </p>
-        <ul style="padding-left:20px;margin:0;list-style:none;">
-          <li style="font-size:15px;line-height:1.85;color:#5B6B82;margin-bottom:8px;padding-left:12px;position:relative;"><span style="position:absolute;left:0;color:#0B5BD3;">—</span>El suministro de bienes hechos a sus especificaciones o claramente personalizados.</li>
-          <li style="font-size:15px;line-height:1.85;color:#5B6B82;margin-bottom:8px;padding-left:12px;position:relative;"><span style="position:absolute;left:0;color:#0B5BD3;">—</span>El suministro de bienes que según su naturaleza no son adecuados para ser devueltos, se deterioran rápidamente o cuando la fecha de vencimiento ha terminado.</li>
-          <li style="font-size:15px;line-height:1.85;color:#5B6B82;margin-bottom:8px;padding-left:12px;position:relative;"><span style="position:absolute;left:0;color:#0B5BD3;">—</span>El suministro de bienes que no son adecuados para el retorno debido a razones de protección de la salud o higiene y fueron desprecintados después del parto.</li>
-          <li style="font-size:15px;line-height:1.85;color:#5B6B82;margin-bottom:8px;padding-left:12px;position:relative;"><span style="position:absolute;left:0;color:#0B5BD3;">—</span>El suministro de bienes que, después de la entrega, según su naturaleza, se mezclan inseparablemente con otros artículos.</li>
-          <li style="font-size:15px;line-height:1.85;color:#5B6B82;padding-left:12px;position:relative;"><span style="position:absolute;left:0;color:#0B5BD3;">—</span>El suministro de contenido digital que no se suministra en un medio tangible si el rendimiento ha comenzado con su consentimiento expreso previo y usted ha reconocido su pérdida de derecho de cancelación.</li>
-        </ul>
       </section>
 
       <!-- Sección: Disponibilidad, errores e inexactitudes -->
@@ -250,31 +211,18 @@
       <section style="margin-bottom:44px;">
         <h2 style="font-size:20px;font-weight:700;color:#0B1B33;letter-spacing:-0.4px;margin:0 0 20px 0;padding-bottom:12px;border-bottom:1px solid rgba(11,27,51,0.07);">Ley aplicable</h2>
         <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0;">
-          Las leyes del País/Estado, excluyendo sus conflictos de normas legales, regirán estos Términos y Su uso del Servicio. Su uso de la Aplicación también puede estar sujeto a otras leyes locales, estatales, nacionales o internacionales.
+          Estos Términos se rigen por las leyes de los Estados Unidos Mexicanos, en particular el Código de Comercio, el Código Civil Federal y la Ley Federal de Protección al Consumidor cuando Usted actúe como consumidor final.
         </p>
       </section>
 
       <!-- Sección: Resolución de disputas -->
       <section style="margin-bottom:44px;">
         <h2 style="font-size:20px;font-weight:700;color:#0B1B33;letter-spacing:-0.4px;margin:0 0 20px 0;padding-bottom:12px;border-bottom:1px solid rgba(11,27,51,0.07);">Resolución de disputas</h2>
-        <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0;">
-          Si usted tiene alguna preocupación o disputa sobre el Servicio, Usted acepta primero tratar de resolver la disputa de manera informal poniéndose en contacto con la Compañía.
+        <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0 0 14px 0;">
+          Si tiene alguna inconformidad, le pedimos escribirnos primero a contacto@sieeg.com.mx o al 961 333 6529 para resolverla de manera directa.
         </p>
-      </section>
-
-      <!-- Sección: Para Usuarios de la UE -->
-      <section style="margin-bottom:44px;">
-        <h2 style="font-size:20px;font-weight:700;color:#0B1B33;letter-spacing:-0.4px;margin:0 0 20px 0;padding-bottom:12px;border-bottom:1px solid rgba(11,27,51,0.07);">Para Usuarios de la Unión Europea (UE)</h2>
         <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0;">
-          Si usted es un consumidor de la Unión Europea, se beneficiará de cualquier disposición obligatoria de la ley del país en el que reside.
-        </p>
-      </section>
-
-      <!-- Sección: Cumplimiento legal de EE.UU. -->
-      <section style="margin-bottom:44px;">
-        <h2 style="font-size:20px;font-weight:700;color:#0B1B33;letter-spacing:-0.4px;margin:0 0 20px 0;padding-bottom:12px;border-bottom:1px solid rgba(11,27,51,0.07);">Cumplimiento legal de los Estados Unidos</h2>
-        <p style="font-size:15px;line-height:1.85;color:#5B6B82;margin:0;">
-          Usted declara y garantiza que (i) usted no está ubicado en un país que está sujeto al embargo del gobierno de los Estados Unidos, o que ha sido designado por el gobierno de los Estados Unidos como un país de "apoyo terrorista", y (ii) Usted no está incluido en ninguna lista del gobierno de los Estados Unidos de partes prohibidas o restringidas.
+          Si Usted es consumidor final, puede acudir a la Procuraduría Federal del Consumidor (PROFECO). Para cualquier otra controversia, las partes se someten a los tribunales competentes de Tuxtla Gutiérrez, Chiapas, renunciando a cualquier otro fuero que pudiera corresponderles.
         </p>
       </section>
 
@@ -331,12 +279,12 @@
     <!-- FOOTER -->
     <footer style="border-top:1px solid rgba(11,27,51,0.06);padding:28px 24px;">
       <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;">
-        <span style="font-size:12px;color:#7A889C;">© {{ new Date().getFullYear() }} SIEEG INTEGRADORES. Todos los derechos reservados.</span>
+        <span style="font-size:12px;color:#5F6E84;">© {{ new Date().getFullYear() }} SIEEG INTEGRADORES. Todos los derechos reservados.</span>
         <div style="display:flex;gap:16px;">
           <NuxtLink to="/terminos" style="font-size:12px;color:#0B5BD3;text-decoration:none;">Términos y Condiciones</NuxtLink>
-          <NuxtLink to="/privacidad" style="font-size:12px;color:#7A889C;text-decoration:none;transition:color 0.2s;"
+          <NuxtLink to="/privacidad" style="font-size:12px;color:#5F6E84;text-decoration:none;transition:color 0.2s;"
             @mouseenter="e => (e.currentTarget as HTMLElement).style.color='#5B6B82'"
-            @mouseleave="e => (e.currentTarget as HTMLElement).style.color='#7A889C'">
+            @mouseleave="e => (e.currentTarget as HTMLElement).style.color='#5F6E84'">
             Políticas de Privacidad
           </NuxtLink>
         </div>
@@ -348,4 +296,5 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: 'landing' })
+useSeoMeta({ title: 'Términos y Condiciones — SIEEG Integradores', description: 'Términos y condiciones de compra en SIEEG Integradores.' })
 </script>

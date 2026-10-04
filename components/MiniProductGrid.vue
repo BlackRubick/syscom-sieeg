@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div style="font-size:11px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">{{ title }}</div>
+    <div style="font-size:11px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">{{ title }}</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;">
       <div v-for="p in products" :key="p.id"
         style="border-radius:12px;background:rgba(11,27,51,0.03);border:1px solid rgba(11,27,51,0.07);padding:10px;display:flex;flex-direction:column;gap:7px;">
-        <img v-if="p.images[0]" :src="p.images[0]" :alt="p.name" style="width:100%;height:70px;object-fit:contain;border-radius:7px;" />
+        <img v-if="p.images[0]" loading="lazy" :src="p.images[0]" :alt="p.name" style="width:100%;height:70px;object-fit:contain;border-radius:7px;" />
         <div v-else style="height:70px;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>
         <div style="font-size:11px;font-weight:600;color:#5B6B82;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ p.name }}</div>
         <div v-if="p.price > 0" style="font-size:12px;font-weight:700;color:#0B5BD3;">{{ fmtCurrency(p.price) }}</div>

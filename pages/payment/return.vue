@@ -28,7 +28,7 @@
       </div>
       <div style="font-size:22px;font-weight:800;color:#0B1B33;margin-bottom:8px;">Pago no realizado</div>
       <div style="font-size:14px;color:#EF4444;font-weight:600;margin-bottom:6px;">Tu pago no pudo ser realizado, intenta de nuevo.</div>
-      <div v-if="errorMsg" style="font-size:12px;color:#7A889C;max-width:300px;line-height:1.6;margin-bottom:22px;">{{ errorMsg }}</div>
+      <div v-if="errorMsg" style="font-size:12px;color:#5F6E84;max-width:300px;line-height:1.6;margin-bottom:22px;">{{ errorMsg }}</div>
       <a href="/cart" style="height:42px;padding:0 24px;border-radius:11px;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;font-size:13px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;box-shadow:0 4px 16px rgba(21,112,239,0.3);">
         Volver al carrito
       </a>
@@ -37,7 +37,7 @@
     <!-- Sin parámetros / error inesperado -->
     <div v-else style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;">
       <div style="font-size:18px;font-weight:700;color:#0B1B33;margin-bottom:6px;">No se encontró información del pago</div>
-      <div style="font-size:13px;color:#7A889C;margin-bottom:22px;">Si realizaste un pago, revisa el estado de tu orden.</div>
+      <div style="font-size:13px;color:#5F6E84;margin-bottom:22px;">Si realizaste un pago, revisa el estado de tu orden.</div>
       <a href="/orders" style="height:42px;padding:0 24px;border-radius:11px;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;font-size:13px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;">
         Ver mis órdenes
       </a>

@@ -3,7 +3,8 @@ import prisma from '~/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const session = getSession(event)
-  if (!session) throw createError({ statusCode: 401, message: 'No autorizado' })
+  // Sin sesión no es un error (páginas públicas): se responde sin usuario
+  if (!session) return { user: null }
 
   const user = await prisma.user.findUnique({
     where: { id: session.userId },

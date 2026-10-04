@@ -49,7 +49,7 @@
           <div v-for="(stat, i) in quickStats" :key="stat.label"
             :style="{ padding:'12px 18px', textAlign:'center', borderRight: i < quickStats.length-1 ? '1px solid rgba(11,27,51,0.07)' : 'none' }">
             <div style="font-size:13px;font-weight:700;color:#0B1B33;white-space:nowrap;">{{ stat.value }}</div>
-            <div style="font-size:10px;color:#7A889C;margin-top:2px;white-space:nowrap;">{{ stat.label }}</div>
+            <div style="font-size:10px;color:#5F6E84;margin-top:2px;white-space:nowrap;">{{ stat.label }}</div>
           </div>
         </div>
       </div>
@@ -70,7 +70,7 @@
           <div style="font-size:14px;font-weight:700;color:#0B1B33;margin-bottom:4px;">
             {{ auth.user?.fiscalCompleted ? 'Datos completos' : 'Datos pendientes' }}
           </div>
-          <div style="font-size:12px;color:#7A889C;line-height:1.5;margin-bottom:16px;">
+          <div style="font-size:12px;color:#5F6E84;line-height:1.5;margin-bottom:16px;">
             {{ auth.user?.fiscalCompleted ? 'Tu información fiscal está lista para facturación.' : 'Completa tu información fiscal para recibir CFDI.' }}
           </div>
           <button @click="showModal=true"
@@ -82,21 +82,21 @@
 
         <!-- RFC chip (solo si tiene datos) -->
         <div v-if="auth.user?.fiscalRfc" style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:18px;">
-          <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">RFC</div>
+          <div style="font-size:10px;font-weight:700;color:#5F6E84;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">RFC</div>
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
             <span style="font-size:15px;font-weight:700;color:#0B5BD3;font-family:monospace;letter-spacing:1px;">{{ auth.user.fiscalRfc }}</span>
             <button @click="copyRFC" :title="copied?'¡Copiado!':'Copiar RFC'"
               :style="{ width:'30px', height:'30px', borderRadius:'8px', border:'none', background: copied?'rgba(34,197,94,0.15)':'rgba(11,27,51,0.05)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0, transition:'all 0.2s' }">
-              <svg v-if="!copied" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7A889C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              <svg v-if="!copied" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5F6E84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
               <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </button>
           </div>
-          <div v-if="auth.user.fiscalRazonSocial" style="font-size:11px;color:#7A889C;margin-top:8px;line-height:1.4;">{{ auth.user.fiscalRazonSocial }}</div>
+          <div v-if="auth.user.fiscalRazonSocial" style="font-size:11px;color:#5F6E84;margin-top:8px;line-height:1.4;">{{ auth.user.fiscalRazonSocial }}</div>
         </div>
 
         <!-- Régimen fiscal chip -->
         <div v-if="auth.user?.fiscalRegimen" style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:18px;">
-          <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Régimen Fiscal</div>
+          <div style="font-size:10px;font-weight:700;color:#5F6E84;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Régimen Fiscal</div>
           <span style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(99,102,241,0.12);color:#4F46E5;display:inline-block;margin-bottom:6px;">{{ auth.user.fiscalRegimen }}</span>
           <div style="font-size:12px;color:#5B6B82;line-height:1.4;">{{ regimenNombre(auth.user.fiscalRegimen) }}</div>
         </div>
@@ -123,7 +123,7 @@
                 <div style="width:18px;height:18px;border-radius:50%;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                   <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
                 </div>
-                <span style="font-size:12px;color:#7A889C;">{{ item }}</span>
+                <span style="font-size:12px;color:#5F6E84;">{{ item }}</span>
               </div>
             </div>
             <button @click="showModal=true"
@@ -236,6 +236,7 @@
 
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Mi perfil — SIEEG' })
 
 const auth      = useAuthStore()
 const showModal = ref(false)
@@ -249,10 +250,10 @@ const initials = computed(() =>
 )
 
 const roleMap: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  admin:    { label: 'Admin',     color: '#7C3AED', bg: 'rgba(21,112,239,0.12)',  border: 'rgba(21,112,239,0.25)' },
+  admin:    { label: 'Administrador', color: '#7C3AED', bg: 'rgba(21,112,239,0.12)',  border: 'rgba(21,112,239,0.25)' },
   approver: { label: 'Aprobador', color: '#B45309', bg: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.25)' },
   seller:   { label: 'Vendedor',  color: '#047857', bg: 'rgba(16,185,129,0.12)',  border: 'rgba(16,185,129,0.28)' },
-  buyer:    { label: 'Comprador', color: '#0B5BD3', bg: 'rgba(21,112,239,0.12)',  border: 'rgba(21,112,239,0.25)' },
+  buyer:    { label: 'Cliente',   color: '#0B5BD3', bg: 'rgba(21,112,239,0.12)',  border: 'rgba(21,112,239,0.25)' },
   viewer:   { label: 'Visor',     color: '#5B6B82', bg: 'rgba(91,107,130,0.1)',  border: 'rgba(91,107,130,0.2)' },
 }
 const roleLabel    = computed(() => roleMap[auth.user?.role ?? '']?.label ?? auth.user?.role ?? '')
@@ -261,7 +262,7 @@ const roleBadgeStyle = computed(() => {
   return { fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px', background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }
 })
 
-const formatDate = (d?: string) => d ? new Intl.DateTimeFormat('es-MX', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(d)) : '—'
+const formatDate = (d?: string) => fechaCorta(d)
 
 const quickStats = computed(() => [
   { label: 'Miembro desde', value: formatDate(auth.user?.createdAt) },

@@ -48,11 +48,11 @@
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
                     <div style="grid-column:1/-1;">
                       <FormField label="RFC" v-model="form.rfc" placeholder="XAXX010101000" :required="true" uppercase />
-                      <p style="font-size:11px;color:#7A889C;margin:4px 0 0;">Escríbelo exactamente como aparece en tu constancia de situación fiscal.</p>
+                      <p style="font-size:11px;color:#5F6E84;margin:4px 0 0;">Escríbelo exactamente como aparece en tu constancia de situación fiscal.</p>
                     </div>
                     <div style="grid-column:1/-1;">
                       <FormField label="Razón Social (sin régimen capital)" v-model="form.razonSocial" placeholder="MI EMPRESA EJEMPLO" :required="true" uppercase />
-                      <p style="font-size:11px;color:#7A889C;margin:4px 0 0;">Sin S.A. de C.V., S. de R.L., etc. Solo la razón social base.</p>
+                      <p style="font-size:11px;color:#5F6E84;margin:4px 0 0;">Sin S.A. de C.V., S. de R.L., etc. Solo la razón social base.</p>
                     </div>
                     <FormField label="Código Postal" v-model="form.codpos" placeholder="06600" :required="true" uppercase />
                     <FormField label="Email para facturas" type="email" v-model="form.email" placeholder="facturacion@empresa.com" :required="true" />
@@ -111,7 +111,7 @@
                     <FormField label="Teléfono" v-model="form.telefono" placeholder="5512345678" />
                     <div style="grid-column:1/-1;">
                       <FormField label="Núm. Registro ID Tributario (extranjeros)" v-model="form.numregidtrib" placeholder="SOLO SI APLICA" uppercase />
-                      <p style="font-size:11px;color:#7A889C;margin:4px 0 0;">Solo requerido para residentes en el extranjero.</p>
+                      <p style="font-size:11px;color:#5F6E84;margin:4px 0 0;">Solo requerido para residentes en el extranjero.</p>
                     </div>
                   </div>
                 </div>
@@ -123,7 +123,7 @@
                   <div v-if="formError" style="padding:9px 12px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);font-size:12px;color:#EF4444;margin-bottom:12px;">{{ formError }}</div>
                 </Transition>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                  <div style="font-size:11px;color:#7A889C;">
+                  <div style="font-size:11px;color:#5F6E84;">
                     <span v-if="required">Completa los datos requeridos para continuar usando la plataforma.</span>
                     <span v-else>Puedes actualizar estos datos en cualquier momento.</span>
                   </div>
@@ -261,7 +261,8 @@ async function handleSave() {
         telefono:       form.value.telefono       || undefined,
       },
     })
-    auth.setUser(data.user)
+    // Se combina: la respuesta solo trae datos fiscales (no número de cliente ni descuento)
+    auth.setUser({ ...auth.user!, ...data.user })
     emit('completed', data.user)
     emit('update:modelValue', false)
   } catch (e: unknown) {

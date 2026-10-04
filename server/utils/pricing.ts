@@ -19,6 +19,15 @@ export async function getPricing(userId: string): Promise<Pricing> {
   return { markupPct: siteConfig?.markupPct ?? 0, discountPct: user?.discountPct ?? 0 }
 }
 
+/** Precios para lo que se muestra: el vendedor/admin puede ver los del cliente que eligió (?cliente=<id>). */
+export async function pricingParaVista(session: { userId: string; role: string }, cliente: unknown): Promise<Pricing> {
+  if (typeof cliente === 'string' && cliente && cliente !== session.userId && ['admin', 'seller'].includes(session.role)) {
+    const c = await prisma.user.findUnique({ where: { id: cliente }, select: { role: true } })
+    if (c?.role === 'buyer') return getPricing(cliente)
+  }
+  return getPricing(session.userId)
+}
+
 function parsePrice(v?: unknown): number { return v ? Math.max(0, parseFloat(String(v)) || 0) : 0 }
 
 /** Costo base de SYSCOM (precio especial o, si no hay, de lista). */

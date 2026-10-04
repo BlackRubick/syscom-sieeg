@@ -1,34 +1,13 @@
 import { createHash } from 'crypto'
 import prisma from '~/server/utils/prisma'
+import { rateLimit } from '~/server/utils/rateLimit'
 import { createUserWithClientNumber } from '~/server/utils/clientNumber'
 import { formatClientNumber } from '~/utils/clientNumber'
 import { sendAccessRequestEmail } from '~/server/utils/email'
 
-// Límite por IP: el formulario es público y cada envío crea un usuario y manda correo
-const buckets    = new Map<string, { count: number; resetAt: number }>()
-const WINDOW_MS  = 60 * 60 * 1000
-const MAX_TRIES  = 5
-
-function checkRateLimit(ip: string) {
-  const now = Date.now()
-  const b   = buckets.get(ip)
-  if (!b || b.resetAt < now) {
-    if (buckets.size > 5000) for (const [k, v] of buckets) if (v.resetAt < now) buckets.delete(k)
-    buckets.set(ip, { count: 1, resetAt: now + WINDOW_MS })
-    return
-  }
-  if (++b.count > MAX_TRIES) {
-    throw createError({ statusCode: 429, message: 'Demasiadas solicitudes. Intenta de nuevo más tarde.' })
-  }
-}
-
 export default defineEventHandler(async (event) => {
-  // X-Real-IP lo fija nginx con $remote_addr; X-Forwarded-For lo puede falsear el cliente
-  checkRateLimit(
-    getHeader(event, 'x-real-ip')
-    ?? getHeader(event, 'x-forwarded-for')?.split(',').pop()?.trim()
-    ?? 'unknown',
-  )
+  // El formulario es público y cada envío crea un usuario y manda correo: 5 por IP cada hora
+  rateLimit(event, 'contacto', 5, 60 * 60_000)
 
   const body = await readBody<{
     name?: string

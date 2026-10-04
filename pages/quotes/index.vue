@@ -67,6 +67,7 @@ import { Plus, Search, FileText, User, ChevronRight, AlertCircle } from '@lucide
 import type { OrderItem } from '~/types'
 
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Cotizaciones — SIEEG' })
 
 interface QuoteRow {
   id: string; folio: string; name: string | null; status: 'open' | 'converted' | 'cancelled'; total: number; items: OrderItem[]; createdAt: string
@@ -127,7 +128,7 @@ const fecha = (iso: string) => new Date(iso).toLocaleDateString('es-MX', { day: 
 .qt-btn-ghost { background: #fff; color: #0B1B33; border: 1px solid #E4E9F1; }
 
 .qt-filters { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 16px; }
-.qt-search { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; background: #F5F8FC; border: 1px solid #E4E9F1; color: #7A889C; }
+.qt-search { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; background: #F5F8FC; border: 1px solid #E4E9F1; color: #5F6E84; }
 .qt-search:focus-within { border-color: #1570EF; background: #fff; }
 .qt-search input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font-size: 13.5px; color: #0B1B33; font-family: inherit; }
 .qt-tabs { display: flex; gap: 4px; padding: 4px; background: #F5F8FC; border: 1px solid #E4E9F1; border-radius: 10px; overflow-x: auto; max-width: 100%; }
@@ -153,8 +154,8 @@ const fecha = (iso: string) => new Date(iso).toLocaleDateString('es-MX', { day: 
 .qt-row-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 12px; color: #5B6B82; white-space: nowrap; }
 .qt-row-total { display: flex; flex-direction: column; align-items: flex-end; white-space: nowrap; }
 .qt-row-total b { font-size: 15px; }
-.qt-row-total span { font-size: 11px; color: #7A889C; }
-.qt-chev { color: #7A889C; }
+.qt-row-total span { font-size: 11px; color: #5F6E84; }
+.qt-chev { color: #5F6E84; }
 
 @media (max-width: 640px) {
   .qt-row { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; padding: 14px; }

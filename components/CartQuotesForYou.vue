@@ -30,6 +30,7 @@ import type { OrderItem, CartItem } from '~/types'
 
 /* Cotizaciones abiertas a nombre del usuario (p. ej. las que le preparó su vendedor):
    las puede pasar a su carrito y pagarlas o confirmarlas desde ahí. */
+const { confirmar } = useConfirmar()
 interface QuoteRow {
   id: string; folio: string; name: string | null; total: number; items: OrderItem[]; createdAt: string
   cliente: { id: string }; vendedor: { name: string } | null
@@ -49,7 +50,7 @@ onMounted(async () => {
 })
 
 async function pasarAlCarrito(q: QuoteRow) {
-  if (cart.items.length && !confirm('Tu carrito ya tiene productos. ¿Cambiarlos por los de esta cotización?')) return
+  if (cart.items.length && !await confirmar({ titulo: 'Tu carrito ya tiene productos', mensaje: '¿Cambiarlos por los de esta cotización?', aceptar: 'Sí, cambiarlos' })) return
   cargando.value = q.id; error.value = ''
   try {
     // Precios del día para el cliente; los que ya no tienen precio no se cargan
@@ -84,7 +85,7 @@ const fecha = (iso: string) => new Date(iso).toLocaleDateString('es-MX', { day: 
 .cq-folio { font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 5px; background: #F1F5FB; color: #0B5BD3; font-family: ui-monospace, Menlo, monospace; }
 .cq-sub { margin-top: 2px; font-size: 12px; color: #5B6B82; }
 .cq-total { display: flex; flex-direction: column; align-items: flex-end; font-size: 14px; font-weight: 700; color: #0B1B33; }
-.cq-total span { font-size: 10.5px; font-weight: 500; color: #7A889C; }
+.cq-total span { font-size: 10.5px; font-weight: 500; color: #5F6E84; }
 .cq-actions { display: flex; gap: 8px; }
 .cq-btn { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 9px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; text-decoration: none; white-space: nowrap; }
 .cq-btn:disabled { opacity: .6; cursor: not-allowed; }

@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
       pedidos:       _count.orders,
       cotizaciones:  _count.quotes,
       garantias:     _count.rmas,
-      ultimosPedidos: orders.map(o => ({ id: o.id, folio: `#${o.id.slice(-8).toUpperCase()}`, total: o.total, status: o.status, createdAt: o.createdAt.toISOString() })),
+      ultimosPedidos: orders.map(o => ({ id: o.id, folio: `PED-${o.id.slice(-8).toUpperCase()}`, total: o.total, status: o.status, createdAt: o.createdAt.toISOString() })),
       ultimasCotizaciones: quotes.map(q => ({ id: q.id, folio: formatQuoteNumber(q.number, q.createdAt), name: q.name, total: q.total, status: q.status, createdAt: q.createdAt.toISOString() })),
     },
   }

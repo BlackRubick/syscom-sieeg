@@ -138,6 +138,12 @@
               <!-- Datos -->
               <template v-else>
                 <p v-if="ficha.ok" class="cl-ok">{{ ficha.ok }}</p>
+                <p v-if="ficha.error" class="cl-error">{{ ficha.error }}</p>
+                <div v-if="ficha.nuevaPass" class="cl-cred">
+                  <div><span>Usuario</span><b>{{ ficha.c.email }}</b></div>
+                  <div><span>Contraseña nueva</span><b>{{ ficha.nuevaPass }}</b></div>
+                  <button type="button" class="cl-btn cl-btn-ghost" @click="copiarAcceso">{{ copiado ? '¡Copiado!' : 'Copiar datos de acceso' }}</button>
+                </div>
                 <section class="cl-sec">
                   <h3>Cuenta</h3>
                   <dl class="cl-dl">
@@ -177,6 +183,10 @@
                 </section>
                 <div class="cl-modal-actions">
                   <NuxtLink v-if="!ficha.c.mostrador" :to="`/fiscal?buscar=${encodeURIComponent(ficha.c.email)}`" class="cl-btn cl-btn-ghost">Editar datos fiscales</NuxtLink>
+                  <template v-if="!ficha.c.mostrador && puedeEditar(ficha.c) && ficha.c.status !== 'inactive'">
+                    <button type="button" class="cl-btn cl-btn-ghost" :disabled="ficha.guardando" @click="restablecerAcceso('correo')">Enviar liga de acceso</button>
+                    <button type="button" class="cl-btn cl-btn-ghost" :disabled="ficha.guardando" @click="restablecerAcceso('generar')">Generar contraseña</button>
+                  </template>
                   <button type="button" class="cl-btn cl-btn-ghost" @click="ficha.abierta = false">Cerrar</button>
                   <button v-if="puedeEditar(ficha.c)" type="button" class="cl-btn cl-btn-primary" @click="editarFicha"><Pencil :size="14" /> Editar</button>
                 </div>
@@ -190,9 +200,12 @@
 </template>
 
 <script setup lang="ts">
+// Importación explícita: el auto-import de Nuxt no registra esIntegrador
+import { esIntegrador, NIVELES_INTEGRADOR } from '~/utils/integrador'
 import { Search, UserPlus, ShoppingCart, IdCard, Pencil } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Clientes — SIEEG' })
 
 interface Cliente {
   id: string; name: string; email: string; clientNumber: number | null; status: string; role: string; mostrador?: boolean
@@ -289,14 +302,14 @@ async function copiarCredenciales() {
 // ── Ficha del cliente ──
 const esAdmin = computed(() => auth.user?.role === 'admin')
 const ficha = reactive({
-  abierta: false, cargando: false, editando: false, guardando: false, error: '', ok: '',
+  abierta: false, cargando: false, editando: false, guardando: false, error: '', ok: '', nuevaPass: '',
   c: null as Ficha | null,
   form: { name: '', email: '', telefono: '', discountPct: 0 },
 })
 const puedeEditar = (c: Ficha) => esAdmin.value || c.role === 'buyer'
 
 async function abrirFicha(id: string) {
-  Object.assign(ficha, { abierta: true, cargando: true, editando: false, error: '', ok: '', c: null })
+  Object.assign(ficha, { abierta: true, cargando: true, editando: false, error: '', ok: '', nuevaPass: '', c: null })
   try { ficha.c = (await $fetch<{ cliente: Ficha }>(`/api/clients/${id}`)).cliente }
   catch (e: any) { ficha.error = e?.data?.message ?? 'No se pudo cargar el cliente' }
   finally { ficha.cargando = false }
@@ -328,11 +341,39 @@ async function guardarFicha() {
   } finally { ficha.guardando = false }
 }
 
+// El cliente olvidó su contraseña (o está pendiente y aún no tiene): liga por correo o contraseña nueva
+const { confirmar } = useConfirmar()
+async function restablecerAcceso(modo: 'correo' | 'generar') {
+  if (!ficha.c) return
+  const c = ficha.c
+  const porCorreo = modo === 'correo'
+  const ok = await confirmar(porCorreo
+    ? { titulo: 'Enviar liga de acceso', mensaje: `Le llegará a ${c.email} una liga para crear su contraseña (vale 72 horas).`, aceptar: 'Enviar liga' }
+    : { titulo: 'Generar contraseña nueva', mensaje: `La contraseña actual de ${c.name.split(' ')[0]} deja de funcionar y se cierran sus sesiones. Te mostraremos la nueva para que se la compartas.`, aceptar: 'Generar' })
+  if (!ok) return
+  ficha.guardando = true; ficha.error = ''; ficha.ok = ''; ficha.nuevaPass = ''
+  try {
+    const r = await $fetch<{ password?: string; enviadoA?: string }>(`/api/clients/${c.id}/password`, { method: 'POST', body: { modo: porCorreo ? 'correo' : 'generar' } })
+    if (r.password) { ficha.nuevaPass = r.password; ficha.ok = 'Contraseña nueva generada. Sus sesiones anteriores se cerraron.' }
+    else ficha.ok = `Liga enviada a ${r.enviadoA}.`
+    await Promise.all([abrirFichaSilencioso(c.id), cargar()])
+  } catch (e: any) {
+    ficha.error = e?.data?.message ?? 'No se pudo restablecer el acceso'
+  } finally { ficha.guardando = false }
+}
+async function abrirFichaSilencioso(id: string) {
+  try { ficha.c = (await $fetch<{ cliente: Ficha }>(`/api/clients/${id}`)).cliente } catch { /* se queda la ficha actual */ }
+}
+async function copiarAcceso() {
+  if (!ficha.c || !ficha.nuevaPass) return
+  const texto = `Acceso a SIEEG Integradores\n${origen.value}/login\nUsuario: ${ficha.c.email}\nContraseña: ${ficha.nuevaPass}`
+  try { await navigator.clipboard.writeText(texto); copiado.value = true; setTimeout(() => (copiado.value = false), 1500) } catch { /* sin portapapeles */ }
+}
+
 const direccionDe = (c: Ficha) => [
   [c.fiscalCalle, c.fiscalNumExt, c.fiscalNumInt ? `int. ${c.fiscalNumInt}` : ''].filter(Boolean).join(' '),
   c.fiscalColonia, c.fiscalCiudad || c.fiscalDelegacion, c.fiscalEstado, c.fiscalCodpos ? `C.P. ${c.fiscalCodpos}` : '',
 ].filter(Boolean).join(', ')
-const fechaCorta = (d: string) => { const f = new Date(d.length === 10 ? `${d}T12:00:00` : d); return isNaN(+f) ? d : f.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) }
 const fmt = (n: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(n)
 
 const iniciales = (n: string) => n.split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase()
@@ -345,7 +386,7 @@ const iniciales = (n: string) => n.split(' ').slice(0, 2).map(p => p[0]).join(''
 .cl-head p { font-size: 13px; color: #5B6B82; margin: 4px 0 0; }
 .cl-card { background: #fff; border: 1px solid #E4E9F1; border-radius: 16px; }
 .cl-filters { padding: 14px 16px; }
-.cl-search { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; background: #F5F8FC; border: 1px solid #E4E9F1; color: #7A889C; max-width: 520px; }
+.cl-search { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; background: #F5F8FC; border: 1px solid #E4E9F1; color: #5F6E84; max-width: 520px; }
 .cl-search:focus-within { border-color: #1570EF; background: #fff; }
 .cl-search input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font-size: 13.5px; color: #0B1B33; font-family: inherit; }
 .cl-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 48px 16px; text-align: center; color: #5B6B82; font-size: 13.5px; }
@@ -368,7 +409,7 @@ const iniciales = (n: string) => n.split(' ').slice(0, 2).map(p => p[0]).join(''
 .cl-num { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: #F1F5FB; color: #0B5BD3; font-family: ui-monospace, Menlo, monospace; flex-shrink: 0; }
 .cl-item-data { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; font-size: 12.5px; }
 .cl-item-data div { display: flex; flex-direction: column; min-width: 0; }
-.cl-item-data span { color: #7A889C; font-size: 11.5px; }
+.cl-item-data span { color: #5F6E84; font-size: 11.5px; }
 .cl-item-data b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cl-item-badges { display: flex; gap: 6px; flex-wrap: wrap; }
 .cl-badge { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; text-decoration: none; }
@@ -386,7 +427,7 @@ const iniciales = (n: string) => n.split(' ').slice(0, 2).map(p => p[0]).join(''
 .cl-dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; margin: 0; }
 .cl-dl div { min-width: 0; }
 .cl-dl div.wide { grid-column: 1 / -1; }
-.cl-dl dt { font-size: 11.5px; color: #7A889C; }
+.cl-dl dt { font-size: 11.5px; color: #5F6E84; }
 .cl-dl dd { margin: 2px 0 0; font-size: 13.5px; font-weight: 600; overflow-wrap: anywhere; }
 .cl-act { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .cl-act li { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 13px; padding: 8px 10px; border-radius: 9px; background: #F5F8FC; }

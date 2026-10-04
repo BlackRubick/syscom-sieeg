@@ -36,5 +36,32 @@ export default defineNuxtConfig({
     },
   },
 
+  // Encabezados de seguridad para todas las respuestas
+  routeRules: {
+    '/**': {
+      headers: {
+        'X-Frame-Options':           'SAMEORIGIN',
+        'X-Content-Type-Options':    'nosniff',
+        'Referrer-Policy':           'strict-origin-when-cross-origin',
+        'Permissions-Policy':        'camera=(), microphone=(), geolocation=(), payment=(self)',
+        'Strict-Transport-Security': 'max-age=31536000',
+        // Imágenes de productos y logotipos llegan de muchos dominios de SYSCOM y marcas; scripts solo propios y OpenPay
+        'Content-Security-Policy': [
+          "default-src 'self'",
+          "script-src 'self' 'unsafe-inline' https://js.openpay.mx https://*.openpay.mx",
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+          "font-src 'self' data: https://fonts.gstatic.com",
+          "img-src 'self' data: blob: https:",
+          "connect-src 'self' https://*.openpay.mx",
+          "frame-src 'self' blob: https://*.openpay.mx",
+          "frame-ancestors 'self'",
+          "object-src 'none'",
+          "base-uri 'self'",
+          "form-action 'self'",
+        ].join('; '),
+      },
+    },
+  },
+
   compatibilityDate: '2024-11-01',
 })

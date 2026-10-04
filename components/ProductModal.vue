@@ -75,7 +75,7 @@
             <h2 style="font-size:18px;font-weight:800;color:#0B1B33;margin:0;line-height:1.3;">{{ displayProduct.name }}</h2>
 
             <div style="display:flex;align-items:center;gap:6px;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7A889C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5F6E84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>
               <span style="font-size:12px;font-family:monospace;color:#5B6B82;">{{ displayProduct.sku }}</span>
             </div>
 
@@ -88,9 +88,9 @@
               <div style="font-size:28px;font-weight:800;color:#0B1B33;letter-spacing:-0.5px;line-height:1;">
                 {{ displayProduct.price > 0 ? fmtCurrency(displayProduct.price) : 'Consultar precio' }}
               </div>
-              <div v-if="displayProduct.price > 0" style="font-size:11px;color:#7A889C;margin-top:4px;">IVA incluido</div>
+              <div v-if="displayProduct.price > 0" style="font-size:11px;color:#5F6E84;margin-top:4px;">IVA incluido</div>
               <div v-if="displayProduct.discount" style="display:flex;align-items:center;gap:8px;margin-top:4px;">
-                <span style="font-size:13px;color:#7A889C;text-decoration:line-through;">{{ fmtCurrency(Math.round(displayProduct.price / (1 - displayProduct.discount / 100))) }}</span>
+                <span style="font-size:13px;color:#5F6E84;text-decoration:line-through;">{{ fmtCurrency(Math.round(displayProduct.price / (1 - displayProduct.discount / 100))) }}</span>
                 <span style="font-size:11px;font-weight:700;color:#16A34A;background:rgba(34,197,94,0.1);padding:2px 7px;border-radius:4px;">-{{ displayProduct.discount }}%</span>
               </div>
             </div>
@@ -103,7 +103,7 @@
 
             <!-- Stock por sucursal -->
             <div v-if="existencia && Object.keys(existencia).length" style="background:rgba(11,27,51,0.03);border-radius:10px;padding:10px 12px;">
-              <div style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Stock por sucursal</div>
+              <div style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Stock por sucursal</div>
               <div style="display:flex;flex-direction:column;gap:5px;">
                 <div v-for="[suc, raw] in Object.entries(existencia).slice(0,6)" :key="suc" style="display:flex;justify-content:space-between;font-size:12px;">
                   <span style="color:#5B6B82;text-transform:capitalize;">{{ suc.replace(/_/g,' ') }}</span>
@@ -113,7 +113,7 @@
             </div>
 
             <div style="display:flex;flex-direction:column;gap:8px;margin-top:auto;">
-              <button @click="handleAdd" :disabled="stockTotal === 0"
+              <button v-if="puedeComprar" @click="handleAdd" :disabled="stockTotal === 0"
                 :style="{ height:'44px', borderRadius:'11px', border:'none', cursor:stockTotal===0?'not-allowed':'pointer', background:added?'rgba(34,197,94,0.15)':'linear-gradient(135deg,#1570EF,#0B5BD3)', color:added?'#16A34A':'white', fontSize:'13px', fontWeight:700, fontFamily:'inherit', opacity:stockTotal===0?0.4:1, boxShadow:added?'none':'0 4px 16px rgba(21,112,239,0.3)', transition:'all 0.2s', display:'flex', alignItems:'center', justifyContent:'center', gap:'7px' }">
                 <svg v-if="!added" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
                 <svg v-else width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -128,14 +128,14 @@
 
           <!-- Descripción -->
           <div v-if="description">
-            <div style="font-size:11px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;">Descripción</div>
-            <div v-if="isHTML(description)" v-html="description" style="font-size:13px;color:#5B6B82;line-height:1.7;" />
+            <div style="font-size:11px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;">Descripción</div>
+            <div v-if="isHTML(description)" class="pm-desc" v-html="sanitizeHtml(description)" style="font-size:13px;color:#5B6B82;line-height:1.7;" />
             <p v-else style="font-size:13px;color:#5B6B82;line-height:1.7;margin:0;">{{ description }}</p>
           </div>
 
           <!-- Características -->
           <div v-if="caracteristicas.length">
-            <div style="font-size:11px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Características</div>
+            <div style="font-size:11px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Características</div>
             <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;">
               <li v-for="(c, i) in caracteristicas" :key="i" style="display:flex;gap:8px;font-size:13px;color:#5B6B82;">
                 <span style="color:#1570EF;flex-shrink:0;margin-top:2px;">—</span>{{ toDisplayString(c) }}
@@ -145,7 +145,7 @@
 
           <!-- Recursos -->
           <div v-if="recursos.length">
-            <div style="font-size:11px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Recursos y manuales</div>
+            <div style="font-size:11px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Recursos y manuales</div>
             <div style="display:flex;flex-wrap:wrap;gap:8px;">
               <a v-for="(r, i) in recursos.filter(r => r.path)" :key="i" :href="r.path" target="_blank" rel="noopener noreferrer"
                 style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:7px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.08);font-size:12px;color:#0B5BD3;text-decoration:none;">
@@ -165,12 +165,14 @@
 
 <script setup lang="ts">
 import { adaptProduct } from '~/composables/useSyscom'
+import { sanitizeHtml } from '~/utils/sanitizeHtml'
 import type { Product } from '~/types'
 
-const props = defineProps<{ product: Product; show: boolean }>()
+const props = defineProps<{ product: Product; show: boolean; cliente?: string }>()
 const emit  = defineEmits<{ (e: 'close'): void }>()
 
 const cart = useCartStore()
+const puedeComprar = computed(() => useAuthStore().user?.role !== 'viewer')
 
 const loading     = ref(true)
 const error       = ref<string | null>(null)
@@ -245,10 +247,11 @@ async function loadDetail() {
   related.value = []; accesorios.value = []; imgIdx.value = 0
 
   const id = props.product.id
+  const q  = props.cliente ? `?moneda=MXN&cliente=${encodeURIComponent(props.cliente)}` : '?moneda=MXN'
   const [det, rel, acc] = await Promise.all([
-    $fetch<Record<string, unknown>>(`/api/syscom/productos/${id}?moneda=MXN`).catch(() => null),
-    $fetch<unknown[]>(`/api/syscom/productos/${id}/relacionados?moneda=MXN`).catch(() => []),
-    $fetch<unknown[]>(`/api/syscom/productos/${id}/accesorios?moneda=MXN`).catch(() => []),
+    $fetch<Record<string, unknown>>(`/api/syscom/productos/${id}${q}`).catch(() => null),
+    $fetch<unknown[]>(`/api/syscom/productos/${id}/relacionados${q}`).catch(() => []),
+    $fetch<unknown[]>(`/api/syscom/productos/${id}/accesorios${q}`).catch(() => []),
   ])
 
   if (!det || (det as Record<string,unknown>).error) {
@@ -268,3 +271,8 @@ async function loadDetail() {
 watch(() => props.show, (open) => { if (open) loadDetail() })
 onMounted(() => { if (props.show) loadDetail() })
 </script>
+
+<style scoped>
+.pm-desc :deep(img) { max-width: 100%; height: auto; }
+.pm-desc :deep(table) { max-width: 100%; display: block; overflow-x: auto; }
+</style>

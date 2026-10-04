@@ -52,6 +52,7 @@ const doc = computed(() => {
     ordenCompra: q.purchaseOrder,
     condiciones: [
       'Precios en pesos mexicanos con IVA incluido.',
+      `Vigencia: ${VIGENCIA_DIAS} días naturales a partir de su emisión (hasta el ${venceCotizacion(q.createdAt)}).`,
       'Precios sujetos a existencias y a cambio sin previo aviso; al confirmar el pedido se aplica el precio del día.',
       'El tiempo de entrega se confirma al realizar el pedido.',
       'La garantía de cada producto es la que otorga su fabricante (se indica en cada partida); se tramita en SIEEG presentando este documento.',

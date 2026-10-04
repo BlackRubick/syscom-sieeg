@@ -16,7 +16,7 @@
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8H8"/><path d="M16 12H8"/><path d="M12 16H8"/></svg>
                   <span style="font-size:15px;font-weight:700;color:#0B1B33;">Factura Global CFDI 4.0</span>
                 </div>
-                <div style="font-size:12px;color:#7A889C;">
+                <div style="font-size:12px;color:#5F6E84;">
                   Receptor: <span style="color:#B45309;font-weight:600;font-family:monospace;">XAXX010101000</span>
                   <span style="margin:0 6px;opacity:0.4;">·</span>PUBLICO EN GENERAL
                 </div>
@@ -34,11 +34,11 @@
             </div>
             <div>
               <div style="font-size:16px;font-weight:700;color:#0B1B33;margin-bottom:4px;">Factura Global Timbrada</div>
-              <div style="font-size:12px;color:#7A889C;">{{ result.ordersIncluded }} pedido{{ result.ordersIncluded!==1?'s':'' }} incluido{{ result.ordersIncluded!==1?'s':'' }}</div>
+              <div style="font-size:12px;color:#5F6E84;">{{ result.ordersIncluded }} pedido{{ result.ordersIncluded!==1?'s':'' }} incluido{{ result.ordersIncluded!==1?'s':'' }}</div>
             </div>
             <div style="width:100%;border-radius:14px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);padding:16px 20px;text-align:left;display:flex;flex-direction:column;gap:10px;">
               <div v-for="row in resultRows" :key="row.label" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
-                <span style="font-size:11px;font-weight:600;color:#7A889C;white-space:nowrap;">{{ row.label }}</span>
+                <span style="font-size:11px;font-weight:600;color:#5F6E84;white-space:nowrap;">{{ row.label }}</span>
                 <span :style="{ fontSize:'11px', color:'#5B6B82', fontFamily:row.mono?'monospace':'inherit', textAlign:'right', wordBreak:'break-all' }">{{ row.value }}</span>
               </div>
             </div>
@@ -66,16 +66,16 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
                 <div>
                   <div style="font-size:13px;font-weight:700;color:#B45309;">{{ pendingOrders.length }} pedido{{ pendingOrders.length!==1?'s':'' }} sin facturar individualmente</div>
-                  <div style="font-size:11px;color:#7A889C;margin-top:2px;">Total: <span style="color:#0B1B33;font-weight:600;">{{ fmtMXN(pendingTotal) }}</span> <span style="font-size:10px;">IVA incl.</span></div>
+                  <div style="font-size:11px;color:#5F6E84;margin-top:2px;">Total: <span style="color:#0B1B33;font-weight:600;">{{ fmtMXN(pendingTotal) }}</span> <span style="font-size:10px;">IVA incl.</span></div>
                 </div>
               </div>
 
               <!-- InformacionGlobal -->
               <div style="margin-bottom:18px;">
-                <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Período</div>
+                <div style="font-size:10px;font-weight:700;color:#5F6E84;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Período</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Periodicidad *</div>
+                    <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:5px;">Periodicidad *</div>
                     <select v-model="form.periodicidad" v-bind="sel">
                       <option value="">Seleccionar…</option>
                       <option value="01">01 – Diario</option>
@@ -86,7 +86,7 @@
                     </select>
                   </div>
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Mes *</div>
+                    <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:5px;">Mes *</div>
                     <select v-model="form.meses" v-bind="sel">
                       <option value="">Seleccionar…</option>
                       <template v-if="form.periodicidad !== '05'">
@@ -98,7 +98,7 @@
                     </select>
                   </div>
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Año *</div>
+                    <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:5px;">Año *</div>
                     <input v-model="form.año" placeholder="2025" maxlength="4" v-bind="inp" />
                   </div>
                 </div>
@@ -106,31 +106,31 @@
 
               <!-- Configuración de pago -->
               <div style="margin-bottom:18px;">
-                <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Configuración</div>
+                <div style="font-size:10px;font-weight:700;color:#5F6E84;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Configuración</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Uso CFDI *</div>
+                    <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:5px;">Uso CFDI *</div>
                     <select v-model="form.usoCfdi" v-bind="sel">
                       <option value="">Seleccionar…</option>
                       <option v-for="(nombre, clave) in USOS_CFDI" :key="clave" :value="clave">{{ clave }} – {{ nombre }}</option>
                     </select>
                   </div>
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Moneda</div>
+                    <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:5px;">Moneda</div>
                     <select v-model="form.moneda" v-bind="sel">
                       <option value="MXN">MXN – Peso mexicano</option>
                       <option value="USD">USD – Dólar</option>
                     </select>
                   </div>
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Forma de pago *</div>
+                    <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:5px;">Forma de pago *</div>
                     <select v-model="form.formaPago" v-bind="sel">
                       <option value="">Seleccionar…</option>
                       <option v-for="f in FORMAS_PAGO" :key="f.c" :value="f.c">{{ f.c }} – {{ f.n }}</option>
                     </select>
                   </div>
                   <div>
-                    <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:5px;">Método de pago *</div>
+                    <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:5px;">Método de pago *</div>
                     <select v-model="form.metodoPago" v-bind="sel">
                       <option value="PUE">PUE – Una sola exhibición</option>
                       <option value="PPD">PPD – Parcialidades o diferido</option>
@@ -144,7 +144,7 @@
 
             <!-- Footer -->
             <div style="padding:16px 26px;border-top:1px solid rgba(11,27,51,0.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-              <div style="font-size:11px;color:#7A889C;">{{ pendingOrders.length }} pedido{{ pendingOrders.length!==1?'s':'' }} · {{ fmtMXN(pendingTotal) }}</div>
+              <div style="font-size:11px;color:#5F6E84;">{{ pendingOrders.length }} pedido{{ pendingOrders.length!==1?'s':'' }} · {{ fmtMXN(pendingTotal) }}</div>
               <div style="display:flex;gap:10px;">
                 <button @click="emit('close')" style="height:38px;padding:0 18px;border-radius:9px;background:rgba(11,27,51,0.05);border:1px solid rgba(11,27,51,0.1);color:#5B6B82;font-size:13px;cursor:pointer;font-family:inherit;">
                   Cancelar

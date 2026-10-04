@@ -40,11 +40,11 @@
                 </div>
                 <div>
                   <div style="font-size:16px;font-weight:700;color:#0B1B33;margin-bottom:4px;">CFDI Timbrado exitosamente</div>
-                  <div style="font-size:12px;color:#7A889C;">El comprobante fue sellado por el SAT</div>
+                  <div style="font-size:12px;color:#5F6E84;">El comprobante fue sellado por el SAT</div>
                 </div>
                 <div style="width:100%;max-width:520px;border-radius:14px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);padding:16px 20px;text-align:left;display:flex;flex-direction:column;gap:10px;">
                   <div v-for="row in resultRows" :key="row.label" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
-                    <span style="font-size:11px;font-weight:600;color:#7A889C;white-space:nowrap;">{{ row.label }}</span>
+                    <span style="font-size:11px;font-weight:600;color:#5F6E84;white-space:nowrap;">{{ row.label }}</span>
                     <span :style="{ fontSize:'11px', color:'#5B6B82', fontFamily: row.mono ? 'monospace':'inherit', textAlign:'right', wordBreak:'break-all' }">{{ row.value }}</span>
                   </div>
                 </div>
@@ -73,12 +73,12 @@
 
                   <!-- Conceptos -->
                   <div style="margin-bottom:20px;">
-                    <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Conceptos</div>
+                    <div style="font-size:10px;font-weight:700;color:#5F6E84;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Conceptos</div>
 
                     <!-- Cabecera de tabla -->
                     <div style="display:grid;grid-template-columns:1.8fr 0.9fr 0.6fr 0.7fr 0.65fr 0.9fr 28px;gap:6px;padding:0 2px 6px;border-bottom:1px solid rgba(11,27,51,0.06);">
                       <span v-for="h in ['Descripción','Clave SAT','Cl. Und.','Unidad','Cant.','P. Unit. (s/IVA)','']" :key="h"
-                        style="font-size:9px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.7px;">{{ h }}</span>
+                        style="font-size:9px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.7px;">{{ h }}</span>
                     </div>
 
                     <!-- Filas -->
@@ -104,11 +104,11 @@
 
                   <!-- Configuración de pago -->
                   <div style="margin-bottom:20px;">
-                    <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Configuración</div>
+                    <div style="font-size:10px;font-weight:700;color:#5F6E84;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Configuración</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
 
                       <div>
-                        <label style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Forma de pago</label>
+                        <label style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Forma de pago</label>
                         <select v-model="formaPago" v-bind="selectStyle">
                           <option value="">Seleccionar...</option>
                           <option v-for="f in FORMAS_PAGO" :key="f.clave" :value="f.clave">{{ f.clave }} — {{ f.nombre }}</option>
@@ -116,7 +116,7 @@
                       </div>
 
                       <div>
-                        <label style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Método de pago</label>
+                        <label style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Método de pago</label>
                         <select v-model="metodoPago" v-bind="selectStyle">
                           <option value="PUE">PUE — Pago en una sola exhibición</option>
                           <option value="PPD">PPD — Pago en parcialidades o diferido</option>
@@ -124,7 +124,7 @@
                       </div>
 
                       <div>
-                        <label style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Moneda</label>
+                        <label style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Moneda</label>
                         <select v-model="moneda" v-bind="selectStyle">
                           <option value="MXN">MXN — Peso mexicano</option>
                           <option value="USD">USD — Dólar estadounidense</option>
@@ -134,7 +134,7 @@
                     </div>
 
                     <div>
-                      <label style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Comentarios (opcional)</label>
+                      <label style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Comentarios (opcional)</label>
                       <textarea v-model="comentarios" placeholder="Observaciones o referencia interna..."
                         :style="{ width:'100%', minHeight:'60px', background:'rgba(11,27,51,0.04)', border:'1px solid rgba(11,27,51,0.09)', borderRadius:'8px', padding:'9px 12px', fontSize:'12px', color:'#0B1B33', outline:'none', fontFamily:'inherit', resize:'vertical', boxSizing:'border-box' }" />
                     </div>
@@ -152,11 +152,11 @@
                   <div style="border-radius:12px;background:rgba(99,102,241,0.05);border:1px solid rgba(99,102,241,0.12);padding:14px 18px;">
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;text-align:center;">
                       <div style="border-right:1px solid rgba(11,27,51,0.07);padding-right:16px;">
-                        <div style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">Subtotal</div>
+                        <div style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">Subtotal</div>
                         <div style="font-size:18px;font-weight:700;color:#0B1B33;">{{ fmtCurrency(subtotal) }}</div>
                       </div>
                       <div style="border-right:1px solid rgba(11,27,51,0.07);padding:0 16px;">
-                        <div style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">IVA 16%</div>
+                        <div style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">IVA 16%</div>
                         <div style="font-size:18px;font-weight:700;color:#5B6B82;">{{ fmtCurrency(totalIva) }}</div>
                       </div>
                       <div style="padding-left:16px;">
@@ -175,7 +175,7 @@
 
                 <!-- ── Footer actions ── -->
                 <div style="padding:16px 26px;border-top:1px solid rgba(11,27,51,0.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-                  <div style="font-size:11px;color:#7A889C;">{{ conceptos.length }} concepto{{ conceptos.length !== 1 ? 's' : '' }}</div>
+                  <div style="font-size:11px;color:#5F6E84;">{{ conceptos.length }} concepto{{ conceptos.length !== 1 ? 's' : '' }}</div>
                   <div style="display:flex;gap:10px;">
                     <button @click="emit('close')" style="height:38px;padding:0 18px;border-radius:9px;background:rgba(11,27,51,0.05);border:1px solid rgba(11,27,51,0.1);color:#5B6B82;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;">
                       Cancelar

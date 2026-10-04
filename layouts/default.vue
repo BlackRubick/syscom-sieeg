@@ -31,6 +31,7 @@
 
   <!-- Modal datos fiscales -->
   <FiscalDataModal v-model="showFiscalModal" :required="fiscalModalRequired" />
+  <ConfirmarDialogo />
 </template>
 
 <script setup lang="ts">
@@ -46,7 +47,11 @@ onMounted(async () => {
   if (!auth.loaded) await auth.init()
   if (needsFiscal(auth.user)) showFiscalModal.value = true
   ui.fetchNotifications()
+  // Avisos nuevos sin recargar: cada minuto mientras la pestaña está a la vista
+  avisosTimer = setInterval(() => { if (document.visibilityState === 'visible') ui.fetchNotifications() }, 60_000)
 })
+let avisosTimer: ReturnType<typeof setInterval> | undefined
+onUnmounted(() => clearInterval(avisosTimer))
 
 const showFiscalModal     = ref(false)
 // El botón de WhatsApp es para clientes; admin y vendedores son parte del equipo

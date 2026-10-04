@@ -23,7 +23,7 @@
     </div>
 
     <!-- KPIs -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;">
       <div v-for="k in kpis" :key="k.label" style="border-radius:14px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:16px 18px;">
         <div :style="{ fontSize:'26px', fontWeight:800, background:k.grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', lineHeight:1 }">
           {{ loading ? '—' : k.value }}
@@ -35,7 +35,7 @@
     <!-- Buscador + filtros -->
     <div style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:12px;">
       <div style="position:relative;max-width:380px;">
-        <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#1570EF':'#7A889C'" />
+        <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#1570EF':'#5F6E84'" />
         <input v-model="search" placeholder="Buscar por nombre, correo o número de cliente"
           @focus="searchFocus=true" @blur="searchFocus=false"
           :style="{ width:'100%', height:'40px', background: searchFocus?'rgba(21,112,239,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${searchFocus?'rgba(21,112,239,0.45)':'rgba(11,27,51,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
@@ -63,7 +63,7 @@
         <!-- Menú ⋮ -->
         <div v-if="isAdmin" style="position:absolute;top:14px;right:14px;">
           <button @click.stop="openMenu===user.id ? openMenu=null : openMenu=user.id"
-            style="width:28px;height:28px;border-radius:8px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.07);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#7A889C;">
+            style="width:28px;height:28px;border-radius:8px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.07);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5F6E84;">
             <MoreVertical :size="13" />
           </button>
           <Transition name="dropdown">
@@ -178,9 +178,9 @@
                       style="width:100%;height:40px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:10px;padding:0 40px 0 14px;font-size:13px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.2s;"
                       @focus="e=>(e.currentTarget as HTMLElement).style.borderColor='rgba(21,112,239,0.45)'"
                       @blur="e=>(e.currentTarget as HTMLElement).style.borderColor='rgba(11,27,51,0.1)'" />
-                    <span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:13px;color:#7A889C;pointer-events:none;">%</span>
+                    <span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:13px;color:#5F6E84;pointer-events:none;">%</span>
                   </div>
-                  <div style="font-size:11px;color:#7A889C;margin-top:5px;">Se resta del precio SYSCOM y después se suma el IVA (16%). 0 = precio normal.</div>
+                  <div style="font-size:11px;color:#5F6E84;margin-top:5px;">Se resta del precio SYSCOM y después se suma el IVA (16%). 0 = precio normal.</div>
                 </div>
               </div>
 
@@ -242,10 +242,13 @@
 </template>
 
 <script setup lang="ts">
+// Importación explícita: el auto-import de Nuxt no registra esIntegrador
+import { esIntegrador, NIVELES_INTEGRADOR } from '~/utils/integrador'
 import { Search, UserPlus, MoreVertical, Pencil, Trash2, X } from '@lucide/vue'
 import type { User } from '~/types'
 
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Usuarios — SIEEG' })
 
 const auth = useAuthStore()
 const isAdmin = computed(() => auth.user?.role === 'admin')
@@ -274,8 +277,8 @@ onMounted(() => document.addEventListener('click', _closeMenu))
 onUnmounted(() => document.removeEventListener('click', _closeMenu))
 
 const roleFilters = [
-  { key:'all', label:'Todos' }, { key:'admin', label:'Admin' },
-  { key:'approver', label:'Aprobador' }, { key:'seller', label:'Vendedor' }, { key:'buyer', label:'Comprador' }, { key:'viewer', label:'Visor' },
+  { key:'all', label:'Todos' }, { key:'admin', label:'Administrador' },
+  { key:'approver', label:'Aprobador' }, { key:'seller', label:'Vendedor' }, { key:'buyer', label:'Cliente' }, { key:'viewer', label:'Visor' },
 ]
 const ROLES    = ['admin','approver','seller','buyer','viewer'] as const
 const STATUSES = ['active','inactive','pending']       as const
@@ -296,10 +299,10 @@ const kpis = computed(() => [
 
 /* ── config visual ── */
 const roleCfg: Record<string, { label:string; color:string; bg:string; border:string }> = {
-  admin:    { label:'Admin',     color:'#7C3AED', bg:'rgba(21,112,239,0.12)', border:'rgba(21,112,239,0.25)' },
+  admin:    { label:'Administrador', color:'#7C3AED', bg:'rgba(21,112,239,0.12)', border:'rgba(21,112,239,0.25)' },
   approver: { label:'Aprobador', color:'#B45309', bg:'rgba(245,158,11,0.12)', border:'rgba(245,158,11,0.25)' },
   seller:   { label:'Vendedor',  color:'#047857', bg:'rgba(16,185,129,0.12)', border:'rgba(16,185,129,0.28)' },
-  buyer:    { label:'Comprador', color:'#0B5BD3', bg:'rgba(21,112,239,0.12)', border:'rgba(21,112,239,0.25)' },
+  buyer:    { label:'Cliente',   color:'#0B5BD3', bg:'rgba(21,112,239,0.12)', border:'rgba(21,112,239,0.25)' },
   viewer:   { label:'Visor',     color:'#5B6B82', bg:'rgba(91,107,130,0.1)', border:'rgba(91,107,130,0.2)' },
 }
 const statusCfg: Record<string, { label:string; color:string; bg:string; dot:string }> = {
@@ -310,7 +313,7 @@ const statusCfg: Record<string, { label:string; color:string; bg:string; dot:str
 const palette = [['#1570EF','#0B5BD3'],['#1570EF','#0B5BD3'],['#16A34A','#059669'],['#F59E0B','#B45309'],['#F43F5E','#E11D48'],['#6366F1','#4F46E5']]
 const avatarGrad = (name: string) => palette[name.charCodeAt(0) % palette.length]
 
-const formatDate     = (d: string) => new Intl.DateTimeFormat('es-MX',{ day:'2-digit', month:'short', year:'numeric' }).format(new Date(d))
+const formatDate     = (d: string) => fechaCorta(d)
 
 /* ── modal crear / editar ── */
 interface Form { name:string; email:string; password:string; role:string; status:string; discountPct:number }

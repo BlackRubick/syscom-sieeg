@@ -19,3 +19,16 @@ export function parseQuoteNumber(q: string): number | null {
   const m = q.trim().match(/^(?:cot[\s-]*)?(?:\d{6}[\s-]+)?0*(\d{1,7})$/i)
   return m ? Number(m[1]) : null
 }
+
+/** Vigencia de una cotización (informativa: al confirmar siempre se cobra el precio del día). */
+export const VIGENCIA_DIAS = 15
+
+export function venceCotizacion(creada: string | Date): string {
+  const d = new Date(creada)
+  d.setDate(d.getDate() + VIGENCIA_DIAS)
+  return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+export function cotizacionVencida(creada: string | Date): boolean {
+  return Date.now() > new Date(creada).getTime() + VIGENCIA_DIAS * 86_400_000
+}

@@ -47,9 +47,9 @@
 
         <!-- Acciones: sesión iniciada -->
         <div v-else class="sn-actions">
-          <NuxtLink to="/cart" class="sn-icon-btn" aria-label="Carrito">
+          <NuxtLink v-if="auth.user?.role !== 'viewer'" to="/cart" class="sn-icon-btn" aria-label="Carrito">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-            <span v-if="cart.count > 0" class="sn-badge">{{ cart.count }}</span>
+            <span v-if="montado && cart.count > 0" class="sn-badge">{{ cart.count }}</span>
           </NuxtLink>
 
           <div class="sn-drop-wrap">
@@ -65,13 +65,14 @@
                 </div>
                 <div class="sn-notif-list">
                   <div v-if="!ui.notifications.length" class="sn-notif-empty">No tienes notificaciones</div>
-                  <button v-for="n in ui.notifications" :key="n.id" type="button" :class="['sn-notif', { unread: !n.read }]" @click="ui.markRead(n.id)">
+                  <button v-for="n in ui.notifications" :key="n.id" type="button" :class="['sn-notif', { unread: !n.read }]" @click="abrirAviso(n)">
                     <span class="sn-notif-ico" :style="{ color: notifColor(n.type), background: `${notifColor(n.type)}18` }">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" v-html="notifIcon(n.type)" />
                     </span>
                     <span class="sn-notif-text">
                       <strong>{{ n.title }}</strong>
                       <span>{{ n.message }}</span>
+                      <em>{{ hace(n.createdAt) }}</em>
                     </span>
                     <i v-if="!n.read" />
                   </button>
@@ -95,7 +96,7 @@
                   <strong>{{ auth.user?.name }}</strong>
                   <span>{{ auth.user?.email }}</span>
                 </div>
-                <NuxtLink v-if="auth.user?.role !== 'admin'" to="/perfil" class="sn-drop-item" @click="userOpen = false">Mi perfil</NuxtLink>
+                <NuxtLink to="/perfil" class="sn-drop-item" @click="userOpen = false">Mi perfil</NuxtLink>
                 <button type="button" class="sn-drop-item danger" @click="salir">Cerrar sesión</button>
               </div>
             </Transition>
@@ -117,7 +118,7 @@
             <NuxtLink v-for="item in navItems" :key="item.href" :to="item.href" :class="{ active: activo(item.href) }">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" v-html="item.svg" />
               {{ item.label }}
-              <span v-if="item.cart && cart.count > 0" class="sn-nav-badge">{{ cart.count }}</span>
+              <span v-if="montado && item.cart && cart.count > 0" class="sn-nav-badge">{{ cart.count }}</span>
             </NuxtLink>
           </template>
         </div>
@@ -138,14 +139,17 @@ const router = useRouter()
 const auth   = useAuthStore()
 const ui     = useUIStore()
 const cart   = useCartStore()
+// El carrito se carga solo en el navegador: el contador se pinta después de montar (sin desajuste de hidratación)
+const montado = ref(false)
+onMounted(() => { montado.value = true })
 
 const CATEGORIAS = ['22', '26', '37', '30', '65811', '32', '38', '25'].map(id => ({ id, nombre: categoriaNombre(id) }))
 
 const ALL_NAV = [
   { href: '/dashboard', label: 'Dashboard',      roles: ['admin', 'approver', 'viewer'], svg: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>' },
   { href: '/catalog',   label: 'Catálogo',       roles: null, svg: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/>' },
-  { href: '/cart',      label: 'Carrito',        roles: null, cart: true, svg: '<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>' },
-  { href: '/orders',    label: 'Órdenes',        roles: null, svg: '<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>' },
+  { href: '/cart',      label: 'Carrito',        roles: ['admin', 'approver', 'seller', 'buyer'], cart: true, svg: '<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>' },
+  { href: '/orders',    label: 'Pedidos',        roles: null, svg: '<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>' },
   { href: '/quotes',    label: 'Cotizaciones',   roles: ['admin', 'approver', 'seller', 'buyer'], svg: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h6"/><path d="M9 11h2"/>' },
   { href: '/garantias', label: 'Garantías',      roles: ['admin', 'approver', 'seller', 'buyer'], svg: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>' },
   { href: '/clientes',  label: 'Clientes',       roles: ['admin', 'seller'], svg: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/>' },
@@ -153,7 +157,7 @@ const ALL_NAV = [
   { href: '/admin',     label: 'Precios',        roles: ['admin'], svg: '<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>' },
   { href: '/fiscal',    label: 'Datos Fiscales', roles: ['admin', 'seller'], svg: '<rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 10h8"/><path d="M8 14h5"/><path d="M8 6h8"/>' },
   { href: '/facturas',  label: 'Facturación',    roles: ['admin'], svg: '<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8H8"/><path d="M16 12H8"/><path d="M12 16H8"/>' },
-  { href: '/perfil',    label: 'Mi Perfil',      roles: ['buyer', 'approver', 'viewer', 'seller'], svg: '<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>' },
+  { href: '/perfil',    label: 'Mi Perfil',      roles: null, svg: '<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>' },
 ]
 const navItems = computed(() => {
   const role = auth.user?.role ?? ''
@@ -187,7 +191,7 @@ const notifOpen = ref(false)
 const userOpen  = ref(false)
 watch(() => route.fullPath, () => { notifOpen.value = false; userOpen.value = false })
 
-const roleLabels: Record<string, string> = { admin: 'Administrador', buyer: 'Comprador', approver: 'Aprobador', viewer: 'Visor', seller: 'Vendedor' }
+const roleLabels = ROLE_LABELS
 const initials  = computed(() => auth.user?.name.split(' ').slice(0, 2).map(n => n[0]).join('') ?? '..')
 const firstName = computed(() => auth.user?.name.split(' ').slice(0, 2).join(' ') ?? '...')
 const roleLabel = computed(() => auth.user ? (roleLabels[auth.user.role] ?? auth.user.role) : '...')
@@ -200,6 +204,23 @@ function notifIcon(type: string): string {
   if (type === 'delivery') return '<rect width="16" height="13" x="1" y="5" rx="1"/><path d="M1 10h16"/><path d="M17 5h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2"/>'
   if (type === 'alert')    return '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/>'
   return '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>'
+}
+
+// Al tocar un aviso: se marca leído y, si es de un pedido, se abre
+function abrirAviso(n: { id: string; orderId?: string | null; title: string }) {
+  ui.markRead(n.id)
+  notifOpen.value = false
+  if (n.orderId) router.push({ path: '/orders', query: { pedido: n.orderId } })
+  else if (/garant/i.test(n.title)) router.push('/garantias')
+  else if (/cotizaci/i.test(n.title)) router.push('/quotes')
+}
+function hace(iso: string) {
+  const min = Math.round((Date.now() - new Date(iso).getTime()) / 60_000)
+  if (min < 1) return 'ahora'
+  if (min < 60) return `hace ${min} min`
+  const h = Math.round(min / 60)
+  if (h < 24) return `hace ${h} h`
+  return new Date(iso).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })
 }
 
 async function salir() {
@@ -277,6 +298,7 @@ a.sn-topbar-item:hover { color: #fff; }
 .sn-notif-ico { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .sn-notif-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .sn-notif-text strong { font-size: 12.5px; color: var(--ink); }
+.sn-notif-text em { font-style: normal; font-size: 11px; color: #5F6E84; margin-top: 2px; }
 .sn-notif-text span { font-size: 12px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .sn-notif i { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); flex-shrink: 0; margin-top: 5px; }
 .sn-overlay { position: fixed; inset: 0; z-index: 55; }

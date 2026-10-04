@@ -216,6 +216,13 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: 'landing', middleware: 'redirect-authenticated' })
+useSeoMeta({
+  title: 'SIEEG Integradores — Videovigilancia, redes, control de acceso y energía en Chiapas',
+  description: 'Cámaras, alarmas, redes, control de acceso, energía y cableado para tu negocio. Precios para integradores, factura en cada compra y envío a domicilio desde Tuxtla Gutiérrez, Chiapas.',
+  ogTitle: 'SIEEG Integradores',
+  ogDescription: 'Equipo de seguridad electrónica, redes y energía con precios para integradores.',
+  ogImage: '/logosieeg.jpg',
+})
 
 // Catálogo público (sin precios). Si SYSCOM falla, las secciones se ocultan.
 interface ProductoPublico { id: string; nombre: string; modelo: string; marca: string; marcaLogo: string; imagen: string; disponible: boolean }

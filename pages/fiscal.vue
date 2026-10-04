@@ -14,7 +14,7 @@
     </div>
 
     <!-- KPIs -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;">
       <div v-for="k in kpis" :key="k.label" style="border-radius:14px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:16px 18px;">
         <div :style="{ fontSize:'26px', fontWeight:800, background:k.grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', lineHeight:1 }">
           {{ loading ? '—' : k.value }}
@@ -26,7 +26,7 @@
     <!-- Filtros -->
     <div style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:12px;">
       <div style="position:relative;max-width:380px;">
-        <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#1570EF':'#7A889C'" />
+        <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#1570EF':'#5F6E84'" />
         <input v-model="search" placeholder="Buscar por nombre, RFC o razón social..."
           @focus="searchFocus=true" @blur="searchFocus=false"
           :style="{ width:'100%', height:'40px', background: searchFocus?'rgba(21,112,239,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${searchFocus?'rgba(21,112,239,0.45)':'rgba(11,27,51,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
@@ -45,11 +45,11 @@
     </div>
 
     <!-- Tabla -->
-    <div v-else-if="filtered.length > 0" style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);overflow:hidden;">
+    <div v-else-if="filtered.length > 0" class="tabla-ancha" style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);">
 
       <!-- Cabecera -->
       <div style="display:grid;grid-template-columns:2fr 1.5fr 1.5fr 1fr 1fr 1fr 44px;gap:0;padding:10px 18px;border-bottom:1px solid rgba(11,27,51,0.07);">
-        <span v-for="h in headers" :key="h" style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;">{{ h }}</span>
+        <span v-for="h in headers" :key="h" style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;">{{ h }}</span>
       </div>
 
       <!-- Filas -->
@@ -64,7 +64,7 @@
           </div>
           <div style="min-width:0;">
             <div style="font-size:13px;font-weight:600;color:#0B1B33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ u.name }}</div>
-            <div style="font-size:11px;color:#7A889C;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ u.email }}</div>
+            <div style="font-size:11px;color:#5F6E84;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ u.email }}</div>
           </div>
         </div>
 
@@ -96,7 +96,7 @@
 
         <!-- Factura.com -->
         <div>
-          <span :style="{ fontSize:'11px', fontWeight:600, padding:'3px 10px', borderRadius:'20px', display:'flex', alignItems:'center', gap:'5px', width:'fit-content', background: u.facturaUid ? 'rgba(99,102,241,0.12)' : 'rgba(91,107,130,0.08)', color: u.facturaUid ? '#F59E0B' : '#7A889C' }">
+          <span :style="{ fontSize:'11px', fontWeight:600, padding:'3px 10px', borderRadius:'20px', display:'flex', alignItems:'center', gap:'5px', width:'fit-content', background: u.facturaUid ? 'rgba(99,102,241,0.12)' : 'rgba(91,107,130,0.08)', color: u.facturaUid ? '#F59E0B' : '#5F6E84' }">
             <span :style="{ width:'5px', height:'5px', borderRadius:'50%', background: u.facturaUid ? '#6366f1' : 'rgba(91,107,130,0.4)', display:'inline-block', flexShrink:0 }" />
             {{ u.facturaUid ? 'Sincronizado' : 'No sincronizado' }}
           </span>
@@ -105,7 +105,7 @@
         <!-- Ver detalle -->
         <div style="display:flex;justify-content:center;">
           <div style="width:28px;height:28px;border-radius:8px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.08);display:flex;align-items:center;justify-content:center;">
-            <ChevronRight :size="13" color="#7A889C" />
+            <ChevronRight :size="13" color="#5F6E84" />
           </div>
         </div>
       </div>
@@ -172,11 +172,11 @@
                   <div v-if="esAdmin" style="padding:14px 16px;border-radius:12px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;"
                     :style="detail.facturaUid ? 'background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2)' : 'background:rgba(91,107,130,0.06);border:1px solid rgba(91,107,130,0.15)'">
                     <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" :stroke="detail.facturaUid ? '#F59E0B' : '#7A889C'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="14" height="17" x="5" y="2" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" :stroke="detail.facturaUid ? '#F59E0B' : '#5F6E84'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect width="14" height="17" x="5" y="2" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
                       <div style="min-width:0;">
-                        <div :style="{ fontSize:'11px', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.8px', marginBottom:'2px', color: detail.facturaUid ? 'rgba(129,140,248,0.7)' : '#7A889C' }">Factura.com</div>
+                        <div :style="{ fontSize:'11px', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.8px', marginBottom:'2px', color: detail.facturaUid ? 'rgba(129,140,248,0.7)' : '#5F6E84' }">Factura.com</div>
                         <div v-if="detail.facturaUid" style="font-size:12px;font-weight:600;color:#4F46E5;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">UID: {{ detail.facturaUid }}</div>
-                        <div v-else style="font-size:12px;color:#7A889C;">No sincronizado</div>
+                        <div v-else style="font-size:12px;color:#5F6E84;">No sincronizado</div>
                       </div>
                     </div>
                     <button v-if="detail.fiscalCompleted" @click.stop="syncToFactura(detail)"
@@ -199,7 +199,7 @@
 
                   <!-- Datos fiscales -->
                   <div style="margin-bottom:20px;">
-                    <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Datos fiscales</div>
+                    <div style="font-size:10px;font-weight:700;color:#5F6E84;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Datos fiscales</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                       <DetailField label="RFC" :value="detail.fiscalRfc" mono />
                       <DetailField label="País" :value="detail.fiscalPais" />
@@ -213,7 +213,7 @@
 
                   <!-- Domicilio -->
                   <div style="margin-bottom:20px;">
-                    <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Domicilio fiscal</div>
+                    <div style="font-size:10px;font-weight:700;color:#5F6E84;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Domicilio fiscal</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                       <DetailField label="Calle" :value="detail.fiscalCalle" />
                       <DetailField label="Número exterior" :value="detail.fiscalNumExt" />
@@ -228,7 +228,7 @@
 
                   <!-- Contacto -->
                   <div>
-                    <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Contacto adicional</div>
+                    <div style="font-size:10px;font-weight:700;color:#5F6E84;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Contacto adicional</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                       <DetailField label="Nombre" :value="detail.fiscalNombre" />
                       <DetailField label="Apellidos" :value="detail.fiscalApellidos" />
@@ -242,37 +242,37 @@
                 <template v-else>
                   <!-- Datos fiscales -->
                   <div style="margin-bottom:18px;">
-                    <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Datos fiscales <span style="color:#EF4444;">*requeridos</span></div>
+                    <div style="font-size:10px;font-weight:700;color:#5F6E84;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Datos fiscales <span style="color:#EF4444;">*requeridos</span></div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                       <div>
-                        <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:4px;">RFC *</div>
+                        <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:4px;">RFC *</div>
                         <input v-model="editForm.rfc" placeholder="XAXX010101000" style="width:100%;height:36px;padding:0 10px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:8px;font-size:12px;color:#0B1B33;outline:none;font-family:monospace;box-sizing:border-box;" />
                       </div>
                       <div>
-                        <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:4px;">País *</div>
+                        <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:4px;">País *</div>
                         <input v-model="editForm.pais" placeholder="MEX" style="width:100%;height:36px;padding:0 10px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:8px;font-size:12px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;" />
                       </div>
                       <div style="grid-column:1/-1;">
-                        <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:4px;">Razón Social *</div>
+                        <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:4px;">Razón Social *</div>
                         <input v-model="editForm.razonSocial" placeholder="Nombre o razón social completa" style="width:100%;height:36px;padding:0 10px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:8px;font-size:12px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;" />
                       </div>
                       <div>
-                        <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:4px;">Código Postal *</div>
+                        <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:4px;">Código Postal *</div>
                         <input v-model="editForm.codpos" placeholder="31000" style="width:100%;height:36px;padding:0 10px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:8px;font-size:12px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;" />
                       </div>
                       <div>
-                        <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:4px;">Email fiscal *</div>
+                        <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:4px;">Email fiscal *</div>
                         <input v-model="editForm.email" type="email" placeholder="facturacion@empresa.com" style="width:100%;height:36px;padding:0 10px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:8px;font-size:12px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;" />
                       </div>
                       <div>
-                        <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:4px;">Régimen Fiscal *</div>
+                        <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:4px;">Régimen Fiscal *</div>
                         <select v-model="editForm.regimen" style="width:100%;height:36px;padding:0 10px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:8px;font-size:12px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;cursor:pointer;">
                           <option value="" style="background:#FFFFFF;">Seleccionar…</option>
                           <option v-for="(nombre, clave) in REGIMENES" :key="clave" :value="clave" style="background:#FFFFFF;">{{ clave }} – {{ nombre }}</option>
                         </select>
                       </div>
                       <div>
-                        <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:4px;">Uso de CFDI</div>
+                        <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:4px;">Uso de CFDI</div>
                         <select v-model="editForm.usocfdi" style="width:100%;height:36px;padding:0 10px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:8px;font-size:12px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;cursor:pointer;">
                           <option value="" style="background:#FFFFFF;">Seleccionar…</option>
                           <option v-for="(nombre, clave) in USOS_CFDI" :key="clave" :value="clave" style="background:#FFFFFF;">{{ clave }} – {{ nombre }}</option>
@@ -283,11 +283,11 @@
 
                   <!-- Domicilio -->
                   <div style="margin-bottom:18px;">
-                    <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Domicilio fiscal</div>
+                    <div style="font-size:10px;font-weight:700;color:#5F6E84;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Domicilio fiscal</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                       <template v-for="f in domicilioFields" :key="f.key">
                         <div>
-                          <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:4px;">{{ f.label }}</div>
+                          <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:4px;">{{ f.label }}</div>
                           <input v-model="editForm[f.key]" :placeholder="f.placeholder" style="width:100%;height:36px;padding:0 10px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:8px;font-size:12px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;" />
                         </div>
                       </template>
@@ -296,11 +296,11 @@
 
                   <!-- Contacto -->
                   <div style="margin-bottom:18px;">
-                    <div style="font-size:10px;font-weight:700;color:#7A889C;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Contacto adicional</div>
+                    <div style="font-size:10px;font-weight:700;color:#5F6E84;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Contacto adicional</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                       <template v-for="f in contactoFields" :key="f.key">
                         <div>
-                          <div style="font-size:10px;font-weight:600;color:#7A889C;margin-bottom:4px;">{{ f.label }}</div>
+                          <div style="font-size:10px;font-weight:600;color:#5F6E84;margin-bottom:4px;">{{ f.label }}</div>
                           <input v-model="editForm[f.key]" :placeholder="f.placeholder" style="width:100%;height:36px;padding:0 10px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:8px;font-size:12px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;" />
                         </div>
                       </template>
@@ -338,6 +338,7 @@
 import { Search, ChevronRight, X, AlertTriangle, Pencil } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Datos fiscales — SIEEG' })
 
 /* ── tipos ── */
 interface FiscalUser {

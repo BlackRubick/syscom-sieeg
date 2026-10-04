@@ -12,6 +12,7 @@
           <p class="cat-subtitle">
             {{ categories.length > 0 ? `${categories.length} categorías disponibles` : 'Cargando catálogo…' }}
           </p>
+          <p v-if="clienteVista" class="cat-cliente">Precios de <b>{{ clienteVista.mostrador ? 'Mostrador · Público en general' : clienteVista.name }}</b><template v-if="clienteVista.discountPct > 0"> (−{{ clienteVista.discountPct }}%)</template> · <NuxtLink to="/cart">cambiar en el carrito</NuxtLink></p>
         </div>
         <div v-if="hasFilter" class="cat-results-chip">
           <Loader2 v-if="loading" :size="11" color="#0B5BD3" class="spin" />
@@ -33,7 +34,7 @@
 
         <!-- Buscador -->
         <div style="position:relative;">
-          <svg class="search-icon" :style="{color:searchFocused?'#1570EF':'#7A889C'}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <svg class="search-icon" :style="{color:searchFocused?'#1570EF':'#5F6E84'}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input
             v-model="search"
             placeholder="Buscar por nombre, modelo, marca o SKU…"
@@ -50,11 +51,11 @@
 
           <!-- Sort -->
           <div style="position:relative;display:flex;align-items:center;flex-shrink:0;">
-            <svg style="position:absolute;left:11px;pointer-events:none;color:#7A889C;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="9" y2="18"/></svg>
+            <svg style="position:absolute;left:11px;pointer-events:none;color:#5F6E84;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="9" y2="18"/></svg>
             <select v-model="sortBy" @change="pagina=1" class="filter-select">
               <option v-for="o in SORT_OPTIONS" :key="o.value" :value="o.value" style="background:#FFFFFF;">{{ o.label }}</option>
             </select>
-            <ChevronDown :size="12" color="#7A889C" style="position:absolute;right:9px;pointer-events:none;" />
+            <ChevronDown :size="12" color="#5F6E84" style="position:absolute;right:9px;pointer-events:none;" />
           </div>
 
           <!-- Marca -->
@@ -67,7 +68,7 @@
                 </span>
               </div>
               <span v-if="activeBrandId" @click.stop="clearBrand()" class="filter-btn-x">×</span>
-              <ChevronDown v-else :size="12" color="#7A889C" />
+              <ChevronDown v-else :size="12" color="#5F6E84" />
             </button>
             <Transition name="dropdown">
               <div v-if="brandDropOpen" class="brand-dropdown">
@@ -75,7 +76,7 @@
                   <input v-model="brandSearch" autofocus placeholder="Buscar marca…" class="brand-search" />
                 </div>
                 <div style="max-height:220px;overflow-y:auto;padding-bottom:6px;">
-                  <div v-if="loadingBrands" style="padding:16px;text-align:center;font-size:12px;color:#7A889C;">Cargando marcas…</div>
+                  <div v-if="loadingBrands" style="padding:16px;text-align:center;font-size:12px;color:#5F6E84;">Cargando marcas…</div>
                   <button v-else v-for="b in filteredBrands" :key="b.id" @click="selectBrand(b.id)"
                     class="brand-option" :class="{ selected: activeBrandId===b.id }">
                     {{ b.nombre }}
@@ -96,7 +97,7 @@
                 </span>
               </div>
               <span v-if="activeCategoryId" @click.stop="selectCategory(null)" class="filter-btn-x">×</span>
-              <ChevronDown v-else :size="12" color="#7A889C" :style="{ transition:'transform 0.2s', transform: catPanelOpen ? 'rotate(180deg)' : 'rotate(0)' }" />
+              <ChevronDown v-else :size="12" color="#5F6E84" :style="{ transition:'transform 0.2s', transform: catPanelOpen ? 'rotate(180deg)' : 'rotate(0)' }" />
             </button>
 
             <!-- Panel desktop (dropdown) -->
@@ -111,7 +112,7 @@
                 <!-- Buscador interno -->
                 <div style="padding:0 12px 10px;">
                   <div style="position:relative;">
-                    <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:#7A889C;" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:#5F6E84;" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                     <input v-model="catSearch" placeholder="Buscar categoría…" class="cat-drop-search" />
                   </div>
                 </div>
@@ -141,7 +142,7 @@
                     <span>{{ cat.nombre }}</span>
                     <span v-if="activeCategoryId===cat.id" class="cat-drop-check">✓</span>
                   </button>
-                  <div v-if="!loadingCats && filteredCats.length===0" style="grid-column:1/-1;padding:20px;text-align:center;font-size:12px;color:#7A889C;">
+                  <div v-if="!loadingCats && filteredCats.length===0" style="grid-column:1/-1;padding:20px;text-align:center;font-size:12px;color:#5F6E84;">
                     Sin resultados
                   </div>
                 </div>
@@ -187,7 +188,7 @@
         <!-- Buscador -->
         <div style="padding:0 16px 12px;">
           <div style="position:relative;">
-            <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:#7A889C;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:#5F6E84;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input v-model="catSearch" placeholder="Buscar categoría…" class="cat-drop-search" style="height:40px;font-size:13px;" />
           </div>
         </div>
@@ -217,7 +218,7 @@
             <span style="flex:1;text-align:left;">{{ cat.nombre }}</span>
             <span v-if="activeCategoryId===cat.id" style="font-size:13px;color:#0B5BD3;">✓</span>
           </button>
-          <div v-if="!loadingCats && filteredCats.length===0" style="padding:24px;text-align:center;font-size:13px;color:#7A889C;">
+          <div v-if="!loadingCats && filteredCats.length===0" style="padding:24px;text-align:center;font-size:13px;color:#5F6E84;">
             Sin resultados
           </div>
         </div>
@@ -279,6 +280,7 @@
           <div class="product-img-wrap">
             <img
               v-if="product.images[0]"
+              loading="lazy"
               :src="product.images[0]"
               :alt="product.name"
               class="product-img"
@@ -320,6 +322,7 @@
                 <div v-if="product.discount" class="product-old-price">{{ fmtCurrency(Math.round(product.price / (1 - product.discount / 100))) }}</div>
               </div>
               <button
+                v-if="puedeComprar"
                 @click.stop="handleAdd(product)"
                 :disabled="product.stock===0"
                 class="btn-add"
@@ -365,7 +368,7 @@
   </div>
 
   <!-- Modal de detalle -->
-  <ProductModal v-if="detailProduct" :product="detailProduct" :show="!!detailProduct" @close="detailProduct=null" />
+  <ProductModal v-if="detailProduct" :product="detailProduct" :show="!!detailProduct" :cliente="clienteVista?.id" @close="detailProduct=null" />
 </template>
 
 <script setup lang="ts">
@@ -374,23 +377,35 @@ import { fetchCategorias, fetchProductos, fetchMarcas } from '~/composables/useS
 import type { Product, SyscomCategoria } from '~/types'
 
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Catálogo — SIEEG' })
 
 const cart = useCartStore()
+const auth = useAuthStore()
+const puedeComprar = computed(() => auth.user?.role !== 'viewer')
+// Vendedor/admin con cliente elegido en el carrito: se muestran los precios de ese cliente
+const clienteCarrito = useClienteCarrito()
+const { clientes, cargar: cargarClientes } = useClientes()
+const vende = computed(() => ['admin', 'seller'].includes(auth.user?.role ?? ''))
+const clienteVista = computed(() => vende.value && clienteCarrito.value ? clientes.value.find(c => c.id === clienteCarrito.value) ?? null : null)
+onMounted(async () => { if (vende.value && clienteCarrito.value && !clientes.value.length) { await cargarClientes(); if (clienteVista.value) loadProducts() } })
 const { isMobile } = useBreakpoint()
 
 // La búsqueda puede llegar desde el navbar (?q=...)
 const route            = useRoute()
-const qInicial         = typeof route.query.q === 'string' ? route.query.q : ''
+const router           = useRouter()
+const qStr = (k: string) => typeof route.query[k] === 'string' ? route.query[k] as string : ''
+const qInicial         = qStr('q')
 const search           = ref(qInicial)
 const dSearch          = ref(qInicial)
 watch(() => route.query.q, q => { if (typeof q === 'string' && q !== search.value) { search.value = q; dSearch.value = q; pagina.value = 1 } })
 const searchFocused    = ref(false)
-const sortBy           = ref('relevancia')
-const pagina           = ref(1)
+const sortBy           = ref(qStr('orden') || 'relevancia')
+const pagina           = ref(Math.max(1, Number(qStr('pagina')) || 1))
 const categories       = ref<SyscomCategoria[]>([])
-const activeCategoryId = ref<string | null>(null)
+// Sin búsqueda ni filtro se abre en Videovigilancia (como el catálogo público) en lugar de una página vacía
+const activeCategoryId = ref<string | null>(qStr('categoria') || (qInicial || qStr('marca') ? null : '22'))
 const brands           = ref<Array<{ id: string; nombre: string }>>([])
-const activeBrandId    = ref<string | null>(null)
+const activeBrandId    = ref<string | null>(qStr('marca') || null)
 const brandSearch      = ref('')
 const brandDropOpen    = ref(false)
 const loadingBrands    = ref(false)
@@ -433,8 +448,19 @@ watch(search, (v) => {
 
 let loadId = 0
 
+// Los filtros viven en la dirección: recargar, compartir o regresar conserva lo que se veía
+watch([dSearch, activeCategoryId, activeBrandId, pagina, sortBy], () => {
+  const query: Record<string, string> = {}
+  if (dSearch.value) query.q = dSearch.value
+  if (activeCategoryId.value) query.categoria = activeCategoryId.value
+  if (activeBrandId.value) query.marca = activeBrandId.value
+  if (pagina.value > 1) query.pagina = String(pagina.value)
+  if (sortBy.value !== 'relevancia') query.orden = sortBy.value
+  router.replace({ query })
+})
+
 onMounted(async () => {
-  if (dSearch.value) loadProducts()
+  if (hasFilter.value) loadProducts()
   const cats = await fetchCategorias()
   categories.value = cats
   loadingCats.value = false
@@ -450,6 +476,7 @@ async function loadProducts() {
   const myId = ++loadId
   loading.value = true; apiError.value = null; products.value = []; cantidad.value = 0
   const r = await fetchProductos({
+    cliente:   clienteVista.value?.id,
     busqueda:  dSearch.value || undefined,
     categoria: activeCategoryId.value ?? undefined,
     marca:     activeBrandId.value ?? undefined,
@@ -519,7 +546,7 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
   box-sizing:border-box;transition:all 0.2s;
 }
 .search-input.focused { background:rgba(21,112,239,0.06);border-color:#1570EF;box-shadow:0 0 0 4px rgba(21,112,239,0.08); }
-.search-input::placeholder { color:#7A889C; }
+.search-input::placeholder { color:#5F6E84; }
 .search-clear { position:absolute;right:13px;top:50%;transform:translateY(-50%);background:rgba(11,27,51,0.08);border:none;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5B6B82;font-size:15px;transition:background 0.15s; }
 .search-clear:hover { background:rgba(11,27,51,0.16); }
 
@@ -573,7 +600,7 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
   box-sizing:border-box;transition:border-color 0.15s;
 }
 .cat-drop-search:focus { border-color:rgba(21,112,239,0.4); }
-.cat-drop-search::placeholder { color:#7A889C; }
+.cat-drop-search::placeholder { color:#5F6E84; }
 .cat-drop-all {
   width:100%;display:flex;align-items:center;gap:8px;
   height:36px;padding:0 12px;border-radius:9px;
@@ -689,7 +716,7 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 
 /* ── Product info ── */
 .product-info { padding:14px 15px 15px;display:flex;flex-direction:column;flex:1; }
-.product-cat-label { display:inline-block;font-size:10px;color:#7A889C;font-weight:500;background:rgba(11,27,51,0.05);padding:2px 8px;border-radius:20px;align-self:flex-start;margin-bottom:7px; }
+.product-cat-label { display:inline-block;font-size:10px;color:#5F6E84;font-weight:500;background:rgba(11,27,51,0.05);padding:2px 8px;border-radius:20px;align-self:flex-start;margin-bottom:7px; }
 .product-name { font-size:13px;font-weight:600;color:#5B6B82;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:38px;margin-bottom:5px;transition:color 0.15s; }
 .product-name.highlighted { color:#0B1B33; }
 .product-sku { font-size:10px;color:rgba(91,107,130,0.45);margin-bottom:5px;font-family:ui-monospace,monospace;letter-spacing:0.4px; }
@@ -697,8 +724,8 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 .product-divider { height:1px;background:rgba(11,27,51,0.06);margin-bottom:11px;margin-top:auto; }
 .product-price-row { display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:0; }
 .product-price { font-size:17px;font-weight:800;color:#0B1B33;letter-spacing:-0.5px;line-height:1; }
-.product-iva { font-size:9.5px;color:#7A889C;margin-top:3px; }
-.product-no-price { font-size:12px;color:#7A889C;font-style:italic; }
+.product-iva { font-size:9.5px;color:#5F6E84;margin-top:3px; }
+.product-no-price { font-size:12px;color:#5F6E84;font-style:italic; }
 .product-old-price { font-size:10px;color:rgba(91,107,130,0.45);text-decoration:line-through;margin-top:2px; }
 
 /* ── Add button ── */
@@ -730,7 +757,7 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 .page-info { display:flex;align-items:baseline;gap:4px;padding:0 6px; }
 .page-current { font-size:18px;font-weight:800;color:#0B1B33; }
 .page-sep { font-size:14px;color:rgba(91,107,130,0.4); }
-.page-total { font-size:13px;color:#7A889C;font-weight:500; }
+.page-total { font-size:13px;color:#5F6E84;font-weight:500; }
 
 /* ── Transitions ── */
 .dropdown-enter-active { transition:opacity 0.15s ease,transform 0.15s ease; }
@@ -751,4 +778,6 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 /* ── Utils ── */
 .spin { animation:spin 1.2s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
+.cat-cliente { margin: 4px 0 0; font-size: 12.5px; color: #0B5BD3; }
+.cat-cliente a { color: #0B5BD3; font-weight: 600; }
 </style>

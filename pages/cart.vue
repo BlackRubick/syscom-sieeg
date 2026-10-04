@@ -1,8 +1,11 @@
 <template>
   <div style="font-family:'Inter',system-ui,sans-serif;max-width:900px;margin:0 auto;">
 
+    <!-- El carrito se carga en el navegador: hasta entonces, un aviso (evita desajustes de hidratación) -->
+    <div v-if="!montado" style="min-height:40vh;display:flex;align-items:center;justify-content:center;font-size:13px;color:#5F6E84;">Cargando carrito…</div>
+
     <!-- ── Éxito: pago con tarjeta ── -->
-    <div v-if="submitted" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+    <div v-else-if="submitted" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
       <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#16A34A,#059669);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 0 40px rgba(34,197,94,0.3);">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
       </div>
@@ -26,13 +29,13 @@
               <img src="/logosieeg.jpg" alt="SIEEG" style="height:26px;width:26px;object-fit:contain;border-radius:5px;" />
               <span style="font-size:15px;font-weight:800;color:#0B1B33;letter-spacing:-0.3px;">SIEEG INTEGRADORES</span>
             </div>
-            <div style="font-size:11px;color:#7A889C;margin-bottom:12px;">Transferencia interbancaria (SPEI)</div>
+            <div style="font-size:11px;color:#5F6E84;margin-bottom:12px;">Transferencia interbancaria (SPEI)</div>
             <div style="display:flex;flex-direction:column;gap:5px;">
-              <div style="font-size:11px;color:#7A889C;">
+              <div style="font-size:11px;color:#5F6E84;">
                 <span style="font-weight:600;color:#5B6B82;">Fecha límite de pago:</span>
                 <span style="margin-left:6px;">{{ speiDueDate }}</span>
               </div>
-              <div style="font-size:11px;color:#7A889C;">
+              <div style="font-size:11px;color:#5F6E84;">
                 <span style="font-weight:600;color:#5B6B82;">Beneficiario:</span>
                 <span style="margin-left:6px;">{{ speiResult.beneficiary || 'SIEEG INTEGRADORES' }}</span>
               </div>
@@ -40,7 +43,7 @@
           </div>
           <!-- Monto a pagar -->
           <div style="padding:16px 22px;border-radius:14px;background:rgba(21,112,239,0.1);border:1px solid rgba(21,112,239,0.25);text-align:center;min-width:180px;">
-            <div style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Total a pagar / MXN</div>
+            <div style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Total a pagar / MXN</div>
             <div style="font-size:26px;font-weight:800;background:linear-gradient(135deg,#1570EF,#0B5BD3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-1px;">{{ fmt(speiResult.amount) }}</div>
           </div>
         </div>
@@ -50,11 +53,11 @@
           <div style="font-size:11px;font-weight:700;color:#0B5BD3;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Detalles de la compra</div>
           <div style="display:flex;flex-direction:column;gap:6px;">
             <div style="display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid rgba(11,27,51,0.04);">
-              <span style="font-size:12px;color:#7A889C;">Descripción</span>
+              <span style="font-size:12px;color:#5F6E84;">Descripción</span>
               <span style="font-size:12px;color:#5B6B82;font-weight:500;">Pedido SIEEG Integradores</span>
             </div>
             <div style="display:flex;justify-content:space-between;gap:16px;padding:8px 0;">
-              <span style="font-size:12px;color:#7A889C;">Fecha y hora</span>
+              <span style="font-size:12px;color:#5F6E84;">Fecha y hora</span>
               <span style="font-size:12px;color:#5B6B82;">{{ speiCreatedDate }}</span>
             </div>
           </div>
@@ -80,11 +83,11 @@
               </div>
               <div style="display:flex;flex-direction:column;gap:6px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                  <span style="font-size:10px;color:#7A889C;">Núm. convenio CIE:</span>
+                  <span style="font-size:10px;color:#5F6E84;">Núm. convenio CIE:</span>
                   <span style="font-size:11px;font-weight:700;font-family:monospace;color:#0B5BD3;">{{ speiResult.agreement }}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                  <span style="font-size:10px;color:#7A889C;">Referencia:</span>
+                  <span style="font-size:10px;color:#5F6E84;">Referencia:</span>
                   <div style="display:flex;align-items:center;gap:4px;">
                     <span style="font-size:10px;font-weight:600;font-family:monospace;color:#0B1B33;">{{ speiResult.reference || speiResult.clabe }}</span>
                     <button @click="copyRef" style="height:18px;padding:0 5px;border-radius:4px;background:rgba(21,112,239,0.1);border:1px solid rgba(21,112,239,0.2);color:#0B5BD3;font-size:9px;cursor:pointer;font-family:inherit;flex-shrink:0;">
@@ -93,11 +96,11 @@
                   </div>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                  <span style="font-size:10px;color:#7A889C;">Importe:</span>
+                  <span style="font-size:10px;color:#5F6E84;">Importe:</span>
                   <span style="font-size:11px;font-weight:700;color:#0B1B33;">{{ fmt(speiResult.amount) }} MXN</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                  <span style="font-size:10px;color:#7A889C;">Concepto:</span>
+                  <span style="font-size:10px;color:#5F6E84;">Concepto:</span>
                   <span style="font-size:10px;color:#5B6B82;">Pedido SIEEG</span>
                 </div>
               </div>
@@ -114,15 +117,15 @@
               </div>
               <div style="display:flex;flex-direction:column;gap:6px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                  <span style="font-size:10px;color:#7A889C;">Beneficiario:</span>
+                  <span style="font-size:10px;color:#5F6E84;">Beneficiario:</span>
                   <span style="font-size:10px;font-weight:600;color:#0B1B33;">{{ speiResult.beneficiary || 'SIEEG' }}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                  <span style="font-size:10px;color:#7A889C;">Banco destino:</span>
+                  <span style="font-size:10px;color:#5F6E84;">Banco destino:</span>
                   <span style="font-size:10px;font-weight:600;color:#0B1B33;">{{ speiResult.bank }}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                  <span style="font-size:10px;color:#7A889C;">CLABE:</span>
+                  <span style="font-size:10px;color:#5F6E84;">CLABE:</span>
                   <div style="display:flex;align-items:center;gap:4px;">
                     <span style="font-size:10px;font-weight:600;font-family:monospace;color:#0B5BD3;">{{ speiResult.clabe }}</span>
                     <button @click="copyClabe" style="height:18px;padding:0 5px;border-radius:4px;background:rgba(21,112,239,0.1);border:1px solid rgba(21,112,239,0.2);color:#0B5BD3;font-size:9px;cursor:pointer;font-family:inherit;flex-shrink:0;">
@@ -131,15 +134,15 @@
                   </div>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                  <span style="font-size:10px;color:#7A889C;">Concepto de pago:</span>
+                  <span style="font-size:10px;color:#5F6E84;">Concepto de pago:</span>
                   <span style="font-size:10px;font-weight:600;font-family:monospace;color:#0B1B33;">{{ speiResult.reference || speiResult.clabe }}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                  <span style="font-size:10px;color:#7A889C;">Referencia:</span>
+                  <span style="font-size:10px;color:#5F6E84;">Referencia:</span>
                   <span style="font-size:10px;font-weight:600;font-family:monospace;color:#0B5BD3;">{{ speiResult.agreement }}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                  <span style="font-size:10px;color:#7A889C;">Importe:</span>
+                  <span style="font-size:10px;color:#5F6E84;">Importe:</span>
                   <span style="font-size:11px;font-weight:700;color:#0B1B33;">{{ fmt(speiResult.amount) }} MXN</span>
                 </div>
               </div>
@@ -168,7 +171,7 @@
 
         <!-- Powered by Openpay -->
         <div style="padding:0 28px 18px;display:flex;align-items:center;justify-content:center;gap:8px;">
-          <span style="font-size:10px;color:#7A889C;">Procesado por</span>
+          <span style="font-size:10px;color:#5F6E84;">Procesado por</span>
           <div style="background:white;border-radius:4px;padding:2px 8px;display:inline-flex;align-items:center;">
             <img src="/openpay/openpay-logo.jpg" alt="Openpay" style="height:12px;object-fit:contain;" />
           </div>
@@ -195,7 +198,7 @@
         <ShoppingCart :size="28" color="rgba(91,107,130,0.45)" :stroke-width="1.5" />
       </div>
       <div style="font-size:18px;font-weight:700;color:#0B1B33;margin-bottom:6px;">Tu carrito está vacío</div>
-      <div style="font-size:13px;color:#7A889C;margin-bottom:24px;">Agrega productos desde el catálogo para continuar</div>
+      <div style="font-size:13px;color:#5F6E84;margin-bottom:24px;">Agrega productos desde el catálogo para continuar</div>
       <a href="/catalog" style="height:40px;padding:0 20px;border-radius:10px;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;font-size:13px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(21,112,239,0.28);">
         Ir al catálogo
       </a>
@@ -207,9 +210,9 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
         <div>
           <h1 style="font-size:20px;font-weight:800;color:#0B1B33;margin:0;">Carrito de compras</h1>
-          <p style="font-size:12px;color:#7A889C;margin:4px 0 0;">{{ cart.items.length }} producto{{ cart.items.length !== 1 ? 's' : '' }} · {{ totalUnits }} unidades</p>
+          <p style="font-size:12px;color:#5F6E84;margin:4px 0 0;">{{ cart.items.length }} producto{{ cart.items.length !== 1 ? 's' : '' }} · {{ totalUnits }} unidad{{ totalUnits !== 1 ? "es" : "" }}</p>
         </div>
-        <button @click="cart.clearCart()"
+        <button @click="vaciarCarrito"
           style="height:34px;padding:0 14px;border-radius:9px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.18);color:#EF4444;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
           <Trash2 :size="12" /> Vaciar todo
         </button>
@@ -238,7 +241,7 @@
 
       <!-- Tabla de productos -->
       <div style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);margin-bottom:16px;overflow:hidden;">
-        <div style="display:grid;grid-template-columns:1fr 100px 120px 110px 40px;gap:12px;padding:10px 20px;border-bottom:1px solid rgba(11,27,51,0.06);">
+        <div class="ct-row ct-row-head" style="display:grid;grid-template-columns:1fr 100px 120px 110px 40px;gap:12px;padding:10px 20px;border-bottom:1px solid rgba(11,27,51,0.06);">
           <span style="font-size:10px;font-weight:600;color:#5B6B82;text-transform:uppercase;letter-spacing:0.8px;">Producto</span>
           <span style="font-size:10px;font-weight:600;color:#5B6B82;text-transform:uppercase;letter-spacing:0.8px;text-align:center;">Precio u.</span>
           <span style="font-size:10px;font-weight:600;color:#5B6B82;text-transform:uppercase;letter-spacing:0.8px;text-align:center;">Cantidad</span>
@@ -248,7 +251,7 @@
 
         <div v-for="(item, idx) in cart.items" :key="item.product.id"
           :style="{ borderTop: idx > 0 ? '1px solid rgba(11,27,51,0.04)' : 'none' }">
-          <div style="display:grid;grid-template-columns:1fr 100px 120px 110px 40px;gap:12px;padding:14px 20px;align-items:center;">
+          <div class="ct-row" style="display:grid;grid-template-columns:1fr 100px 120px 110px 40px;gap:12px;padding:14px 20px;align-items:center;">
             <div style="display:flex;align-items:center;gap:12px;min-width:0;">
               <div style="width:46px;height:46px;flex-shrink:0;border-radius:10px;background:rgba(21,112,239,0.07);border:1px solid rgba(21,112,239,0.12);display:flex;align-items:center;justify-content:center;overflow:hidden;">
                 <img v-if="item.product?.images?.[0]" :src="item.product.images[0]" :alt="item.product.name"
@@ -258,34 +261,34 @@
               </div>
               <div style="min-width:0;">
                 <div style="font-size:13px;font-weight:600;color:#0B1B33;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ item.product?.name ?? '—' }}</div>
-                <div style="font-size:11px;color:#7A889C;margin-top:2px;display:flex;gap:6px;">
+                <div style="font-size:11px;color:#5F6E84;margin-top:2px;display:flex;gap:6px;">
                   <span>{{ item.product?.supplier ?? '' }}</span>
                   <span v-if="item.product?.sku" style="font-family:monospace;">{{ item.product.sku }}</span>
                   <span v-if="item.product?.garantia">· Garantía {{ item.product.garantia }}</span>
                 </div>
               </div>
             </div>
-            <div style="text-align:center;font-size:12px;font-weight:600;color:#5B6B82;">
+            <div class="ct-cell-price" style="text-align:center;font-size:12px;font-weight:600;color:#5B6B82;">
               {{ precioDe(item) > 0 ? fmt(precioDe(item)) : '—' }}
             </div>
-            <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
-              <button @click="cart.updateQuantity(item.product.id, item.quantity - 1)"
+            <div class="ct-cell-qty" style="display:flex;align-items:center;justify-content:center;gap:6px;">
+              <button @click="cart.updateQuantity(item.product.id, item.quantity - 1)" :aria-label="`Quitar una pieza de ${item.product?.name ?? 'producto'}`"
                 style="width:28px;height:28px;border-radius:7px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5B6B82;">
                 <Minus :size="10" :stroke-width="2.5" />
               </button>
               <div style="width:34px;height:28px;border-radius:7px;background:rgba(21,112,239,0.08);border:1px solid rgba(21,112,239,0.18);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#0B5BD3;">
                 {{ item.quantity }}
               </div>
-              <button @click="cart.updateQuantity(item.product.id, item.quantity + 1)"
+              <button @click="cart.updateQuantity(item.product.id, item.quantity + 1)" :aria-label="`Agregar una pieza de ${item.product?.name ?? 'producto'}`"
                 style="width:28px;height:28px;border-radius:7px;background:rgba(21,112,239,0.08);border:1px solid rgba(21,112,239,0.18);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#0B5BD3;">
                 <Plus :size="10" :stroke-width="2.5" />
               </button>
             </div>
-            <div style="text-align:right;font-size:14px;font-weight:700;color:#0B1B33;">
+            <div class="ct-cell-sub" style="text-align:right;font-size:14px;font-weight:700;color:#0B1B33;">
               {{ precioDe(item) > 0 ? fmt(precioDe(item) * item.quantity) : '—' }}
             </div>
-            <div style="display:flex;justify-content:center;">
-              <button @click="cart.removeItem(item.product.id)"
+            <div class="ct-cell-del" style="display:flex;justify-content:center;">
+              <button @click="cart.removeItem(item.product.id)" :aria-label="`Quitar ${item.product?.name ?? 'producto'} del carrito`"
                 style="width:28px;height:28px;border-radius:7px;background:transparent;border:1px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(91,107,130,0.35);transition:all 0.15s;"
                 @mouseenter="(e:any) => { e.currentTarget.style.background='rgba(239,68,68,0.08)'; e.currentTarget.style.borderColor='rgba(239,68,68,0.2)'; e.currentTarget.style.color='#EF4444' }"
                 @mouseleave="(e:any) => { e.currentTarget.style.background='transparent'; e.currentTarget.style.borderColor='transparent'; e.currentTarget.style.color='rgba(91,107,130,0.35)' }">
@@ -297,9 +300,9 @@
 
         <div style="border-top:1px solid rgba(11,27,51,0.04);padding:10px 20px;">
           <a href="/catalog"
-            style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#7A889C;font-weight:500;text-decoration:none;"
+            style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#5F6E84;font-weight:500;text-decoration:none;"
             @mouseenter="(e:any) => e.currentTarget.style.color='#0B5BD3'"
-            @mouseleave="(e:any) => e.currentTarget.style.color='#7A889C'">
+            @mouseleave="(e:any) => e.currentTarget.style.color='#5F6E84'">
             <Plus :size="12" /> Agregar más productos
           </a>
         </div>
@@ -312,7 +315,7 @@
         <div style="flex:1;min-width:280px;border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:20px;display:flex;flex-direction:column;gap:18px;">
           <div style="font-size:13px;font-weight:700;color:#0B1B33;">Detalles de la orden</div>
           <div>
-            <div style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Prioridad</div>
+            <div style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Prioridad</div>
             <div style="display:flex;gap:6px;">
               <button v-for="p in priorities" :key="p.key" @click="priority = p.key"
                 :style="{
@@ -320,7 +323,7 @@
                   fontWeight: priority === p.key ? 700 : 500, cursor:'pointer', fontFamily:'inherit',
                   border: `1px solid ${priority === p.key ? p.border : 'rgba(11,27,51,0.07)'}`,
                   background: priority === p.key ? p.bg : 'rgba(11,27,51,0.02)',
-                  color: priority === p.key ? p.color : '#7A889C',
+                  color: priority === p.key ? p.color : '#5F6E84',
                   transition:'all 0.15s'
                 }">{{ p.label }}</button>
             </div>
@@ -352,7 +355,7 @@
                 style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
                 <span style="font-size:12px;color:#5B6B82;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">
                   {{ (item.product?.name ?? '').slice(0, 28) }}{{ (item.product?.name ?? '').length > 28 ? '…' : '' }}
-                  <span style="color:#7A889C;"> ×{{ item.quantity }}</span>
+                  <span style="color:#5F6E84;"> ×{{ item.quantity }}</span>
                 </span>
                 <span style="font-size:12px;color:#5B6B82;font-weight:500;flex-shrink:0;">
                   {{ precioDe(item) > 0 ? fmt(precioDe(item) * item.quantity) : '—' }}
@@ -425,7 +428,7 @@
                   <div style="background:white;border-radius:6px;padding:3px 10px;display:flex;align-items:center;">
                     <img src="/openpay/openpay-logo.jpg" alt="Openpay by BBVA" style="height:18px;object-fit:contain;" />
                   </div>
-                  <span style="font-size:11px;color:#7A889C;">Pago seguro</span>
+                  <span style="font-size:11px;color:#5F6E84;">Pago seguro</span>
                 </div>
                 <!-- Logos de marcas de tarjeta oficiales -->
                 <div style="display:flex;align-items:center;gap:5px;">
@@ -463,7 +466,7 @@
                   cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center',
                   justifyContent:'center', gap:'8px', transition:'all 0.15s', border:'none',
                   background: payTab==='card' ? 'rgba(21,112,239,0.15)' : 'rgba(11,27,51,0.03)',
-                  color: payTab==='card' ? '#0B5BD3' : '#7A889C',
+                  color: payTab==='card' ? '#0B5BD3' : '#5F6E84',
                   outline: payTab==='card' ? '1.5px solid rgba(21,112,239,0.45)' : '1px solid rgba(11,27,51,0.08)',
                 }">
                 <CreditCard :size="14" /> Tarjeta
@@ -474,7 +477,7 @@
                   cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center',
                   justifyContent:'center', gap:'8px', transition:'all 0.15s', border:'none',
                   background: payTab==='spei' ? 'rgba(34,197,94,0.12)' : 'rgba(11,27,51,0.03)',
-                  color: payTab==='spei' ? '#16A34A' : '#7A889C',
+                  color: payTab==='spei' ? '#16A34A' : '#5F6E84',
                   outline: payTab==='spei' ? '1.5px solid rgba(34,197,94,0.35)' : '1px solid rgba(11,27,51,0.08)',
                 }">
                 <div style="background:white;border-radius:3px;padding:1px 4px;display:flex;align-items:center;">
@@ -488,14 +491,14 @@
           <!-- ── Tab: Tarjeta ── -->
           <div v-if="payTab === 'card'" style="padding:0 24px 24px;display:flex;flex-direction:column;gap:14px;">
             <div>
-              <label style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Nombre en la tarjeta</label>
+              <label style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Nombre en la tarjeta</label>
               <input v-model="card.holderName" type="text" placeholder="Como aparece en la tarjeta"
                 autocomplete="cc-name"
                 :style="inputStyle(cardFocus.holderName)"
                 @focus="cardFocus.holderName=true" @blur="cardFocus.holderName=false" />
             </div>
             <div>
-              <label style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Número de tarjeta</label>
+              <label style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Número de tarjeta</label>
               <div style="position:relative;">
                 <input v-model="card.number" type="text" placeholder="0000 0000 0000 0000"
                   autocomplete="cc-number" maxlength="19"
@@ -509,7 +512,7 @@
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div>
-                <label style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Vencimiento (MM/AA)</label>
+                <label style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">Vencimiento (MM/AA)</label>
                 <input v-model="card.expiry" type="text" placeholder="MM/AA"
                   autocomplete="cc-exp" maxlength="5"
                   @input="formatExpiry"
@@ -517,7 +520,7 @@
                   @focus="cardFocus.expiry=true" @blur="cardFocus.expiry=false" />
               </div>
               <div>
-                <label style="font-size:10px;font-weight:600;color:#7A889C;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">CVV</label>
+                <label style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:6px;">CVV</label>
                 <input v-model="card.cvv" type="password" placeholder="•••"
                   autocomplete="cc-csc" maxlength="4"
                   :style="inputStyle(cardFocus.cvv)"
@@ -624,7 +627,7 @@
 .ct-info-title { font-size:13px; font-weight:700; color:#0B1B33; }
 .ct-info-field { display:flex; flex-direction:column; gap:6px; font-size:12px; color:#5B6B82; }
 .ct-info-row { display:flex; justify-content:space-between; }
-.ct-info-row em { font-style:normal; font-size:10px; color:#7A889C; }
+.ct-info-row em { font-style:normal; font-size:10px; color:#5F6E84; }
 .ct-info-input { width:100%; height:40px; padding:0 12px; border-radius:10px; border:1px solid #D5DEEA; background:#fff; font-size:13px; color:#0B1B33; font-family:inherit; outline:none; box-sizing:border-box; transition:border-color .2s; }
 .ct-info-input:focus { border-color:rgba(21,112,239,0.5); }
 .ct-info-area { height:auto; padding:10px 12px; resize:vertical; line-height:1.5; }
@@ -634,8 +637,8 @@
 .ct-btn-primary { border:none; background:linear-gradient(135deg,#1570EF,#0B5BD3); color:#fff; box-shadow:0 4px 18px rgba(21,112,239,0.32); }
 .ct-btn-ghost { border:1px solid rgba(11,27,51,0.14); background:#fff; color:#0B1B33; }
 .ct-btn-ghost:hover:not(:disabled) { background:#F5F8FC; }
-.ct-note { font-size:11.5px; color:#7A889C; line-height:1.5; text-align:center; }
-.ct-sep { display:flex; align-items:center; gap:8px; margin:4px 0 -2px; font-size:11px; color:#7A889C; }
+.ct-note { font-size:11.5px; color:#5F6E84; line-height:1.5; text-align:center; }
+.ct-sep { display:flex; align-items:center; gap:8px; margin:4px 0 -2px; font-size:11px; color:#5F6E84; }
 .ct-sep::before, .ct-sep::after { content:''; flex:1; height:1px; background:rgba(11,27,51,0.1); }
 .ct-name { width:100%; height:40px; padding:0 12px; border-radius:10px; border:1px solid rgba(11,27,51,0.14); background:#F5F8FC; font-size:12.5px; color:#0B1B33; font-family:inherit; outline:none; box-sizing:border-box; }
 .ct-name:focus { border-color:#1570EF; background:#fff; }
@@ -645,13 +648,29 @@
 .ct-quote-folio { font-size:11px; font-weight:700; padding:1px 6px; border-radius:5px; background:#fff; color:#0B5BD3; font-family:ui-monospace,Menlo,monospace; }
 .ct-quote button { border:none; background:none; color:#5B6B82; font-size:12px; text-decoration:underline; cursor:pointer; font-family:inherit; }
 .ct-error { padding:9px 11px; border-radius:9px; background:#FEF2F2; color:#B91C1C; font-size:12.5px; }
+/* Celular: cada producto como tarjeta (nombre arriba; precio, cantidad y subtotal abajo) */
+@media (max-width: 640px) {
+  .ct-row-head { display: none !important; }
+  .ct-row { grid-template-columns: 1fr auto !important; grid-template-areas: "prod del" "price price" "qty sub" !important; gap: 10px !important; padding: 14px 16px !important; }
+  .ct-row > :first-child { grid-area: prod; }
+  .ct-cell-del { grid-area: del; align-self: start; }
+  .ct-cell-price { grid-area: price; text-align: left !important; }
+  .ct-cell-price::before { content: 'Precio unitario: '; font-weight: 500; color: #5F6E84; }
+  .ct-cell-qty { grid-area: qty; justify-content: flex-start !important; }
+  .ct-cell-sub { grid-area: sub; align-self: center; }
+  .ct-row > :first-child div[style*="white-space:nowrap"] { white-space: normal !important; }
+}
 </style>
 
 <script setup lang="ts">
 import { ShoppingCart, Package, Trash2, Plus, Minus, CreditCard, X, Lock, FileText } from '@lucide/vue'
 import { ENVIO_BASICO, type ShippingConfig } from '~/utils/orderTotals'
 
+const { confirmar } = useConfirmar()
+const montado = ref(false)
+onMounted(() => { montado.value = true })
 definePageMeta({ middleware: 'auth' })
+useHead({ title: 'Carrito — SIEEG' })
 
 const cart      = useCartStore()
 const notes     = ref('')
@@ -696,7 +715,8 @@ const priorities = [
 ]
 
 const activePri     = computed(() => priorities.find(p => p.key === priority.value)!)
-const priorityLabel = computed(() => ({ urgent:'Urgente — notificación inmediata', high:'Alta — procesamiento en 4h', normal:'Normal — procesamiento en 24h', low:'Baja — sin urgencia' }[priority.value] ?? ''))
+// Solo le indica la urgencia al vendedor: no hay tiempos garantizados
+const priorityLabel = computed(() => ({ urgent:'Urgente — lo atendemos primero', high:'Alta — le damos preferencia', normal:'Normal', low:'Baja — sin prisa' }[priority.value] ?? ''))
 // Envío: si la compra no llega al mínimo se cobra nuestro cargo (el servidor lo vuelve a calcular)
 const { data: shippingCfg } = useFetch<ShippingConfig>('/api/config/shipping', { default: () => ({ freeShippingMin: 1000, shippingFee: 200, basicShippingFee: ENVIO_BASICO }) })
 // ── Cliente (vendedor / admin) ──
@@ -748,7 +768,7 @@ const pedidoConfirmado = ref(false)
 const pagoEnLinea = computed(() => !!(config.public.openpayMerchantId && config.public.openpayPublicKey))
 
 async function confirmarPedido() {
-  if (!confirm(`¿Confirmar tu pedido por ${fmt(totales.value.total)}? Te contactaremos para el pago.`)) return
+  if (!await confirmar({ titulo: 'Confirmar pedido', mensaje: `Total: ${fmt(totales.value.total)} IVA incluido.\nTe contactaremos para el pago por transferencia y la entrega.`, aceptar: 'Confirmar pedido' })) return
   accion.value = 'confirmar'; accionError.value = ''
   try {
     await $fetch('/api/orders', {
@@ -781,7 +801,7 @@ async function guardarCotizacion() {
 }
 async function generarPedidoCliente() {
   if (!clienteSel.value) return
-  if (!confirm(`¿Generar el pedido a nombre de ${clienteSel.value.name}? Quedará pendiente de aprobación.`)) return
+  if (!await confirmar({ titulo: `Pedido para ${clienteSel.value.name}`, mensaje: `Total: ${fmt(totales.value.total)} IVA incluido.\nQuedará pendiente de aprobación.`, aceptar: 'Generar pedido' })) return
   accion.value = 'pedido'; accionError.value = ''
   try {
     await $fetch('/api/orders', {
@@ -799,6 +819,11 @@ async function generarPedidoCliente() {
 const subtotal      = computed(() => totales.value.subtotal)
 const iva           = computed(() => totales.value.iva)
 const totalUnits    = computed(() => cart.items.reduce((s, i) => s + i.quantity, 0))
+
+async function vaciarCarrito() {
+  if (!await confirmar({ titulo: '¿Vaciar el carrito?', mensaje: `Se quitarán ${cart.items.length} producto${cart.items.length !== 1 ? 's' : ''}.`, aceptar: 'Sí, vaciar', cancelar: 'No', peligro: true })) return
+  await cart.clearCart()
+}
 
 const speiPdfUrl = computed(() => {
   if (!speiResult.value?.transactionId) return ''

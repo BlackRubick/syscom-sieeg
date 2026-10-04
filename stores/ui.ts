@@ -12,37 +12,35 @@ interface AppNotification {
 
 export const useUIStore = defineStore('ui', {
   state: () => ({
-    sidebarCollapsed:   false,
-    mobileSidebarOpen:  false,
     notifications:      [] as AppNotification[],
     notifsLoaded:       false,
+    // El servidor cuenta todas las no leídas (la lista solo trae las últimas 50)
+    unreadTotal:        0,
   }),
   getters: {
-    unreadCount: (s) => s.notifications.filter(n => !n.read).length,
+    unreadCount: (s) => s.unreadTotal,
   },
   actions: {
-    toggleSidebar()      { this.sidebarCollapsed  = !this.sidebarCollapsed },
-    openMobileSidebar()  { this.mobileSidebarOpen = true },
-    closeMobileSidebar() { this.mobileSidebarOpen = false },
-
     async fetchNotifications() {
       try {
         const res = await $fetch<{ notifications: AppNotification[]; unreadCount: number }>(
           '/api/notifications',
         )
         this.notifications = res.notifications
+        this.unreadTotal   = res.unreadCount
         this.notifsLoaded  = true
       } catch { /* silencioso */ }
     },
 
     async markRead(id: string) {
       const n = this.notifications.find(n => n.id === id)
-      if (n) n.read = true
+      if (n && !n.read) { n.read = true; this.unreadTotal = Math.max(0, this.unreadTotal - 1) }
       try { await $fetch(`/api/notifications/${id}/read`, { method: 'POST' }) } catch { /* ok */ }
     },
 
     async markAllRead() {
       this.notifications.forEach(n => { n.read = true })
+      this.unreadTotal = 0
       try { await $fetch('/api/notifications/read-all', { method: 'POST' }) } catch { /* ok */ }
     },
   },

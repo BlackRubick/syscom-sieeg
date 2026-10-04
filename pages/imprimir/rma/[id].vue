@@ -37,7 +37,7 @@
             <div class="doc-label">Recibió</div>
             <div class="doc-party-name">{{ rma.atiende?.name ?? 'SIEEG Integradores' }}</div>
             <div v-if="rma.atiende?.email">{{ rma.atiende.email }}</div>
-            <div v-if="rma.orderId">Pedido #{{ rma.orderId.slice(-8).toUpperCase() }}</div>
+            <div v-if="rma.orderId">Pedido PED-{{ rma.orderId.slice(-8).toUpperCase() }}</div>
           </div>
         </section>
 

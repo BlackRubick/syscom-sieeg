@@ -227,7 +227,7 @@ const cargarMas = () => cargar(false)
 .pc-search { display:flex; align-items:center; gap:10px; margin-top:26px; max-width:620px; padding:6px 6px 6px 16px; border-radius:14px; background:rgba(11,27,51,0.04); border:1px solid rgba(11,27,51,0.12); color:var(--muted); transition:border-color .2s; }
 .pc-search:focus-within { border-color:rgba(21,112,239,0.5); background:rgba(21,112,239,0.05); }
 .pc-search input { flex:1; min-width:0; height:40px; background:none; border:none; outline:none; color:var(--text); font-size:14px; font-family:inherit; }
-.pc-search input::placeholder { color:#7A889C; }
+.pc-search input::placeholder { color:#5F6E84; }
 
 .pc-chips { display:flex; gap:8px; margin-top:18px; overflow-x:auto; padding-bottom:8px; scrollbar-width:thin; scrollbar-color:rgba(11,27,51,0.14) transparent; }
 .pc-chips::-webkit-scrollbar { height:6px; }

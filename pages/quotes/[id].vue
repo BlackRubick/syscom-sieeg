@@ -48,8 +48,9 @@
           <div class="qd-kv"><span>Vendedor</span><b>{{ quote.vendedor?.name ?? 'Compra directa' }}</b></div>
           <div v-if="quote.vendedor" class="qd-kv"><span>Correo</span><b>{{ quote.vendedor.email }}</b></div>
           <div class="qd-kv"><span>Precios</span><b>{{ quote.status === 'open' ? `Del día (${fechaCorta(hoy)})` : 'Al momento de cotizar' }}</b></div>
+          <div v-if="quote.status === 'open'" class="qd-kv"><span>Vigencia</span><b :style="{ color: cotizacionVencida(quote.createdAt) ? '#B91C1C' : undefined }">{{ cotizacionVencida(quote.createdAt) ? `Venció el ${venceCotizacion(quote.createdAt)}` : `Hasta el ${venceCotizacion(quote.createdAt)}` }}</b></div>
           <div v-if="quote.purchaseOrder" class="qd-kv"><span>Orden de compra</span><b>{{ quote.purchaseOrder }}</b></div>
-          <div v-if="quote.orderId" class="qd-kv no-print"><span>Pedido</span><b><NuxtLink :to="`/orders?pedido=${quote.orderId}`">#{{ quote.orderId.slice(-8).toUpperCase() }}</NuxtLink></b></div>
+          <div v-if="quote.orderId" class="qd-kv no-print"><span>Pedido</span><b><NuxtLink :to="`/orders?pedido=${quote.orderId}`">PED-{{ quote.orderId.slice(-8).toUpperCase() }}</NuxtLink></b></div>
         </section>
       </div>
 
@@ -132,6 +133,7 @@
 import { ArrowLeft, CheckCircle, Download, ShoppingCart, UserCheck, Mail } from '@lucide/vue'
 import type { OrderItem, Product } from '~/types'
 
+const { confirmar } = useConfirmar()
 definePageMeta({ middleware: 'auth' })
 
 interface ItemPrecio extends OrderItem { disponible: boolean }
@@ -183,7 +185,7 @@ async function convertir() {
   const msg = esCliente.value
     ? `¿Aceptar la cotización ${quote.value.folio} y generar el pedido por ${fmt(total.value)}?`
     : `¿Convertir la cotización ${quote.value.folio} en pedido para ${quote.value.cliente.name} por ${fmt(total.value)}?`
-  if (!confirm(msg)) return
+  if (!await confirmar({ titulo: esCliente.value ? 'Aceptar cotización' : 'Convertir en pedido', mensaje: msg, aceptar: esCliente.value ? 'Sí, generar pedido' : 'Sí, convertir' })) return
   accion.value = 'convertir'; accionError.value = ''
   try {
     await $fetch(`/api/quotes/${quote.value.id}/convert`, { method: 'POST', body: {} })
@@ -194,7 +196,7 @@ async function convertir() {
 }
 
 async function cancelar() {
-  if (!quote.value || !confirm(`¿Cancelar la cotización ${quote.value.folio}?`)) return
+  if (!quote.value || !await confirmar({ titulo: `¿Cancelar la cotización ${quote.value.folio}?`, aceptar: 'Sí, cancelar', cancelar: 'No', peligro: true })) return
   accion.value = 'cancelar'; accionError.value = ''
   try {
     const r = await $fetch<{ quote: Quote }>(`/api/quotes/${quote.value.id}`, { method: 'PATCH', body: { status: 'cancelled' } })
@@ -207,7 +209,7 @@ async function cancelar() {
 // Carga los productos al carrito (y el cliente, si es vendedor/admin) para editar y guardar de nuevo
 async function alCarrito() {
   if (!quote.value) return
-  if (cart.items.length && !confirm('Tu carrito tiene productos. ¿Reemplazarlos por los de esta cotización?')) return
+  if (cart.items.length && !await confirmar({ titulo: 'Tu carrito tiene productos', mensaje: '¿Reemplazarlos por los de esta cotización?', aceptar: 'Sí, reemplazar' })) return
   await cart.clearCart()
   for (const it of filas.value) {
     const producto: Product = {
@@ -328,7 +330,7 @@ useHead(() => ({ title: quote.value ? `${quote.value.name ?? `Cotización ${quot
 .qd-items td { padding: 12px 18px; border-bottom: 1px solid #EEF1F6; vertical-align: middle; }
 .qd-items .c { text-align: center; }
 .qd-items .r { text-align: right; white-space: nowrap; }
-.qd-items tr.off td { color: #7A889C; }
+.qd-items tr.off td { color: #5F6E84; }
 .qd-prod { display: flex; align-items: center; gap: 12px; }
 .qd-prod img { width: 44px; height: 44px; object-fit: contain; border-radius: 8px; border: 1px solid #EEF1F6; background: #fff; flex-shrink: 0; }
 .qd-prod-name { font-weight: 600; line-height: 1.35; }
@@ -342,7 +344,7 @@ useHead(() => ({ title: quote.value ? `${quote.value.name ?? `Cotización ${quot
 .qd-note { font-size: 11.5px; color: #B45309; }
 .qd-warn { padding: 8px 10px; border-radius: 8px; background: #FEF2F2; color: #B91C1C; font-size: 12px; }
 .qd-notes { margin: 0; font-size: 13.5px; line-height: 1.6; white-space: pre-line; }
-.qd-legal { margin: 0; font-size: 11.5px; color: #7A889C; text-align: center; }
+.qd-legal { margin: 0; font-size: 11.5px; color: #5F6E84; text-align: center; }
 
 .qd-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
 .qd-btn { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 11px; font-size: 13.5px; font-weight: 700; font-family: inherit; cursor: pointer; }
@@ -360,7 +362,7 @@ useHead(() => ({ title: quote.value ? `${quote.value.name ?? `Cotización ${quot
 .qd-mail-sug { display: flex; gap: 6px; flex-wrap: wrap; }
 .qd-mail-sug button { font-size: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid #D5DEEA; background: #fff; color: #5B6B82; cursor: pointer; font-family: inherit; }
 .qd-mail-sug button.on { border-color: #1570EF; color: #0B5BD3; background: #EAF2FF; }
-.qd-mail-note { margin: 0; font-size: 12px; color: #7A889C; line-height: 1.5; }
+.qd-mail-note { margin: 0; font-size: 12px; color: #5F6E84; line-height: 1.5; }
 .qd-ok { padding: 10px 12px; border-radius: 10px; background: #ECFDF3; color: #15803D; font-size: 13px; }
 .qd-error { width: 100%; padding: 10px 12px; border-radius: 10px; background: #FEF2F2; color: #B91C1C; font-size: 13px; }
 
