@@ -6,6 +6,17 @@ import { ORDER_INCLUDE, serializeOrder } from '~/server/utils/orderDto'
 const ALLOWED = ['approved', 'rejected', 'cancelled', 'processing', 'shipped', 'delivered'] as const
 type AllowedStatus = typeof ALLOWED[number]
 
+// Cambios de estado permitidos (p. ej. un pedido rechazado o entregado ya no se puede aprobar)
+const TRANSICIONES: Record<string, AllowedStatus[]> = {
+  pending:    ['approved', 'rejected', 'cancelled'],
+  approved:   ['processing', 'shipped', 'delivered', 'cancelled'],
+  processing: ['shipped', 'delivered', 'cancelled'],
+  shipped:    ['delivered'],
+}
+const ESTADO_TEXTO: Record<string, string> = {
+  pending: 'pendiente', approved: 'aprobado', rejected: 'rechazado', cancelled: 'cancelado', processing: 'en proceso', shipped: 'enviado', delivered: 'entregado',
+}
+
 export default defineEventHandler(async (event) => {
   const session   = requireSession(event)
   const isManager = session.role === 'admin' || session.role === 'approver'
@@ -13,7 +24,8 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
   if (!id) throw createError({ statusCode: 400, message: 'ID requerido' })
 
-  const body = await readBody<{ status: AllowedStatus }>(event)
+  const body = await readBody<{ status: AllowedStatus; motivo?: string }>(event)
+  const motivo = typeof body.motivo === 'string' && body.motivo.trim() ? body.motivo.trim().slice(0, 300) : null
   if (!ALLOWED.includes(body.status)) {
     throw createError({ statusCode: 400, message: 'Estado inválido' })
   }
@@ -33,9 +45,14 @@ export default defineEventHandler(async (event) => {
     if (body.status !== 'cancelled') {
       throw createError({ statusCode: 403, message: 'Solo puedes cancelar tus propios pedidos' })
     }
-    if (!['pending', 'approved'].includes(existing.status)) {
-      throw createError({ statusCode: 400, message: `No se puede cancelar un pedido en estado "${existing.status}"` })
+    // Ya aprobado = ya se compró a SYSCOM: solo administración puede cancelarlo (y gestionar la devolución)
+    if (existing.status !== 'pending') {
+      throw createError({ statusCode: 400, message: 'El pedido ya fue aprobado y comprado; para cancelarlo comunícate con SIEEG.' })
     }
+  }
+
+  if (!TRANSICIONES[existing.status]?.includes(body.status)) {
+    throw createError({ statusCode: 400, message: `Un pedido ${ESTADO_TEXTO[existing.status] ?? existing.status} no puede pasar a ${ESTADO_TEXTO[body.status]}` })
   }
 
   let syscomError: string | undefined
@@ -56,6 +73,7 @@ export default defineEventHandler(async (event) => {
     by:      session.userId,
     byName:  session.name,
     at:      new Date().toISOString(),
+    ...(motivo ? { note: `Motivo: ${motivo}` } : {}),
   }
   const newLog = [...((existing.auditLog ?? []) as unknown[]), auditEntry]
 
@@ -70,9 +88,10 @@ export default defineEventHandler(async (event) => {
       rejected:  '❌ Pedido rechazado',
       cancelled: '🚫 Pedido cancelado',
     }
+    const monto = updated.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })
     const messages: Record<string, string> = {
-      rejected:  `Tu pedido por ${updated.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} IVA incl. fue rechazado.`,
-      cancelled: `Tu pedido por ${updated.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} IVA incl. fue cancelado.`,
+      rejected:  `Tu pedido por ${monto} IVA incl. fue rechazado.${motivo ? ` Motivo: ${motivo}` : ''}`,
+      cancelled: `Tu pedido por ${monto} IVA incl. fue cancelado.${motivo ? ` Motivo: ${motivo}` : ''}${existing.paymentStatus === 'paid' ? ' Te contactaremos para el reembolso.' : ''}`,
     }
     await prisma.notification.create({
       data: {

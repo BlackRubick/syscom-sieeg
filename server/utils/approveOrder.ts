@@ -6,6 +6,7 @@ import { trackingInicial } from '~/server/utils/syscomTracking'
 import { actualizarPreciosPendiente } from '~/server/utils/actualizarPrecios'
 
 const RFC_RE = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i
+const ESTADO_TEXTO: Record<string, string> = { rejected: 'rechazado', cancelled: 'cancelado', processing: 'en proceso', shipped: 'enviado', delivered: 'entregado' }
 
 export async function approveOrder(
   orderId: string,
@@ -16,14 +17,25 @@ export async function approveOrder(
     where:   { id: orderId },
     include: { user: { select: { id: true, name: true, email: true } } },
   })
-  if (!existing) throw new Error(`Orden ${orderId} no encontrada`)
+  if (!existing) throw createError({ statusCode: 404, message: 'Pedido no encontrado' })
   if (existing.status === 'approved') {
     const order = await prisma.order.findUniqueOrThrow({ where: { id: orderId }, include: ORDER_INCLUDE })
     return { order, syscomError: undefined }
   }
+  // Solo un pedido pendiente se aprueba: uno cancelado o rechazado no debe llegar a SYSCOM
+  if (existing.status !== 'pending') {
+    throw createError({ statusCode: 400, message: `No se puede aprobar un pedido ${ESTADO_TEXTO[existing.status] ?? existing.status}` })
+  }
   // Aún sin pagar: se aprueba con el precio del día (si SYSCOM subió el precio, se cobra el nuevo)
   if (await actualizarPreciosPendiente(orderId).catch(() => false)) {
     Object.assign(existing, await prisma.order.findUniqueOrThrow({ where: { id: orderId }, select: { items: true, total: true, shippingFee: true, auditLog: true } }))
+  }
+
+  // Se "aparta" el pedido de forma atómica: si dos personas aprueban a la vez, solo una lo manda a SYSCOM
+  const apartado = await prisma.order.updateMany({ where: { id: orderId, status: 'pending' }, data: { status: 'approved' } })
+  if (!apartado.count) {
+    const order = await prisma.order.findUniqueOrThrow({ where: { id: orderId }, include: ORDER_INCLUDE })
+    return { order, syscomError: order.status === 'approved' ? 'Otra persona ya lo estaba aprobando; revisa el folio SYSCOM.' : undefined }
   }
 
   const user = await prisma.user.findUnique({

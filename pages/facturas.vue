@@ -47,7 +47,11 @@
     <template v-if="tab==='orders'">
 
       <!-- KPIs pedidos -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+      <div v-if="ordersError" role="alert" style="display:flex;justify-content:space-between;gap:10px;margin-bottom:14px;padding:10px 14px;border-radius:10px;background:#FEF2F2;border:1px solid rgba(239,68,68,0.25);color:#B91C1C;font-size:13px;">
+        <span>{{ ordersError }}</span>
+        <button type="button" aria-label="Cerrar" style="border:none;background:none;color:#B91C1C;cursor:pointer;font-size:16px;" @click="ordersError = ''">×</button>
+      </div>
+      <div class="fa-kpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
         <div v-for="k in orderKpis" :key="k.label" style="border-radius:14px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:16px 18px;">
           <div :style="{ fontSize:'24px', fontWeight:800, background:k.grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', lineHeight:1 }">
             {{ loadingOrders ? '—' : k.value }}
@@ -322,6 +326,7 @@ interface BillingOrder {
 
 const orders       = ref<BillingOrder[]>([])
 const loadingOrders = ref(true)
+const ordersError   = ref('')
 const orderSearch  = ref('')
 const orderSearchFocus = ref(false)
 const orderFilter  = ref('all')
@@ -329,6 +334,7 @@ const orderFilter  = ref('all')
 const orderFilters = [
   { key: 'all',     label: 'Todos' },
   { key: 'ready',   label: 'Listos para facturar' },
+  { key: 'blocked', label: 'No facturables' },
   { key: 'no_data', label: 'Sin datos fiscales' },
   { key: 'no_sync', label: 'Sin sincronizar' },
 ]
@@ -337,16 +343,22 @@ onMounted(async () => {
   try {
     const data = await $fetch<{ orders: BillingOrder[] }>('/api/factura/orders')
     orders.value = data.orders
-  } catch { /**/ } finally {
+  } catch (e: unknown) {
+    ordersError.value = (e as { data?: { message?: string } })?.data?.message ?? 'No se pudieron cargar los pedidos'
+  } finally {
     loadingOrders.value = false
   }
 })
 
+// Solo pedidos aprobados (ya comprados) se facturan; pendientes, cancelados y rechazados no
+const FACTURABLES = ['approved', 'processing', 'shipped', 'delivered']
+const ESTADO_PEDIDO: Record<string, string> = { pending: 'Pendiente', rejected: 'Rechazado', cancelled: 'Cancelado' }
 function canBill(o: BillingOrder) {
-  return !o.cfdiUid && !!(o.userFacturaUid && o.userFiscalCompleted && o.userFiscalUsocfdi)
+  return !o.cfdiUid && FACTURABLES.includes(o.status) && !!(o.userFacturaUid && o.userFiscalCompleted && o.userFiscalUsocfdi)
 }
 function billBlockReason(o: BillingOrder) {
   if (o.cfdiUid)              return 'CFDI emitido'
+  if (!FACTURABLES.includes(o.status)) return `Pedido ${ESTADO_PEDIDO[o.status]?.toLowerCase() ?? o.status}`
   if (!o.userFiscalCompleted) return 'Sin datos fiscales'
   if (!o.userFacturaUid)      return 'Sin sincronizar'
   if (!o.userFiscalUsocfdi)   return 'Sin uso CFDI'
@@ -354,12 +366,14 @@ function billBlockReason(o: BillingOrder) {
 }
 function billBadgeLabel(o: BillingOrder) {
   if (o.cfdiUid)             return 'Facturado'
+  if (!FACTURABLES.includes(o.status)) return ESTADO_PEDIDO[o.status] ?? o.status
   if (canBill(o))            return 'Listo'
   if (o.userFiscalCompleted) return 'Sin sincronizar'
   return 'Sin datos'
 }
 function billBadgeStyle(o: BillingOrder) {
-  if (o.cfdiUid) return { fontSize:'10px', fontWeight:600, padding:'2px 8px', borderRadius:'20px', background:'rgba(99,102,241,0.1)', color:'#F59E0B' }
+  if (o.cfdiUid) return { fontSize:'10px', fontWeight:600, padding:'2px 8px', borderRadius:'20px', background:'rgba(99,102,241,0.12)', color:'#4F46E5' }
+  if (!FACTURABLES.includes(o.status)) return { fontSize:'10px', fontWeight:600, padding:'2px 8px', borderRadius:'20px', background:'rgba(239,68,68,0.08)', color:'#B91C1C' }
   const ready   = canBill(o)
   const partial = !ready && o.userFiscalCompleted
   return {
@@ -381,6 +395,7 @@ const orderKpis = computed(() => [
 const filteredOrders = computed(() => {
   let list = orders.value
   if (orderFilter.value === 'ready')   list = list.filter(canBill)
+  if (orderFilter.value === 'blocked') list = list.filter(o => !FACTURABLES.includes(o.status))
   if (orderFilter.value === 'no_data') list = list.filter(o => !o.userFiscalCompleted)
   if (orderFilter.value === 'no_sync') list = list.filter(o => o.userFiscalCompleted && !o.userFacturaUid)
   const q = orderSearch.value.toLowerCase()
@@ -406,7 +421,9 @@ async function syncUser(o: BillingOrder) {
     orders.value = orders.value.map(order =>
       order.userId === o.userId ? { ...order, userFacturaUid: res.facturaUid } : order
     )
-  } catch { /**/ } finally {
+  } catch (e: unknown) {
+    ordersError.value = `No se pudo sincronizar a ${o.userName}: ${(e as { data?: { message?: string } })?.data?.message ?? 'error de Factura.com'}`
+  } finally {
     syncing.value = null
   }
 }

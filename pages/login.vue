@@ -86,6 +86,9 @@
             </div>
           </button>
         </form>
+        <div style="text-align:center;margin-top:16px;">
+          <NuxtLink to="/restablecer" style="font-size:13px;font-weight:600;color:#0B5BD3;text-decoration:none;">¿Olvidaste tu contraseña?</NuxtLink>
+        </div>
 
         <!-- Footer -->
         <div style="margin-top:28px;padding-top:20px;border-top:1px solid rgba(11,27,51,0.07);display:flex;justify-content:center;gap:20px;">
@@ -134,7 +137,8 @@ async function handleLogin() {
       body: { email: email.value, password: password.value },
     })
     auth.setUser(data.user as never)
-    router.push(volver.value)
+    // Carga completa: no se arrastra nada (carrito, precios en caché, cliente elegido) de una sesión anterior
+    window.location.href = volver.value
   } catch (e: unknown) {
     const msg = (e as { data?: { message?: string } })?.data?.message
     error.value = msg ?? 'Error al iniciar sesión'

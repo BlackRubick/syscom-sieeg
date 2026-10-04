@@ -406,7 +406,7 @@
             </section>
 
             <!-- Cancelar -->
-            <section v-if="(detail.status==='pending' || detail.status==='approved') && (isManager || detail.userId === auth.user?.id || detail.vendedor?.id === auth.user?.id)" class="od-cancel">
+            <section v-if="(isManager ? ['pending','approved','processing'].includes(detail.status) : detail.status === 'pending' && (detail.userId === auth.user?.id || detail.vendedor?.id === auth.user?.id))" class="od-cancel">
               <p v-if="detail.syscomFolio && isManager" class="od-muted" style="margin:0 0 8px;">Cancelar aquí <b>no</b> cancela el pedido en SYSCOM ({{ detail.syscomFolio }}); cancélalo también con tu ejecutivo.</p>
               <button class="od-btn od-btn-ghost" :disabled="cancelling" @click="cancelOrder(detail)">{{ cancelling ? 'Cancelando…' : 'Cancelar pedido' }}</button>
             </section>

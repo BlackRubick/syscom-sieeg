@@ -17,6 +17,8 @@ export default defineEventHandler(async (event) => {
   const clientes = await prisma.user.findMany({
     where: {
       status: { not: 'inactive' },
+      // Solo clientes: el personal (admin, vendedores, aprobadores, visores) no se elige como cliente
+      role: 'buyer',
       ...(search ? {
         OR: [
           ...(cl ? [{ clientNumber: cl }] : []),

@@ -43,8 +43,12 @@ export default defineEventHandler(async (event) => {
   if (body.orderId) {
     const existingOrder = await prisma.order.findUnique({
       where:  { id: body.orderId },
-      select: { cfdiUid: true },
+      select: { cfdiUid: true, status: true, userId: true },
     })
+    if (!existingOrder || existingOrder.userId !== userId) throw createError({ statusCode: 400, message: 'El pedido no es de este cliente' })
+    if (!['approved', 'processing', 'shipped', 'delivered'].includes(existingOrder.status)) {
+      throw createError({ statusCode: 400, message: 'Solo se facturan pedidos aprobados (no pendientes, cancelados ni rechazados)' })
+    }
     if (existingOrder?.cfdiUid) {
       throw createError({ statusCode: 409, message: 'Este pedido ya tiene un CFDI generado. Actualiza la página.' })
     }

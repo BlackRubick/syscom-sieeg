@@ -39,8 +39,9 @@ export default defineEventHandler(async (event) => {
         data:  { paymentStatus: 'paid' },
       })
     }
-    if (order.status !== 'approved') {
-      await approveOrder(order.id)
+    // Un pago que llega tarde a un pedido cancelado no lo revive: queda pagado para reembolsar
+    if (order.status === 'pending') {
+      await approveOrder(order.id).catch(() => { /* queda pagado y pendiente; se aprueba a mano */ })
     }
   } else if (
     (body.type === 'charge.failed' || body.type === 'charge.cancelled') &&

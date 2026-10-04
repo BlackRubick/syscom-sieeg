@@ -420,15 +420,15 @@ const domicilioFields = [
   { key: 'numeroExterior', label: 'Número exterior',       placeholder: '123' },
   { key: 'numeroInterior', label: 'Número interior',       placeholder: 'A' },
   { key: 'colonia',        label: 'Colonia',               placeholder: 'Centro' },
-  { key: 'ciudad',         label: 'Ciudad',                placeholder: 'Chihuahua' },
+  { key: 'ciudad',         label: 'Ciudad',                placeholder: 'Tuxtla Gutiérrez' },
   { key: 'delegacion',     label: 'Delegación / Municipio',placeholder: 'Municipio' },
   { key: 'localidad',      label: 'Localidad',             placeholder: 'Localidad' },
-  { key: 'estado',         label: 'Estado',                placeholder: 'CHIH' },
+  { key: 'estado',         label: 'Estado',                placeholder: 'Chiapas' },
 ]
 const contactoFields = [
   { key: 'nombre',       label: 'Nombre',                  placeholder: 'Juan' },
   { key: 'apellidos',    label: 'Apellidos',               placeholder: 'Pérez García' },
-  { key: 'telefono',     label: 'Teléfono',                placeholder: '6141234567' },
+  { key: 'telefono',     label: 'Teléfono',                placeholder: '9611234567' },
   { key: 'numregidtrib', label: 'Núm. Reg. ID Tributario', placeholder: '' },
 ]
 
@@ -464,7 +464,7 @@ async function saveEdit() {
   editSaving.value = true
   editError.value  = ''
   try {
-    const res = await $fetch<{ user: FiscalUser }>(`/api/users/${detail.value.id}/fiscal`, {
+    const res = await $fetch<{ user: FiscalUser; facturaError?: string }>(`/api/users/${detail.value.id}/fiscal`, {
       method: 'PATCH',
       body:   editForm.value,
     })
@@ -472,6 +472,8 @@ async function saveEdit() {
     if (idx >= 0) users.value[idx] = res.user
     detail.value  = res.user
     editing.value = false
+    // Se guardó; solo avisar si Factura.com no lo pudo registrar
+    syncError.value = res.facturaError ? `Datos guardados, pero Factura.com respondió: ${res.facturaError}` : ''
   } catch (e: unknown) {
     editError.value = (e as { data?: { message?: string } })?.data?.message ?? 'Error al guardar'
   } finally {

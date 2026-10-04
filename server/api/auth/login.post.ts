@@ -1,7 +1,7 @@
 import { createHash } from 'crypto'
 import bcrypt from 'bcryptjs'
 import prisma from '~/server/utils/prisma'
-import { createToken, SESSION_COOKIE, SESSION_COOKIE_OPTS } from '~/server/utils/session'
+import { createToken, passwordVersion, SESSION_COOKIE, SESSION_COOKIE_OPTS } from '~/server/utils/session'
 
 // #4 — Rate limiting en memoria (por IP)
 interface RateBucket { count: number; resetAt: number }
@@ -91,6 +91,7 @@ export default defineEventHandler(async (event) => {
     role:   user.role,
     name:   user.name,
     email:  user.email,
+    pv:     passwordVersion(needsRehash ? (await prisma.user.findUniqueOrThrow({ where: { id: user.id }, select: { password: true } })).password : user.password),
   })
 
   setCookie(event, SESSION_COOKIE, token, SESSION_COOKIE_OPTS)

@@ -1,6 +1,11 @@
 <template>
   <div :style="{ fontFamily:`'Inter',system-ui,sans-serif` }">
 
+    <div v-if="avisoOk" role="status" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;padding:10px 14px;border-radius:10px;background:#ECFDF3;border:1px solid rgba(22,163,74,0.25);color:#15803D;font-size:13px;">
+      <span>{{ avisoOk }}</span>
+      <button type="button" aria-label="Cerrar aviso" style="border:none;background:none;color:#15803D;cursor:pointer;font-size:16px;" @click="avisoOk = ''">×</button>
+    </div>
+
     <!-- Header -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div>
@@ -147,6 +152,13 @@
                 <div style="grid-column:1/-1;"><FormField label="Nombre completo" v-model="form.name" placeholder="Juan Pérez García" :required="true" /></div>
                 <div style="grid-column:1/-1;"><FormField label="Correo electrónico" type="email" v-model="form.email" placeholder="juan@empresa.com" :required="true" /></div>
                 <div v-if="modal==='create'" style="grid-column:1/-1;"><FormField label="Contraseña" type="password" v-model="form.password" placeholder="Mínimo 8 caracteres" :required="true" /></div>
+                <div v-else style="grid-column:1/-1;">
+                  <FormField label="Nueva contraseña (opcional)" type="password" v-model="form.password" placeholder="Déjala vacía para no cambiarla" />
+                  <div style="font-size:11px;color:#5F6E84;margin-top:5px;">Si la cambias, se cierran sus sesiones abiertas.</div>
+                </div>
+                <div v-if="modal==='edit' && editTarget?.status === 'pending' && form.status === 'active' && !form.password" style="grid-column:1/-1;padding:9px 12px;border-radius:9px;background:#EAF2FF;color:#0B5BD3;font-size:12px;line-height:1.5;">
+                  Al activarlo le llega un correo a <b>{{ form.email }}</b> para que cree su contraseña (la liga vale 72 horas). Si prefieres, escribe tú una contraseña y compártesela.
+                </div>
                 <FormSelect label="Rol" v-model="form.role" :options="ROLES.map(r=>({value:r,label:roleCfg[r].label}))" />
                 <FormSelect label="Estado" v-model="form.status" :options="STATUSES.map(s=>({value:s,label:statusCfg[s].label}))" />
                 <div style="grid-column:1/-1;">
@@ -204,13 +216,17 @@
           </div>
           <div style="font-size:16px;font-weight:700;color:#0B1B33;">¿Eliminar a {{ deleteTarget?.name.split(' ')[0] }}?</div>
           <div style="font-size:13px;color:#5B6B82;line-height:1.5;">
-            Se eliminará <strong style="color:#5B6B82;">{{ deleteTarget?.name }}</strong> del sistema.<br>Esta acción no se puede deshacer.
+            Se eliminará <strong style="color:#5B6B82;">{{ deleteTarget?.name }}</strong> del sistema.<br>Esta acción no se puede deshacer. Si tiene pedidos, cotizaciones o garantías no se puede eliminar: desactívalo.
           </div>
           <div v-if="isSelf" style="padding:9px 12px;border-radius:8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);font-size:12px;color:#B45309;width:100%;box-sizing:border-box;">
             No puedes eliminar tu propia cuenta.
           </div>
           <div v-else-if="deleteError" style="padding:9px 12px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);font-size:12px;color:#EF4444;width:100%;box-sizing:border-box;">
             {{ deleteError }}
+            <button v-if="puedeDesactivar" type="button" :disabled="deleting" @click="desactivarEnLugar"
+              style="display:block;margin-top:8px;height:32px;padding:0 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.35);background:#fff;color:#B91C1C;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">
+              Desactivar en su lugar
+            </button>
           </div>
           <div style="display:flex;gap:10px;margin-top:10px;width:100%;">
             <button @click="closeDeleteModal()" :disabled="deleting" style="flex:1;height:40px;border-radius:10px;border:1px solid rgba(11,27,51,0.12);background:rgba(11,27,51,0.05);color:#5B6B82;font-size:13px;cursor:pointer;font-family:inherit;">Cancelar</button>
@@ -303,6 +319,7 @@ const editTarget = ref<User|null>(null)
 const form       = ref<Form>({ name:'', email:'', password:'', role:'buyer', status:'active', discountPct:0 })
 const saving     = ref(false)
 const formError  = ref('')
+const avisoOk    = ref('')
 
 function openCreate() {
   form.value = { name:'', email:'', password:'', role:'buyer', status:'active', discountPct:0 }
@@ -327,9 +344,16 @@ async function handleSave() {
       const data = await $fetch<{ user:User }>('/api/users', { method:'POST', body })
       users.value.push(data.user)
     } else {
-      const data = await $fetch<{ user:User }>(`/api/users/${editTarget.value!.id}`, { method:'PATCH', body })
+      if (form.value.password) {
+        if (form.value.password.length < 8) { formError.value = 'La contraseña debe tener al menos 8 caracteres'; saving.value=false; return }
+        body.password = form.value.password
+      }
+      const data = await $fetch<{ user:User; bienvenida?: 'enviada' | 'fallo' | null }>(`/api/users/${editTarget.value!.id}`, { method:'PATCH', body })
       const idx  = users.value.findIndex(u => u.id === data.user.id)
       if (idx >= 0) users.value[idx] = data.user
+      avisoOk.value = data.bienvenida === 'enviada' ? `Cuenta activada. Le enviamos a ${data.user.email} la liga para crear su contraseña.`
+        : data.bienvenida === 'fallo' ? `Cuenta activada, pero no se pudo enviar el correo. Edítalo y asígnale una contraseña.`
+        : body.password ? `Contraseña de ${data.user.name.split(' ')[0]} actualizada.` : ''
     }
     modal.value = null
   } catch (e: unknown) {
@@ -352,18 +376,36 @@ const isSelf          = computed(() => !!confirmDeleteId.value && confirmDeleteI
 
 function closeDeleteModal() {
   confirmDeleteId.value = null
+  puedeDesactivar.value = false
   deleteError.value = ''
 }
 
 async function handleDelete() {
   if (!confirmDeleteId.value || isSelf.value) return
-  deleting.value = true; deleteError.value = ''
+  deleting.value = true; deleteError.value = ''; puedeDesactivar.value = false
   try {
     await $fetch(`/api/users/${confirmDeleteId.value}`, { method:'DELETE' })
     users.value = users.value.filter(u => u.id !== confirmDeleteId.value)
     closeDeleteModal()
   } catch (e: unknown) {
-    deleteError.value = (e as { data?: { message?: string } })?.data?.message ?? 'No se pudo eliminar el usuario'
+    const err = e as { statusCode?: number; data?: { message?: string } }
+    deleteError.value = err?.data?.message ?? 'No se pudo eliminar el usuario'
+    // Tiene historial: se ofrece desactivarlo (ya no entra y se conserva todo)
+    puedeDesactivar.value = err?.statusCode === 409 && deleteTarget.value?.status !== 'inactive'
+  } finally { deleting.value = false }
+}
+
+const puedeDesactivar = ref(false)
+async function desactivarEnLugar() {
+  if (!confirmDeleteId.value) return
+  deleting.value = true
+  try {
+    const data = await $fetch<{ user: User }>(`/api/users/${confirmDeleteId.value}`, { method: 'PATCH', body: { status: 'inactive' } })
+    const idx = users.value.findIndex(u => u.id === data.user.id)
+    if (idx >= 0) users.value[idx] = data.user
+    closeDeleteModal()
+  } catch (e: unknown) {
+    deleteError.value = (e as { data?: { message?: string } })?.data?.message ?? 'No se pudo desactivar'
   } finally { deleting.value = false }
 }
 </script>

@@ -7,6 +7,8 @@ export default defineEventHandler(async (event) => {
 
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: 'desc' },
+    // Los más recientes; con más volumen conviene paginar
+    take: 1000,
     include: {
       user: {
         select: {
@@ -36,6 +38,7 @@ export default defineEventHandler(async (event) => {
       userFiscalUsocfdi:     o.user.fiscalUsocfdi,
       userFiscalRegimen:     o.user.fiscalRegimen,
       status:                o.status,
+      paymentStatus:         o.paymentStatus,
       items:                 o.items,
       total:                 o.total,
       shippingFee:           o.shippingFee,

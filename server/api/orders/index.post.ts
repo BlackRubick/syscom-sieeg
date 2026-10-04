@@ -20,12 +20,15 @@ export default defineEventHandler(async (event) => {
     quoteId?:  string
   }>(event)
 
-  if (!body.items?.length) {
+  if (!Array.isArray(body.items) || !body.items.length) {
     throw createError({ statusCode: 400, message: 'El carrito está vacío' })
   }
+  // Cada producto se valida contra SYSCOM: se limita para que un pedido no dispare cientos de consultas
+  if (body.items.length > 100) throw createError({ statusCode: 400, message: 'Máximo 100 productos por pedido' })
   for (const item of body.items) {
     if (!item.productId || !item.name) throw createError({ statusCode: 400, message: 'Ítem inválido en el carrito' })
-    if (!item.quantity  || item.quantity  <= 0) throw createError({ statusCode: 400, message: `Cantidad inválida para "${item.name}"` })
+    const q = Number(item.quantity)
+    if (!Number.isInteger(q) || q < 1 || q > 9999) throw createError({ statusCode: 400, message: `Cantidad inválida para "${item.name}"` })
   }
 
   const { clientId, sellerId } = await resolverCliente(session, body.clientId)

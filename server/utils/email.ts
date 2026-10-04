@@ -11,7 +11,6 @@ function createTransport() {
       user: config.smtpUser,
       pass: config.smtpPass,
     },
-    tls: { rejectUnauthorized: false },
   })
 }
 
@@ -25,13 +24,13 @@ export async function sendAccessRequestEmail(data: {
   if (!config.smtpHost || !config.smtpUser || !config.smtpAdminTo) return
 
   const transporter = createTransport()
-  const companyLine = data.company ? `<tr><td style="padding:6px 0;color:#94a3b8;font-size:13px;">Empresa</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#f1f5f9;">${data.company}</td></tr>` : ''
-  const phoneLine   = data.phone   ? `<tr><td style="padding:6px 0;color:#94a3b8;font-size:13px;">Teléfono</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#f1f5f9;">${data.phone}</td></tr>` : ''
+  const companyLine = data.company ? `<tr><td style="padding:6px 0;color:#94a3b8;font-size:13px;">Empresa</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#f1f5f9;">${esc(data.company)}</td></tr>` : ''
+  const phoneLine   = data.phone   ? `<tr><td style="padding:6px 0;color:#94a3b8;font-size:13px;">Teléfono</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#f1f5f9;">${esc(data.phone)}</td></tr>` : ''
 
   await transporter.sendMail({
     from:    `"SIEEG INTEGRADORES" <${config.smtpUser}>`,
     to:      config.smtpAdminTo,
-    subject: `🙋 Nueva solicitud de acceso — ${data.name}`,
+    subject: `🙋 Nueva solicitud de acceso — ${data.name.replace(/[\r\n]+/g, ' ').slice(0, 120)}`,
     html: `
 <!DOCTYPE html>
 <html>
@@ -52,8 +51,8 @@ export async function sendAccessRequestEmail(data: {
       </p>
 
       <table style="width:100%;border-collapse:collapse;">
-        <tr><td style="padding:6px 0;color:#94a3b8;font-size:13px;width:100px;">Nombre</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#f1f5f9;">${data.name}</td></tr>
-        <tr><td style="padding:6px 0;color:#94a3b8;font-size:13px;">Correo</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#7DD3FC;">${data.email}</td></tr>
+        <tr><td style="padding:6px 0;color:#94a3b8;font-size:13px;width:100px;">Nombre</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#f1f5f9;">${esc(data.name)}</td></tr>
+        <tr><td style="padding:6px 0;color:#94a3b8;font-size:13px;">Correo</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#7DD3FC;">${esc(data.email)}</td></tr>
         ${companyLine}
         ${phoneLine}
       </table>
@@ -139,5 +138,38 @@ export async function sendQuoteEmail(data: {
   </div>
 </body>
 </html>`,
+  })
+}
+
+/** Liga para crear o restablecer la contraseña (bienvenida = cuenta recién activada). */
+export async function sendPasswordEmail(data: { to: string; nombre: string; link: string; bienvenida: boolean; horas: number }) {
+  const config = useRuntimeConfig()
+  if (!config.smtpHost || !config.smtpUser) throw createError({ statusCode: 503, message: 'El correo no está configurado en el servidor' })
+  const titulo = data.bienvenida ? 'Tu cuenta ya está activa' : 'Restablece tu contraseña'
+  const texto  = data.bienvenida
+    ? 'Ya puedes comprar en la plataforma de SIEEG Integradores. Crea tu contraseña para entrar:'
+    : 'Recibimos una solicitud para restablecer tu contraseña. Si no fuiste tú, ignora este correo.'
+  await createTransport().sendMail({
+    from:    `"SIEEG INTEGRADORES" <${config.smtpUser}>`,
+    to:      data.to,
+    subject: `${titulo} — SIEEG Integradores`,
+    html: `
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#F4F7FB;font-family:'Segoe UI',Arial,sans-serif;">
+  <div style="max-width:560px;margin:32px auto;background:#FFFFFF;border-radius:16px;border:1px solid #E4E9F1;overflow:hidden;">
+    <div style="background:#0B1B33;padding:22px 28px;"><div style="font-size:20px;font-weight:700;color:#FFFFFF;">SIEEG INTEGRADORES</div></div>
+    <div style="padding:24px 28px;">
+      <p style="font-size:16px;font-weight:700;color:#0B1B33;margin:0 0 8px;">${esc(titulo)}</p>
+      <p style="font-size:14px;color:#5B6B82;margin:0 0 6px;">Hola ${esc(data.nombre.split(' ')[0])},</p>
+      <p style="font-size:14px;color:#5B6B82;margin:0 0 20px;line-height:1.55;">${esc(texto)}</p>
+      <div style="text-align:center;margin:8px 0 20px;">
+        <a href="${esc(data.link)}" style="display:inline-block;padding:12px 26px;border-radius:10px;background:#1570EF;color:#FFFFFF;font-size:14px;font-weight:600;text-decoration:none;">${data.bienvenida ? 'Crear mi contraseña' : 'Restablecer contraseña'}</a>
+      </div>
+      <p style="font-size:12px;color:#5F6E84;margin:0;line-height:1.5;">La liga vence en ${data.horas} horas y solo se puede usar una vez. Tu usuario es <b>${esc(data.to)}</b>.</p>
+    </div>
+    <div style="padding:14px 28px;border-top:1px solid #E4E9F1;font-size:11px;color:#5F6E84;">SIEEG Integradores · Tel. / WhatsApp 961 333 6529 · contacto@sieeg.com.mx</div>
+  </div>
+</body></html>`,
   })
 }

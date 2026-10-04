@@ -1,6 +1,7 @@
 import { createHash } from 'crypto'
 import bcrypt from 'bcryptjs'
-import { requireSession } from '~/server/utils/session'
+import { requireSession, createToken, passwordVersion, SESSION_COOKIE, SESSION_COOKIE_OPTS } from '~/server/utils/session'
+import { olvidarUsuarioEnCache } from '~/server/middleware/refresh-session'
 import prisma from '~/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -35,6 +36,10 @@ export default defineEventHandler(async (event) => {
 
   const newHash = await bcrypt.hash(body.newPassword, 12)
   await prisma.user.update({ where: { id: session.userId }, data: { password: newHash } })
+
+  // Las demás sesiones abiertas se cierran; esta sigue con la contraseña nueva
+  olvidarUsuarioEnCache(session.userId)
+  setCookie(event, SESSION_COOKIE, createToken({ ...session, pv: passwordVersion(newHash) }), SESSION_COOKIE_OPTS)
 
   return { ok: true }
 })

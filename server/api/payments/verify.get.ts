@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   if (charge.status === 'completed' && order.paymentStatus !== 'paid') {
     paymentStatus = 'paid'
     await prisma.order.update({ where: { id: order.id }, data: { paymentStatus: 'paid' } })
-    if (order.status !== 'approved') {
+    if (order.status === 'pending') {
       try {
         await approveOrder(order.id)
       } catch {

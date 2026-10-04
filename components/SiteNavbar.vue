@@ -204,8 +204,10 @@ function notifIcon(type: string): string {
 
 async function salir() {
   userOpen.value = false
-  await auth.logout()
-  router.push('/login')
+  try { await auth.logout() } catch { /* el cookie se borra igual al recargar */ }
+  try { sessionStorage.clear() } catch { /* sin storage */ }
+  // Carga completa: carrito, precios en caché, cliente elegido y avisos no pasan al siguiente usuario
+  window.location.href = '/login'
 }
 </script>
 

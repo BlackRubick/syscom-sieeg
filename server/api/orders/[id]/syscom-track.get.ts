@@ -13,7 +13,8 @@ export default defineEventHandler(async (event) => {
 
   const order = await prisma.order.findUnique({ where: { id } })
   if (!order) throw createError({ statusCode: 404, message: 'Orden no encontrada' })
-  if (order.userId !== session.userId && !isManager) throw createError({ statusCode: 403, message: 'Sin autorización' })
+  // El vendedor ve todos los pedidos, así que también puede consultar su estado en SYSCOM
+  if (order.userId !== session.userId && !isManager && session.role !== 'seller') throw createError({ statusCode: 403, message: 'Sin autorización' })
   if (!order.syscomFolio) throw createError({ statusCode: 400, message: 'Este pedido no tiene folio SYSCOM' })
 
   let result

@@ -30,9 +30,10 @@ export default defineEventHandler(async (event) => {
   if (body.method === 'card' && (!body.token || !body.deviceSessionId)) {
     throw createError({ statusCode: 400, message: 'Token de pago requerido' })
   }
-  if (!body.items?.length) {
+  if (!Array.isArray(body.items) || !body.items.length) {
     throw createError({ statusCode: 400, message: 'El carrito está vacío' })
   }
+  if (body.items.length > 100) throw createError({ statusCode: 400, message: 'Máximo 100 productos por pedido' })
 
   for (const item of body.items) {
     if (!item.productId || !item.name) throw createError({ statusCode: 400, message: 'Ítem inválido' })
