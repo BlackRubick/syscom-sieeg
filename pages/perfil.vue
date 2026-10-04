@@ -74,7 +74,7 @@
             {{ auth.user?.fiscalCompleted ? 'Tu información fiscal está lista para facturación.' : 'Completa tu información fiscal para recibir CFDI.' }}
           </div>
           <button @click="showModal=true"
-            :style="{ width:'100%', height:'38px', borderRadius:'10px', border:'none', background: auth.user?.fiscalCompleted ? 'rgba(21,112,239,0.1)' : 'linear-gradient(135deg,#F59E0B,#D97706)', color: auth.user?.fiscalCompleted ? '#0B5BD3' : 'white', fontSize:'12px', fontWeight:600, cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', justifyContent:'center', gap:'6px', border: auth.user?.fiscalCompleted ? '1px solid rgba(21,112,239,0.2)' : 'none' }">
+            :style="{ width:'100%', height:'38px', borderRadius:'10px', background: auth.user?.fiscalCompleted ? 'rgba(21,112,239,0.1)' : 'linear-gradient(135deg,#F59E0B,#D97706)', color: auth.user?.fiscalCompleted ? '#0B5BD3' : 'white', fontSize:'12px', fontWeight:600, cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', justifyContent:'center', gap:'6px', border: auth.user?.fiscalCompleted ? '1px solid rgba(21,112,239,0.2)' : 'none' }">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" :stroke="auth.user?.fiscalCompleted?'#0B5BD3':'white'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
             {{ auth.user?.fiscalCompleted ? 'Actualizar datos' : 'Completar ahora' }}
           </button>

@@ -101,6 +101,7 @@
 
 <script setup lang="ts">
 import { Eye, EyeOff, ArrowRight } from '@lucide/vue'
+import type { CSSProperties } from 'vue'
 
 definePageMeta({ layout: 'auth' })
 useHead({ title: 'Iniciar sesión — SIEEG' })
@@ -123,9 +124,9 @@ const error     = ref('')
 const emailFocus = ref(false)
 const passFocus  = ref(false)
 
-const wrapStyle = { minHeight:'100vh', background:'#F5F8FC', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden', fontFamily:"'Inter',system-ui,sans-serif" }
+const wrapStyle: CSSProperties = { minHeight:'100vh', background:'#F5F8FC', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden', fontFamily:"'Inter',system-ui,sans-serif" }
 
-function fieldWrap(focus: boolean) {
+function fieldWrap(focus: boolean): CSSProperties {
   return { position:'relative', borderRadius:'12px', background: focus ? 'rgba(21,112,239,0.07)' : 'rgba(11,27,51,0.04)', border:`1px solid ${focus ? 'rgba(21,112,239,0.55)' : 'rgba(11,27,51,0.12)'}`, transition:'all 0.2s ease', boxShadow: focus ? '0 0 0 3px rgba(21,112,239,0.08)' : 'none' }
 }
 

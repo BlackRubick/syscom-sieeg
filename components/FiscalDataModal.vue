@@ -149,6 +149,7 @@
 </template>
 
 <script setup lang="ts">
+import type { CSSProperties } from 'vue'
 import { FileText, X } from '@lucide/vue'
 import type { User } from '~/types'
 
@@ -220,7 +221,7 @@ watch(() => props.modelValue, (open) => {
   }
 })
 
-const selectStyle = (focused: boolean) => ({
+const selectStyle = (focused: boolean): CSSProperties => ({
   width: '100%', height: '40px',
   background: focused ? 'rgba(21,112,239,0.06)' : '#FFFFFF',
   border: `1px solid ${focused ? 'rgba(21,112,239,0.45)' : 'rgba(11,27,51,0.1)'}`,

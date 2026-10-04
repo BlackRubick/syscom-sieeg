@@ -665,6 +665,7 @@
 <script setup lang="ts">
 import { ShoppingCart, Package, Trash2, Plus, Minus, CreditCard, X, Lock, FileText } from '@lucide/vue'
 import { ENVIO_BASICO, type ShippingConfig } from '~/utils/orderTotals'
+import type { CSSProperties } from 'vue'
 
 const { confirmar } = useConfirmar()
 const montado = ref(false)
@@ -827,7 +828,7 @@ async function vaciarCarrito() {
 
 const speiPdfUrl = computed(() => {
   if (!speiResult.value?.transactionId) return ''
-  const isSandbox = config.public.openpayIsSandbox === true || config.public.openpayIsSandbox === 'true'
+  const isSandbox = String(config.public.openpayIsSandbox) === 'true'
   const dash = isSandbox ? 'https://sandbox-dashboard.openpay.mx' : 'https://dashboard.openpay.mx'
   return `${dash}/spei-pdf/${config.public.openpayMerchantId}/${speiResult.value.transactionId}`
 })
@@ -846,7 +847,7 @@ const speiCreatedDate = computed(() => {
 
 const fmt = (n: number) => new Intl.NumberFormat('es-MX', { style:'currency', currency:'MXN' }).format(n)
 
-function inputStyle(focused: boolean) {
+function inputStyle(focused: boolean): CSSProperties {
   return {
     width:'100%', height:'42px', padding:'0 13px', fontSize:'13px',
     color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box',
@@ -907,7 +908,7 @@ async function loadOpenPay(): Promise<void> {
   }
   w.OpenPay.setId(merchantId)
   w.OpenPay.setApiKey(publicKey)
-  w.OpenPay.setSandboxMode(config.public.openpayIsSandbox === true || config.public.openpayIsSandbox === 'true')
+  w.OpenPay.setSandboxMode(String(config.public.openpayIsSandbox) === 'true')
   openpayLoaded = true
 }
 

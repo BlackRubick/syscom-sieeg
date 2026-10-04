@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { resolverCliente, vendeAClientes } from '~/server/utils/roles'
@@ -36,7 +37,7 @@ export default defineEventHandler(async (event) => {
 
   const updated = await prisma.order.update({
     where: { id },
-    data:  { userId: clientId, sellerId: order.sellerId ?? session.userId, items, shippingFee, total, auditLog: log },
+    data:  { userId: clientId, sellerId: order.sellerId ?? session.userId, items: items as unknown as Prisma.InputJsonValue, shippingFee, total, auditLog: log as Prisma.InputJsonValue[] },
     include: ORDER_INCLUDE,
   })
 

@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { approveOrder } from '~/server/utils/approveOrder'
@@ -75,7 +76,7 @@ export default defineEventHandler(async (event) => {
     at:      new Date().toISOString(),
     ...(motivo ? { note: `Motivo: ${motivo}` } : {}),
   }
-  const newLog = [...((existing.auditLog ?? []) as unknown[]), auditEntry]
+  const newLog = [...((existing.auditLog ?? []) as Prisma.InputJsonValue[]), auditEntry as Prisma.InputJsonValue]
 
   const updated = await prisma.order.update({
     where: { id },

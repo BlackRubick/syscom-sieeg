@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { enviarPedidoSyscom } from '~/server/utils/syscom'
@@ -26,25 +27,25 @@ export default defineEventHandler(async (event) => {
   enCurso.add(id)
   let result
   try {
-    result = await enviarPedidoSyscom(order.userId, order.items as OrderItem[], order.id.slice(-8).toUpperCase())
+    result = await enviarPedidoSyscom(order.userId, order.items as unknown as OrderItem[], order.id.slice(-8).toUpperCase())
   } finally {
     enCurso.delete(id)
   }
 
-  const auditLog = [...((order.auditLog ?? []) as unknown[]), {
+  const auditLog: Prisma.InputJsonValue[] = [...((order.auditLog ?? []) as Prisma.InputJsonValue[]), {
     status: 'approved', by: session.userId, byName: session.name, at: new Date().toISOString(), retry: true,
     ...(result.folio ? { syscomFolio: result.folio } : {}),
     ...(result.error ? { syscomError: result.error } : {}),
   }]
 
   if (result.error && !result.folio) {
-    await prisma.order.update({ where: { id }, data: { auditLog, syscomData: (result.data ?? { error: result.error }) as object } })
+    await prisma.order.update({ where: { id }, data: { auditLog, syscomData: (result.data ?? { error: result.error }) as Prisma.InputJsonValue } })
     throw createError({ statusCode: 502, message: result.error })
   }
 
   const updated = await prisma.order.update({
     where: { id },
-    data:  { auditLog, syscomFolio: result.folio, syscomData: result.data ?? undefined, syscomTracking: trackingInicial() as object, syscomStatusAt: new Date() },
+    data:  { auditLog, syscomFolio: result.folio, syscomData: (result.data ?? undefined) as Prisma.InputJsonValue | undefined, syscomTracking: trackingInicial() as object, syscomStatusAt: new Date() },
     include: ORDER_INCLUDE,
   })
 

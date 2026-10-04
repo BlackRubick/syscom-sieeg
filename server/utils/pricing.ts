@@ -7,9 +7,8 @@ import type { OrderItem, SyscomProducto } from '~/types'
    costo SYSCOM (sin IVA) → + margen global (siteConfig.markupPct) → − descuento del cliente (user.discountPct) → + IVA 16%.
    El precio que ve el cliente YA INCLUYE IVA. El costo de SYSCOM nunca debe llegar al navegador. */
 
-const IVA = 1.16
-
-export interface Pricing { markupPct: number; discountPct: number }
+import { costoSyscom, precioConMargen, precioVenta, type Pricing } from './preciosPuros'
+export { costoSyscom, precioConMargen, precioVenta, type Pricing }
 
 export async function getPricing(userId: string): Promise<Pricing> {
   const [user, siteConfig] = await Promise.all([
@@ -26,25 +25,6 @@ export async function pricingParaVista(session: { userId: string; role: string }
     if (c?.role === 'buyer') return getPricing(cliente)
   }
   return getPricing(session.userId)
-}
-
-function parsePrice(v?: unknown): number { return v ? Math.max(0, parseFloat(String(v)) || 0) : 0 }
-
-/** Costo base de SYSCOM (precio especial o, si no hay, de lista). */
-export function costoSyscom(p: Pick<SyscomProducto, 'precios'>): number {
-  const especial = parsePrice(p.precios?.precio_especial)
-  const lista    = parsePrice(p.precios?.precio_lista)
-  return especial > 0 ? especial : lista
-}
-
-/** Precio con margen e IVA, antes del descuento del cliente. */
-export function precioConMargen(p: Pick<SyscomProducto, 'precios'>, pr: Pricing): number {
-  return Math.round(costoSyscom(p) * (1 + pr.markupPct / 100) * IVA * 100) / 100
-}
-
-/** Precio final de venta para el cliente, con IVA incluido. */
-export function precioVenta(p: Pick<SyscomProducto, 'precios'>, pr: Pricing): number {
-  return Math.round(costoSyscom(p) * (1 + pr.markupPct / 100) * (1 - pr.discountPct / 100) * IVA * 100) / 100
 }
 
 /** Reemplaza `precios` de un producto SYSCOM por los precios de venta (oculta el costo). */

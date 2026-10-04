@@ -12,7 +12,7 @@ export default defineNuxtPlugin(() => {
       if (route.path === '/login') return
       redirigiendo = true
       useAuthStore().clear()
-      navigateTo({ path: '/login', query: { expirada: '1', volver: route.fullPath } }).finally(() => { redirigiendo = false })
+      Promise.resolve(navigateTo({ path: '/login', query: { expirada: '1', volver: route.fullPath } })).finally(() => { redirigiendo = false })
     },
   }) as typeof globalThis.$fetch
 })

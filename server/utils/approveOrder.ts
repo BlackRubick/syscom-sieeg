@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import prisma from '~/server/utils/prisma'
 import { enviarPedidoSyscom } from '~/server/utils/syscom'
 import type { OrderItem } from '~/types'
@@ -57,7 +58,7 @@ export async function approveOrder(
       syscomError = `RFC inválido: ${user.fiscalRfc}. Verifica los datos fiscales del usuario.`
     } else {
       try {
-        const result = await enviarPedidoSyscom(existing.userId, existing.items as OrderItem[], existing.id.slice(-8).toUpperCase())
+        const result = await enviarPedidoSyscom(existing.userId, existing.items as unknown as OrderItem[], existing.id.slice(-8).toUpperCase())
         syscomFolio = result.folio
         syscomData  = result.data ?? undefined
         syscomError = result.error
@@ -83,7 +84,7 @@ export async function approveOrder(
     ...(syscomFolio ? { syscomFolio } : {}),
     ...(syscomError ? { syscomError } : {}),
   }
-  const newLog = [...((existing.auditLog ?? []) as unknown[]), auditEntry]
+  const newLog = [...((existing.auditLog ?? []) as Prisma.InputJsonValue[]), auditEntry as Prisma.InputJsonValue]
 
   const updated = await prisma.order.update({
     where: { id: orderId },
@@ -91,7 +92,7 @@ export async function approveOrder(
       status:    'approved',
       auditLog:  newLog,
       syscomFolio,
-      syscomData,
+      syscomData: syscomData as Prisma.InputJsonValue | undefined,
       ...(syscomFolio && !existing.syscomFolio ? { syscomTracking: trackingInicial() as object, syscomStatusAt: new Date() } : {}),
     },
     include: ORDER_INCLUDE,

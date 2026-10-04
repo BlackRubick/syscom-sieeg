@@ -24,7 +24,7 @@ const error = ref('')
 const data  = ref<{ quote: Quote; precios: Precios | null } | null>(null)
 
 onMounted(async () => {
-  try { data.value = await $fetch(`/api/quotes/${route.params.id}`) }
+  try { data.value = await $fetch<{ quote: Quote; precios: Precios | null }>(`/api/quotes/${String(route.params.id)}`) }
   catch (e: any) { error.value = e?.data?.message ?? 'No se pudo cargar la cotización' }
 })
 

@@ -51,10 +51,11 @@ export interface Product {
   featured: boolean
   discount?: number
   specs?: Record<string, string>
-  specs?: Record<string, string>
   satKey?: string
   garantia?: string
-} {
+}
+
+export interface CartItem {
   product: Product
   quantity: number
   notes?: string

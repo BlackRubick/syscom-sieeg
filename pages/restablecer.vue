@@ -68,7 +68,7 @@ const cuenta    = ref<{ nombre: string; email: string } | null>(null)
 onMounted(async () => {
   if (!token.value) return
   validando.value = true
-  try { cuenta.value = await $fetch('/api/auth/reset', { query: { token: token.value } }) }
+  try { cuenta.value = await $fetch<{ nombre: string; email: string }>(`/api/auth/reset?token=${encodeURIComponent(token.value)}`) }
   catch (e: any) { ligaError.value = e?.data?.message ?? 'La liga ya no es válida.' }
   finally { validando.value = false }
 })

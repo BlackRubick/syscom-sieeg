@@ -282,6 +282,7 @@
 </template>
 
 <script setup lang="ts">
+import CfdiModal from '~/components/CfdiModal.vue'
 import { Search, FileText } from '@lucide/vue'
 import type { OrderItem } from '~/types'
 
@@ -294,9 +295,9 @@ if (auth.user?.role !== 'admin') navigateTo('/catalog')
 /* ── Tabs ── */
 const tab  = ref<'orders'|'emitidas'>('orders')
 const tabs = [
-  { key: 'orders',   label: 'Órdenes' },
+  { key: 'orders',   label: 'Pedidos' },
   { key: 'emitidas', label: 'Emitidas' },
-]
+] as const
 
 /* ════════════════════════════════
    PEDIDOS
@@ -553,7 +554,7 @@ interface CfdiUser {
 
 const cfdiOpen      = ref(false)
 const cfdiUser      = ref<CfdiUser|null>(null)
-const cfdiConceptos = ref<unknown[]>([])
+const cfdiConceptos = ref<NonNullable<InstanceType<typeof CfdiModal>['$props']['initialConceptos']>>([])
 const cfdiOrderId   = ref<string|undefined>(undefined)
 
 async function openCfdiFromOrder(o: BillingOrder) {

@@ -1,3 +1,4 @@
+import type { OrderStatus } from '@prisma/client'
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { buildCfdiConcepto, crearCFDI, obtenerCliente, crearCliente, conceptosDePedidos } from '~/server/utils/factura'
@@ -50,7 +51,7 @@ export default defineEventHandler(async (event) => {
 
   // Obtener pedidos aprobados sin CFDI individual
   const where = {
-    status:  { in: ['approved', 'processing', 'shipped', 'delivered'] as const },
+    status:  { in: ['approved', 'processing', 'shipped', 'delivered'] as OrderStatus[] },
     cfdiUid: null,
     ...(body.orderIds?.length ? { id: { in: body.orderIds } } : {}),
   }

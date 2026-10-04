@@ -9,9 +9,10 @@
 </template>
 
 <script setup lang="ts">
+import type { CSSProperties } from 'vue'
 defineProps<{ label:string; modelValue:string; options:{ value:string; label:string }[] }>()
 defineEmits(['update:modelValue'])
 const focus = ref(false)
-const labelStyle = { display:'block', fontSize:'11px', fontWeight:500, color:'#5B6B82', marginBottom:'6px' }
-const selectStyle = computed(() => ({ width:'100%', height:'40px', background: focus.value ? 'rgba(21,112,239,0.06)' : '#FFFFFF', border:`1px solid ${focus.value ? 'rgba(21,112,239,0.45)' : 'rgba(11,27,51,0.1)'}`, borderRadius:'10px', padding:'0 12px', fontSize:'13px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.18s', cursor:'pointer' }))
+const labelStyle: CSSProperties = { display:'block', fontSize:'11px', fontWeight:500, color:'#5B6B82', marginBottom:'6px' }
+const selectStyle = computed<CSSProperties>(() => ({ width:'100%', height:'40px', background: focus.value ? 'rgba(21,112,239,0.06)' : '#FFFFFF', border:`1px solid ${focus.value ? 'rgba(21,112,239,0.45)' : 'rgba(11,27,51,0.1)'}`, borderRadius:'10px', padding:'0 12px', fontSize:'13px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.18s', cursor:'pointer' }))
 </script>

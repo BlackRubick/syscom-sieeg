@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { createCardCharge, createSpeiCharge, openpayErrorMessage } from '~/server/utils/openpay'
@@ -122,7 +123,7 @@ export default defineEventHandler(async (event) => {
       userId:        session.userId,
       sellerId:      cot?.sellerId ?? null,
       quoteNumber:   cot?.number ?? null,
-      items,
+      items:         items as unknown as Prisma.InputJsonValue,
       total,
       shippingFee,
       priority:      body.priority ?? 'normal',
@@ -131,7 +132,7 @@ export default defineEventHandler(async (event) => {
       paymentId,
       paymentStatus,
       paymentMethod: body.method,
-      paymentData,
+      paymentData:   paymentData ?? undefined,
     },
     include: { user: { select: { id: true, name: true, email: true } } },
   }).catch(async (e) => { if (cot) await liberarCotizacion(cot.id); throw e })

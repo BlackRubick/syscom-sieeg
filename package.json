@@ -9,7 +9,9 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-    "db:setup": "prisma db push && tsx prisma/seed.ts"
+    "db:setup": "prisma db push && tsx prisma/seed.ts",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "typecheck": "nuxi typecheck"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -28,6 +30,8 @@
   },
   "devDependencies": {
     "@types/nodemailer": "^8.0.1",
-    "tsx": "^4.22.4"
+    "tsx": "^4.22.4",
+    "typescript": "^5.9.3",
+    "vue-tsc": "^2.2.12"
   }
 }

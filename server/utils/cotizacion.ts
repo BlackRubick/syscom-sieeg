@@ -62,7 +62,7 @@ export async function crearCotizacion(data: { userId: string; sellerId: string |
   for (let intento = 0; intento < 5; intento++) {
     const { _max } = await prisma.quote.aggregate({ _max: { number: true } })
     try {
-      return await prisma.quote.create({ data: { ...data, number: (_max.number ?? 0) + 1 } })
+      return await prisma.quote.create({ data: { ...data, items: data.items as unknown as Prisma.InputJsonValue, number: (_max.number ?? 0) + 1 } })
     } catch (e) {
       const err = e as { code?: string }
       if (err.code === 'P2002') continue

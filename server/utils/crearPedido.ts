@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import prisma from '~/server/utils/prisma'
 import { repriceItems } from '~/server/utils/pricing'
 import { totalDe, envioDe } from '~/utils/orderTotals'
@@ -30,7 +31,7 @@ export async function crearPedido(opts: {
       userId:      opts.clientId,
       sellerId:    opts.sellerId ?? null,
       quoteNumber: opts.quoteNumber ?? null,
-      items,
+      items:       items as unknown as Prisma.InputJsonValue,
       total,
       shippingFee,
       priority:    opts.priority ?? 'normal',
