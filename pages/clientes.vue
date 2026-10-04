@@ -41,7 +41,7 @@
         </div>
         <div class="cl-item-badges">
           <span v-if="ROL[c.role]" class="cl-badge off">{{ ROL[c.role] }}</span>
-          <span v-if="esIntegrador(c.discountPct)" class="cl-badge int">Integrador −{{ DESCUENTO_INTEGRADOR }}%</span>
+          <span v-if="esIntegrador(c.discountPct)" class="cl-badge int">Integrador −{{ c.discountPct }}%</span>
           <span v-else-if="c.discountPct > 0" class="cl-badge int">−{{ c.discountPct }}%</span>
           <span :class="['cl-badge', c.status === 'active' ? 'ok' : 'off']">{{ c.status === 'active' ? 'Activo' : c.status === 'pending' ? 'Pendiente' : 'Inactivo' }}</span>
           <NuxtLink v-if="!c.fiscalCompleted && !c.mostrador" :to="`/fiscal?buscar=${encodeURIComponent(c.email)}`" class="cl-badge warn">Faltan datos fiscales →</NuxtLink>
@@ -71,11 +71,7 @@
                   <FormField label="Contraseña inicial" v-model="form.password" placeholder="Mínimo 8 caracteres" :required="true" />
                   <button type="button" class="cl-btn cl-btn-ghost" @click="generarPassword">Generar</button>
                 </div>
-                <button type="button" :class="['cl-int', { on: form.integrador }]" :aria-pressed="form.integrador" @click="form.integrador = !form.integrador">
-                  <BadgePercent :size="16" />
-                  <span><b>Integrador</b> · se le asigna {{ DESCUENTO_INTEGRADOR }}% de descuento automáticamente</span>
-                  <span class="cl-int-check">{{ form.integrador ? '✓' : '' }}</span>
-                </button>
+                <IntegradorPicker v-model="form.integrador" />
                 <p v-if="formError" class="cl-error">{{ formError }}</p>
                 <div class="cl-modal-actions">
                   <button type="button" class="cl-btn cl-btn-ghost" :disabled="guardando" @click="cerrar">Cancelar</button>
@@ -126,14 +122,10 @@
                 <FormField v-if="!ficha.c.mostrador" label="Correo electrónico" type="email" v-model="ficha.form.email" :required="true" />
                 <FormField label="Teléfono" v-model="ficha.form.telefono" placeholder="961 000 0000" />
                 <template v-if="!ficha.c.mostrador">
-                  <button type="button" :class="['cl-int', { on: ficha.form.integrador }]" :aria-pressed="ficha.form.integrador" @click="toggleIntegradorFicha">
-                    <BadgePercent :size="16" />
-                    <span><b>Integrador</b> · {{ DESCUENTO_INTEGRADOR }}% de descuento automático</span>
-                    <span class="cl-int-check">{{ ficha.form.integrador ? '✓' : '' }}</span>
-                  </button>
+                  <IntegradorPicker v-model="ficha.form.discountPct" />
                   <label v-if="esAdmin" class="cl-disc">
-                    <span>Descuento (%)</span>
-                    <input v-model.number="ficha.form.discountPct" type="number" min="0" max="100" step="0.5" @input="ficha.form.integrador = esIntegrador(ficha.form.discountPct)" />
+                    <span>Otro descuento (%)</span>
+                    <input v-model.number="ficha.form.discountPct" type="number" min="0" max="100" step="0.5" />
                   </label>
                 </template>
                 <p v-if="ficha.error" class="cl-error">{{ ficha.error }}</p>
@@ -152,7 +144,7 @@
                     <div><dt>Número de cliente</dt><dd>{{ ficha.c.mostrador ? 'Mostrador' : formatClientNumber(ficha.c.clientNumber) || '—' }}</dd></div>
                     <div><dt>Correo</dt><dd>{{ ficha.c.mostrador ? '—' : ficha.c.email }}</dd></div>
                     <div><dt>Teléfono</dt><dd>{{ ficha.c.fiscalTelefono || '—' }}</dd></div>
-                    <div><dt>Tipo</dt><dd>{{ ROL[ficha.c.role] ?? 'Cliente' }}{{ esIntegrador(ficha.c.discountPct) ? ' · Integrador' : '' }}</dd></div>
+                    <div><dt>Tipo</dt><dd>{{ ROL[ficha.c.role] ?? 'Cliente' }}{{ esIntegrador(ficha.c.discountPct) ? ` · Integrador ${ficha.c.discountPct}%` : '' }}</dd></div>
                     <div><dt>Descuento</dt><dd>{{ ficha.c.discountPct > 0 ? `${ficha.c.discountPct}%` : 'Sin descuento' }}</dd></div>
                     <div><dt>Estado</dt><dd>{{ ficha.c.status === 'active' ? 'Activo' : ficha.c.status === 'pending' ? 'Pendiente' : 'Inactivo' }}</dd></div>
                     <div><dt>Alta</dt><dd>{{ fechaCorta(ficha.c.createdAt) }}</dd></div>
@@ -198,7 +190,7 @@
 </template>
 
 <script setup lang="ts">
-import { Search, UserPlus, ShoppingCart, IdCard, Pencil, BadgePercent } from '@lucide/vue'
+import { Search, UserPlus, ShoppingCart, IdCard, Pencil } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -258,13 +250,13 @@ function venderA(c: { id: string }) {
 const modal     = ref(false)
 const guardando = ref(false)
 const formError = ref('')
-const form      = reactive({ name: '', email: '', password: '', integrador: false })
+const form      = reactive({ name: '', email: '', password: '', integrador: 0 })
 const creado    = ref<(Cliente & { password: string }) | null>(null)
 const copiado   = ref(false)
 const origen    = computed(() => (import.meta.client ? window.location.origin : ''))
 
 function abrirNuevo() {
-  form.name = ''; form.email = ''; form.password = ''; form.integrador = false; formError.value = ''; creado.value = null
+  form.name = ''; form.email = ''; form.password = ''; form.integrador = 0; formError.value = ''; creado.value = null
   modal.value = true
 }
 function cerrar() { modal.value = false }
@@ -299,7 +291,7 @@ const esAdmin = computed(() => auth.user?.role === 'admin')
 const ficha = reactive({
   abierta: false, cargando: false, editando: false, guardando: false, error: '', ok: '',
   c: null as Ficha | null,
-  form: { name: '', email: '', telefono: '', integrador: false, discountPct: 0 },
+  form: { name: '', email: '', telefono: '', discountPct: 0 },
 })
 const puedeEditar = (c: Ficha) => esAdmin.value || c.role === 'buyer'
 
@@ -311,12 +303,8 @@ async function abrirFicha(id: string) {
 }
 function editarFicha() {
   const c = ficha.c!
-  ficha.form = { name: c.name, email: c.email, telefono: c.fiscalTelefono ?? '', integrador: esIntegrador(c.discountPct), discountPct: c.discountPct }
+  ficha.form = { name: c.name, email: c.email, telefono: c.fiscalTelefono ?? '', discountPct: c.discountPct }
   ficha.error = ''; ficha.ok = ''; ficha.editando = true
-}
-function toggleIntegradorFicha() {
-  ficha.form.integrador = !ficha.form.integrador
-  ficha.form.discountPct = ficha.form.integrador ? DESCUENTO_INTEGRADOR : 0
 }
 async function guardarFicha() {
   if (!ficha.c) return
@@ -326,8 +314,11 @@ async function guardarFicha() {
       method: 'PATCH',
       body: {
         name: ficha.form.name, telefono: ficha.form.telefono,
-        ...(ficha.c.mostrador ? {} : { email: ficha.form.email, integrador: ficha.form.integrador }),
-        ...(esAdmin.value && !ficha.c.mostrador ? { discountPct: ficha.form.discountPct } : {}),
+        ...(ficha.c.mostrador ? {} : { email: ficha.form.email }),
+        // Admin guarda cualquier %; el vendedor solo niveles de integrador (si no lo cambió, no se manda)
+        ...(ficha.c.mostrador ? {}
+          : esAdmin.value ? { discountPct: ficha.form.discountPct }
+          : ficha.form.discountPct !== ficha.c.discountPct ? { integrador: ficha.form.discountPct } : {}),
       },
     })
     await Promise.all([abrirFicha(ficha.c.id), cargar()])
@@ -385,12 +376,6 @@ const iniciales = (n: string) => n.split(' ').slice(0, 2).map(p => p[0]).join(''
 .cl-badge.off { background: #F1F3F6; color: #5B6B82; }
 .cl-badge.warn { background: #FFF7E6; color: #B45309; }
 .cl-badge.int { background: #EAF2FF; color: #0B5BD3; }
-.cl-int { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px dashed #B9C6DA; background: #F8FAFD; color: #33445C; font-size: 13px; font-family: inherit; text-align: left; cursor: pointer; }
-.cl-int.on { border: 1px solid #1570EF; background: #EAF2FF; color: #0B1B33; }
-.cl-int svg { color: #0B5BD3; flex-shrink: 0; }
-.cl-int > span:nth-child(2) { flex: 1; }
-.cl-int-check { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid #B9C6DA; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; flex-shrink: 0; }
-.cl-int.on .cl-int-check { background: #1570EF; border-color: #1570EF; }
 .cl-disc { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; color: #5B6B82; }
 .cl-disc input { width: 110px; height: 38px; padding: 0 10px; border-radius: 10px; border: 1px solid #D5DEEA; font-size: 14px; font-family: inherit; }
 .cl-modal-lg { max-width: 640px; max-height: calc(100vh - 32px); overflow-y: auto; }

@@ -2,17 +2,17 @@ import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { vendeAClientes } from '~/server/utils/roles'
 import { getMostradorId } from '~/server/utils/mostrador'
-import { DESCUENTO_INTEGRADOR } from '~/utils/integrador'
+import { nivelIntegrador } from '~/utils/integrador'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-/* Editar un cliente desde la página Clientes: nombre, correo, teléfono e integrador (descuento fijo).
+/* Editar un cliente desde la página Clientes: nombre, correo, teléfono e integrador (10, 20 o 30 %).
    El vendedor solo edita clientes (compradores); administración, a cualquiera y también el % de descuento libre. */
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
   if (!vendeAClientes(session.role)) throw createError({ statusCode: 403, message: 'Sin autorización' })
   const id   = getRouterParam(event, 'id')!
-  const body = await readBody<{ name?: string; email?: string; telefono?: string; integrador?: boolean; discountPct?: number }>(event)
+  const body = await readBody<{ name?: string; email?: string; telefono?: string; integrador?: number | boolean; discountPct?: number }>(event)
 
   const existing = await prisma.user.findUnique({ where: { id }, select: { id: true, role: true, email: true } })
   if (!existing) throw createError({ statusCode: 404, message: 'Cliente no encontrado' })
@@ -38,8 +38,10 @@ export default defineEventHandler(async (event) => {
   if (!esMostrador) {
     if (session.role === 'admin' && body.discountPct !== undefined && Number.isFinite(Number(body.discountPct))) {
       data.discountPct = Math.max(0, Math.min(100, Number(body.discountPct)))
-    } else if (typeof body.integrador === 'boolean') {
-      data.discountPct = body.integrador ? DESCUENTO_INTEGRADOR : 0
+    } else if (body.integrador !== undefined) {
+      const nivel = nivelIntegrador(body.integrador)
+      if (nivel === null) throw createError({ statusCode: 400, message: 'Nivel de integrador inválido' })
+      data.discountPct = nivel
     }
   }
 

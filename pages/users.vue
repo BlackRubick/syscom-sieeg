@@ -150,14 +150,16 @@
                 <FormSelect label="Rol" v-model="form.role" :options="ROLES.map(r=>({value:r,label:roleCfg[r].label}))" />
                 <FormSelect label="Estado" v-model="form.status" :options="STATUSES.map(s=>({value:s,label:statusCfg[s].label}))" />
                 <div style="grid-column:1/-1;">
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
                     <span style="font-size:11px;font-weight:600;color:#5B6B82;letter-spacing:0.3px;">Descuento en catálogo (%)</span>
-                    <button type="button" :aria-pressed="esIntegrador(form.discountPct)" @click="form.discountPct = esIntegrador(form.discountPct) ? 0 : DESCUENTO_INTEGRADOR"
-                      :style="{ height:'28px', padding:'0 12px', borderRadius:'8px', fontSize:'12px', fontWeight:700, fontFamily:'inherit', cursor:'pointer',
-                        border: esIntegrador(form.discountPct) ? '1px solid #1570EF' : '1px dashed rgba(11,27,51,0.25)',
-                        background: esIntegrador(form.discountPct) ? '#EAF2FF' : 'transparent', color: esIntegrador(form.discountPct) ? '#0B5BD3' : '#5B6B82' }">
-                      {{ esIntegrador(form.discountPct) ? '✓ Integrador' : `Integrador (${DESCUENTO_INTEGRADOR}%)` }}
-                    </button>
+                    <span style="display:flex;gap:4px;">
+                      <button v-for="n in NIVELES_INTEGRADOR" :key="n" type="button" :aria-pressed="form.discountPct === n" @click="form.discountPct = form.discountPct === n ? 0 : n"
+                        :style="{ height:'28px', padding:'0 10px', borderRadius:'8px', fontSize:'12px', fontWeight:700, fontFamily:'inherit', cursor:'pointer',
+                          border: form.discountPct === n ? '1px solid #1570EF' : '1px dashed rgba(11,27,51,0.25)',
+                          background: form.discountPct === n ? '#1570EF' : 'transparent', color: form.discountPct === n ? '#fff' : '#5B6B82' }">
+                        Integrador {{ n }}%
+                      </button>
+                    </span>
                   </div>
                   <div style="position:relative;">
                     <input v-model.number="form.discountPct" type="number" min="0" max="100" step="0.5" placeholder="0"
@@ -166,7 +168,7 @@
                       @blur="e=>(e.currentTarget as HTMLElement).style.borderColor='rgba(11,27,51,0.1)'" />
                     <span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:13px;color:#7A889C;pointer-events:none;">%</span>
                   </div>
-                  <div style="font-size:11px;color:#7A889C;margin-top:5px;">0 = precio normal · 10 = 10% de descuento sobre precios SYSCOM</div>
+                  <div style="font-size:11px;color:#7A889C;margin-top:5px;">Se resta del precio SYSCOM y después se suma el IVA (16%). 0 = precio normal.</div>
                 </div>
               </div>
 
