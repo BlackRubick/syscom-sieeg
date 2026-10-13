@@ -55,7 +55,7 @@
 
     <!-- Cards -->
     <div v-else style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
-      <div v-for="user in filtered" :key="user.id"
+      <div v-for="user in filtered" :key="user.id" :style="{ zIndex: openMenu===user.id ? 30 : 'auto' }"
         style="border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:18px;position:relative;box-shadow:0 3px 14px rgba(11,27,51,0.105);transition:box-shadow 0.25s,transform 0.2s;"
         @mouseenter="e => { (e.currentTarget as HTMLElement).style.boxShadow='0 10px 30px rgba(11,27,51,0.158),0 0 0 1px rgba(21,112,239,0.12)'; (e.currentTarget as HTMLElement).style.transform='translateY(-3px)' }"
         @mouseleave="e => { (e.currentTarget as HTMLElement).style.boxShadow='0 3px 14px rgba(11,27,51,0.105)'; (e.currentTarget as HTMLElement).style.transform='translateY(0)' }">
@@ -106,6 +106,15 @@
           <span v-if="user.discountPct && user.discountPct > 0" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(34,197,94,0.12);color:#16A34A;border:1px solid rgba(34,197,94,0.25);">
             {{ esIntegrador(user.discountPct) ? 'Integrador ' : '' }}-{{ user.discountPct }}%
           </span>
+        </div>
+
+        <!-- Solicitud pendiente: activarla en un clic -->
+        <div v-if="isAdmin && user.status==='pending'" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+          <button type="button" :disabled="activando===user.id" @click="darAcceso(user)"
+            :style="{ height:'36px', borderRadius:'10px', border:'none', background: activando===user.id ? 'rgba(22,163,74,0.5)' : 'linear-gradient(135deg,#16A34A,#059669)', color:'#fff', fontSize:'13px', fontWeight:600, cursor: activando===user.id ? 'not-allowed' : 'pointer', fontFamily:'inherit' }">
+            {{ activando===user.id ? 'Activando...' : 'Dar acceso' }}
+          </button>
+          <span style="font-size:11px;color:#5F6E84;line-height:1.4;">Le llega un correo para crear su contraseña. Para darle descuento usa ⋮ → Editar.</span>
         </div>
 
         <!-- Detalles -->
@@ -365,6 +374,21 @@ async function handleSave() {
   } catch (e: unknown) {
     formError.value = (e as { data?: { message?: string } })?.data?.message ?? 'Error al guardar'
   } finally { saving.value = false }
+}
+
+/* ── dar acceso a una solicitud pendiente ── */
+const activando = ref<string | null>(null)
+async function darAcceso(u: User) {
+  activando.value = u.id; avisoOk.value = ''
+  try {
+    const data = await $fetch<{ user:User; bienvenida?: 'enviada' | 'fallo' | null }>(`/api/users/${u.id}`, { method:'PATCH', body:{ status:'active' } })
+    const idx  = users.value.findIndex(x => x.id === data.user.id)
+    if (idx >= 0) users.value[idx] = data.user
+    avisoOk.value = data.bienvenida === 'enviada' ? `Cuenta activada. Le enviamos a ${data.user.email} la liga para crear su contraseña.`
+      : `Cuenta activada, pero no se pudo enviar el correo. Edítalo y asígnale una contraseña.`
+  } catch (e: unknown) {
+    avisoOk.value = (e as { data?: { message?: string } })?.data?.message ?? 'No se pudo activar la cuenta'
+  } finally { activando.value = null }
 }
 
 /* ── eliminar ── */
