@@ -141,6 +141,33 @@ export async function sendQuoteEmail(data: {
   })
 }
 
+/** Acuse para quien llenó el formulario de contacto: su solicitud ya llegó. */
+export async function sendAccessConfirmationEmail(data: { to: string; nombre: string }) {
+  const config = useRuntimeConfig()
+  if (!config.smtpHost || !config.smtpUser) return
+  await createTransport().sendMail({
+    from:    `"SIEEG INTEGRADORES" <${config.smtpUser}>`,
+    to:      data.to,
+    replyTo: config.smtpAdminTo || config.smtpUser,
+    subject: 'Recibimos tu solicitud — SIEEG Integradores',
+    html: `
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#F4F7FB;font-family:'Segoe UI',Arial,sans-serif;">
+  <div style="max-width:560px;margin:32px auto;background:#FFFFFF;border-radius:16px;border:1px solid #E4E9F1;overflow:hidden;">
+    <div style="background:#0B1B33;padding:22px 28px;"><div style="font-size:20px;font-weight:700;color:#FFFFFF;">SIEEG INTEGRADORES</div></div>
+    <div style="padding:24px 28px;">
+      <p style="font-size:16px;font-weight:700;color:#0B1B33;margin:0 0 8px;">¡Recibimos tu solicitud!</p>
+      <p style="font-size:14px;color:#5B6B82;margin:0 0 6px;">Hola ${esc(data.nombre.split(' ')[0])},</p>
+      <p style="font-size:14px;color:#5B6B82;margin:0 0 14px;line-height:1.55;">Gracias por tu interés en comprar con SIEEG Integradores. Alguien de nuestro equipo te contactará en menos de 24 horas para darte de alta y ofrecerte precios especiales para tu negocio.</p>
+      <p style="font-size:14px;color:#5B6B82;margin:0;line-height:1.55;">Cuando tu cuenta esté activa te llegará otro correo con la liga para crear tu contraseña.</p>
+    </div>
+    <div style="padding:14px 28px;border-top:1px solid #E4E9F1;font-size:11px;color:#5F6E84;">SIEEG Integradores · Tel. / WhatsApp 961 333 6529 · contacto@sieeg.com.mx</div>
+  </div>
+</body></html>`,
+  })
+}
+
 /** Liga para crear o restablecer la contraseña (bienvenida = cuenta recién activada). */
 export async function sendPasswordEmail(data: { to: string; nombre: string; link: string; bienvenida: boolean; horas: number }) {
   const config = useRuntimeConfig()

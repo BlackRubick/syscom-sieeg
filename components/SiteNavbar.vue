@@ -206,11 +206,15 @@ function notifIcon(type: string): string {
   return '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>'
 }
 
-// Al tocar un aviso: se marca leído y, si es de un pedido, se abre
-function abrirAviso(n: { id: string; orderId?: string | null; title: string }) {
+// Al tocar un aviso: se marca leído y se abre lo que corresponde (pedido, usuario, garantía, cotización)
+function abrirAviso(n: { id: string; orderId?: string | null; title: string; message: string }) {
   ui.markRead(n.id)
   notifOpen.value = false
   if (n.orderId) router.push({ path: '/orders', query: { pedido: n.orderId } })
+  else if (/solicitud de acceso/i.test(n.title)) {
+    const correo = n.message.match(/[^\s@]+@[^\s@]+\.[a-z]{2,}/i)?.[0]
+    router.push({ path: '/users', query: correo ? { q: correo } : {} })
+  }
   else if (/garant/i.test(n.title)) router.push('/garantias')
   else if (/cotizaci/i.test(n.title)) router.push('/quotes')
 }

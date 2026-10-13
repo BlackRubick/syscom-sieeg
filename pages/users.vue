@@ -268,7 +268,10 @@ onMounted(async () => {
 })
 
 /* ── filtros ── */
-const search      = ref('')
+// ?q= llega desde la notificación de una solicitud de acceso
+const route       = useRoute()
+const search      = ref(typeof route.query.q === 'string' ? route.query.q : '')
+watch(() => route.query.q, q => { if (typeof q === 'string') search.value = q })
 const roleFilter  = ref('all')
 const searchFocus = ref(false)
 const openMenu    = ref<string | null>(null)

@@ -3,7 +3,7 @@ import prisma from '~/server/utils/prisma'
 import { rateLimit } from '~/server/utils/rateLimit'
 import { createUserWithClientNumber } from '~/server/utils/clientNumber'
 import { formatClientNumber } from '~/utils/clientNumber'
-import { sendAccessRequestEmail } from '~/server/utils/email'
+import { sendAccessRequestEmail, sendAccessConfirmationEmail } from '~/server/utils/email'
 
 export default defineEventHandler(async (event) => {
   // El formulario es público y cada envío crea un usuario y manda correo: 5 por IP cada hora
@@ -77,13 +77,16 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Enviar email al admin (sin bloquear la respuesta si falla)
+  // Correos al admin y al solicitante (sin bloquear la respuesta; si fallan queda en el log)
   sendAccessRequestEmail({
     name:    name.trim(),
     email:   email.toLowerCase().trim(),
     company: company?.trim() ?? '',
     phone:   phone?.trim()   ?? '',
-  }).catch(() => {})
+  }).catch(e => console.error('[contacto] correo al admin falló:', e?.message ?? e))
+
+  sendAccessConfirmationEmail({ to: email.toLowerCase().trim(), nombre: name.trim() })
+    .catch(e => console.error('[contacto] acuse al solicitante falló:', e?.message ?? e))
 
   return { success: true }
 })
