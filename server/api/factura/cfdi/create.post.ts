@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
 
   const user = await prisma.user.findUnique({
     where:  { id: userId },
-    select: { facturaUid: true, fiscalUsocfdi: true, fiscalCompleted: true, fiscalEmail: true },
+    select: { facturaUid: true, fiscalUsocfdi: true, fiscalCompleted: true, fiscalEmail: true, fiscalRfc: true },
   })
 
   if (!user)              throw createError({ statusCode: 404, message: 'Usuario no encontrado' })
@@ -65,6 +65,16 @@ export default defineEventHandler(async (event) => {
     Moneda:        body.moneda ?? 'MXN',
     Comentarios:   body.comentarios?.trim() || undefined,
     EnviarCorreo:  body.enviarCorreo ?? true,
+  }
+
+  // SAT (CFDI40130): factura a PUBLICO EN GENERAL (XAXX010101000) lleva InformacionGlobal; venta del día = periodicidad diaria
+  if (user.fiscalRfc?.toUpperCase() === 'XAXX010101000') {
+    const hoy = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Mexico_City' }))
+    payload.InformacionGlobal = {
+      Periodicidad: '01',
+      Meses:        String(hoy.getMonth() + 1).padStart(2, '0'),
+      Año:          String(hoy.getFullYear()),
+    }
   }
 
   const result = await crearCFDI(payload)
