@@ -383,6 +383,7 @@
                 <div><div class="od-label">CLABE</div><div class="od-mono od-strong" style="color:#059669;">{{ detail.paymentData.clabe }}</div></div>
                 <div><div class="od-label">Banco</div><div class="od-text">{{ detail.paymentData.bank }}</div></div>
                 <div><div class="od-label">Convenio CIE</div><div class="od-mono od-strong" style="color:#16A34A;">{{ detail.paymentData.agreement }}</div></div>
+                <div v-if="detail.paymentData.reference"><div class="od-label">Referencia</div><div class="od-mono od-strong od-break">{{ detail.paymentData.reference }}</div></div>
               </div>
               <div v-if="isManager && detail.paymentMethod === 'spei' && detail.paymentStatus !== 'paid'" class="od-reason" style="color:#B45309;">Verifica la recepción de la transferencia antes de aprobar.</div>
             </section>

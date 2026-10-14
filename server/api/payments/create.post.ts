@@ -106,8 +106,9 @@ export default defineEventHandler(async (event) => {
         clabe:       charge.payment_method.clabe,
         bank:        charge.payment_method.bank,
         agreement:   charge.payment_method.agreement,
-        beneficiary: charge.payment_method.name,
-        reference:   charge.payment_method.reference ?? '',
+        // OpenPay: la CLABE y el convenio CIE son fijos del comercio; `name` es la referencia única de este cargo
+        beneficiary: 'SIEEG INTEGRADORES',
+        reference:   charge.payment_method.name,
         dueDate:     charge.due_date ?? '',
         createdAt:   charge.creation_date,
       }
