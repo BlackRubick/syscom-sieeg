@@ -1,25 +1,8 @@
 import type { OrderStatus } from '@prisma/client'
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
-import { buildCfdiConcepto, crearCFDI, obtenerCliente, crearCliente, conceptosDePedidos } from '~/server/utils/factura'
+import { buildCfdiConcepto, crearCFDI, conceptosDePedidos, receptorPublicoUid } from '~/server/utils/factura'
 import type { CfdiPayload } from '~/server/utils/factura'
-
-const RFC_PUBLICO = 'XAXX010101000'
-
-async function getOrCreatePublicoUid(): Promise<string> {
-  const existente = await obtenerCliente(RFC_PUBLICO)
-  if (existente?.UID) return existente.UID
-
-  const nuevo = await crearCliente({
-    rfc:    RFC_PUBLICO,
-    razons: 'PUBLICO EN GENERAL',
-    codpos: '00000',
-    email:  process.env.FACTURA_ADMIN_EMAIL ?? process.env.NUXT_ADMIN_EMAIL ?? 'admin@empresa.com',
-    regimen:'616',
-    pais:   'MEX',
-  })
-  return nuevo.UID
-}
 
 interface GlobalCfdiBody {
   periodicidad: string
@@ -66,7 +49,7 @@ export default defineEventHandler(async (event) => {
   const conceptos = conceptosDePedidos(orders)
 
   // Obtener o crear el receptor "PUBLICO EN GENERAL" en Factura.com
-  const receptorUid = await getOrCreatePublicoUid()
+  const receptorUid = await receptorPublicoUid('global')
 
   const payload: CfdiPayload = {
     Receptor:      { UID: receptorUid },

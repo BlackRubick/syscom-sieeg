@@ -399,3 +399,33 @@ export async function obtenerNombreSerie(serieId: number): Promise<string> {
     return res.data?.find(s => s.SerieID === serieId)?.SerieName ?? ''
   } catch { return '' }
 }
+
+/* ── Público en general (XAXX010101000) ──
+ * SAT (CFDI40130): si el receptor se llama exactamente "PUBLICO EN GENERAL" el CFDI lleva InformacionGlobal (periodicidad).
+ * Por eso la factura global usa ese nombre y la individual "VENTA AL PUBLICO EN GENERAL" (sin periodicidad).
+ * Ambos con régimen 616, uso S01 y el CP del lugar de expedición. Los UID se fijan en el .env (FACTURA_UID_PUBLICO_*). */
+export const RFC_PUBLICO = 'XAXX010101000'
+export const esPublicoEnGeneral = (rfc?: string | null) => rfc?.trim().toUpperCase() === RFC_PUBLICO
+export const NOMBRE_PUBLICO = { global: 'PUBLICO EN GENERAL', individual: 'VENTA AL PUBLICO EN GENERAL' } as const
+
+const publicoUidCache: Partial<Record<string, string>> = {}
+
+export async function receptorPublicoUid(tipo: 'global' | 'individual'): Promise<string> {
+  const deEnv = tipo === 'global' ? process.env.FACTURA_UID_PUBLICO_GLOBAL : process.env.FACTURA_UID_PUBLICO_INDIVIDUAL
+  if (deEnv) return deEnv
+  const clave = `${getFacturaEnv()}:${tipo}`
+  if (publicoUidCache[clave]) return publicoUidCache[clave]!
+
+  const nombre = NOMBRE_PUBLICO[tipo]
+  const existente = await obtenerCliente(RFC_PUBLICO)
+  let uid = existente?.UID && existente.RazonSocial?.trim().toUpperCase() === nombre ? existente.UID : ''
+  if (!uid) {
+    const emisor = await obtenerEmisor()
+    uid = (await crearCliente({
+      rfc: RFC_PUBLICO, razons: nombre, codpos: emisor.codpos, regimen: '616', pais: 'MEX', usocfdi: 'S01',
+      email: process.env.FACTURA_ADMIN_EMAIL ?? process.env.SMTP_ADMIN_TO ?? emisor.email ?? '',
+    })).UID
+  }
+  publicoUidCache[clave] = uid
+  return uid
+}

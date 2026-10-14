@@ -3,6 +3,7 @@ import prisma from '~/server/utils/prisma'
 import {
   buildCfdiConcepto, validarConceptos, conceptosDePedidos,
   obtenerEmisor, obtenerNombreSerie, obtenerCliente, getFacturaEnv,
+  esPublicoEnGeneral, RFC_PUBLICO, NOMBRE_PUBLICO,
 } from '~/server/utils/factura'
 import type { ConceptoInput } from '~/server/utils/factura'
 import { renderCfdiPreview } from '~/server/utils/cfdiPreview'
@@ -60,8 +61,8 @@ export default defineEventHandler(async (event) => {
 
     conceptos = conceptosDePedidos(orders)
     receptor  = {
-      rfc:         'XAXX010101000',
-      razonSocial: 'PUBLICO EN GENERAL',
+      rfc:         RFC_PUBLICO,
+      razonSocial: NOMBRE_PUBLICO.global,
       regimen:     '616',
       codpos:      emisor.codpos,
       usoCfdi:     body.usoCfdi,
@@ -82,6 +83,9 @@ export default defineEventHandler(async (event) => {
     if (!user) throw createError({ statusCode: 404, message: 'Usuario no encontrado' })
 
     // Preferimos los datos que tiene Factura.com, que son los que irán en el CFDI real
+    if (esPublicoEnGeneral(user.fiscalRfc)) {
+      receptor = { rfc: RFC_PUBLICO, razonSocial: NOMBRE_PUBLICO.individual, regimen: '616', codpos: emisor.codpos, usoCfdi: 'S01', email: user.fiscalEmail || user.email }
+    } else {
     const cliente = user.fiscalRfc ? await obtenerCliente(user.fiscalRfc) : null
     receptor = {
       rfc:         cliente?.RFC          || user.fiscalRfc         || '',
@@ -90,6 +94,7 @@ export default defineEventHandler(async (event) => {
       codpos:      cliente?.CodigoPostal || user.fiscalCodpos      || '',
       usoCfdi:     user.fiscalUsocfdi    || '',
       email:       cliente?.Contacto?.Email || user.fiscalEmail || user.email,
+    }
     }
   }
 

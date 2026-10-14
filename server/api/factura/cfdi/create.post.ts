@@ -1,6 +1,6 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
-import { buildCfdiConcepto, crearCFDI, validarConceptos } from '~/server/utils/factura'
+import { buildCfdiConcepto, crearCFDI, validarConceptos, esPublicoEnGeneral, receptorPublicoUid } from '~/server/utils/factura'
 import type { CfdiPayload, ConceptoInput } from '~/server/utils/factura'
 
 interface CreateCfdiBody {
@@ -34,8 +34,11 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!user)              throw createError({ statusCode: 404, message: 'Usuario no encontrado' })
-  if (!user.facturaUid)   throw createError({ statusCode: 400, message: 'El usuario no está sincronizado con Factura.com — sincronízalo primero' })
-  if (!user.fiscalUsocfdi) throw createError({ statusCode: 400, message: 'El usuario no tiene Uso de CFDI configurado en sus datos fiscales' })
+  // Sin RFC propio (XAXX010101000): factura individual a "VENTA AL PUBLICO EN GENERAL", sin periodicidad
+  const publico = esPublicoEnGeneral(user.fiscalRfc)
+  if (!publico && !user.facturaUid)    throw createError({ statusCode: 400, message: 'El usuario no está sincronizado con Factura.com — sincronízalo primero' })
+  if (!publico && !user.fiscalUsocfdi) throw createError({ statusCode: 400, message: 'El usuario no tiene Uso de CFDI configurado en sus datos fiscales' })
+  const receptorUid = publico ? await receptorPublicoUid('individual') : user.facturaUid!
 
   validarConceptos(conceptos)
 
@@ -55,26 +58,16 @@ export default defineEventHandler(async (event) => {
   }
 
   const payload: CfdiPayload = {
-    Receptor:      { UID: user.facturaUid },
+    Receptor:      { UID: receptorUid },
     TipoDocumento: 'factura',
     Conceptos:     conceptos.map(buildCfdiConcepto),
-    UsoCFDI:       user.fiscalUsocfdi,
+    UsoCFDI:       publico ? 'S01' : user.fiscalUsocfdi!,
     Serie:         serieId,
     FormaPago:     formaPago,
     MetodoPago:    metodoPago,
     Moneda:        body.moneda ?? 'MXN',
     Comentarios:   body.comentarios?.trim() || undefined,
     EnviarCorreo:  body.enviarCorreo ?? true,
-  }
-
-  // SAT (CFDI40130): factura a PUBLICO EN GENERAL (XAXX010101000) lleva InformacionGlobal; venta del día = periodicidad diaria
-  if (user.fiscalRfc?.toUpperCase() === 'XAXX010101000') {
-    const hoy = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Mexico_City' }))
-    payload.InformacionGlobal = {
-      Periodicidad: '01',
-      Meses:        String(hoy.getMonth() + 1).padStart(2, '0'),
-      Año:          String(hoy.getFullYear()),
-    }
   }
 
   const result = await crearCFDI(payload)
