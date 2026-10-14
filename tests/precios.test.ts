@@ -41,13 +41,14 @@ test('totales: el IVA solo se desglosa (precios con IVA incluido)', () => {
   assert.equal(totalDe([{ price: 10.5, quantity: 3 }, { price: 1, quantity: 2 }]), 33.5)
 })
 
-test('integrador: solo niveles 10, 20 y 30', () => {
-  assert.equal(esIntegrador(30), true)
+test('integrador: solo niveles 10, 20 y 25', () => {
+  assert.equal(esIntegrador(25), true)
+  assert.equal(esIntegrador(30), false)
   assert.equal(esIntegrador(15), false)
   assert.equal(nivelIntegrador(20), 20)
   assert.equal(nivelIntegrador(0), 0)
-  assert.equal(nivelIntegrador(true), 30)
-  assert.equal(nivelIntegrador(25), null)
+  assert.equal(nivelIntegrador(true), 25)
+  assert.equal(nivelIntegrador(30), null)
 })
 
 test('garantía con singular corregido', () => {

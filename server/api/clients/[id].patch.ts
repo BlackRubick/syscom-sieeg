@@ -2,11 +2,11 @@ import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { vendeAClientes } from '~/server/utils/roles'
 import { getMostradorId } from '~/server/utils/mostrador'
-import { nivelIntegrador } from '~/utils/integrador'
+import { nivelIntegrador, DESCUENTO_MAX } from '~/utils/integrador'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-/* Editar un cliente desde la página Clientes: nombre, correo, teléfono e integrador (10, 20 o 30 %).
+/* Editar un cliente desde la página Clientes: nombre, correo, teléfono e integrador (10, 20 o 25 %).
    El vendedor solo edita clientes (compradores); administración, a cualquiera y también el % de descuento libre. */
 export default defineEventHandler(async (event) => {
   const session = requireSession(event)
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
   if (typeof body.telefono === 'string') data.fiscalTelefono = body.telefono.trim().slice(0, 30) || null
   if (!esMostrador) {
     if (session.role === 'admin' && body.discountPct !== undefined && Number.isFinite(Number(body.discountPct))) {
-      data.discountPct = Math.max(0, Math.min(100, Number(body.discountPct)))
+      data.discountPct = Math.max(0, Math.min(DESCUENTO_MAX, Number(body.discountPct)))
     } else if (body.integrador !== undefined) {
       const nivel = nivelIntegrador(body.integrador)
       if (nivel === null) throw createError({ statusCode: 400, message: 'Nivel de integrador inválido' })

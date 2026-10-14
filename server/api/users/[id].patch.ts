@@ -1,3 +1,4 @@
+import { DESCUENTO_MAX } from '~/utils/integrador'
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { olvidarUsuarioEnCache } from '~/server/middleware/refresh-session'
@@ -36,7 +37,7 @@ export default defineEventHandler(async (event) => {
     if (!STATUSES.includes(body.status as UserStatus)) throw createError({ statusCode: 400, message: 'Estado inválido' })
     data.status = body.status as UserStatus
   }
-  if (body.discountPct !== undefined && Number.isFinite(Number(body.discountPct))) data.discountPct = Math.max(0, Math.min(100, Number(body.discountPct)))
+  if (body.discountPct !== undefined && Number.isFinite(Number(body.discountPct))) data.discountPct = Math.max(0, Math.min(DESCUENTO_MAX, Number(body.discountPct)))
 
   // Que nunca se quede el sistema sin un administrador activo (ni uno mismo se quite el acceso)
   const dejaDeSerAdmin = existing.role === 'admin' && existing.status === 'active'

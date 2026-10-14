@@ -17,7 +17,7 @@
 import { esIntegrador, NIVELES_INTEGRADOR } from '~/utils/integrador'
 import { BadgePercent } from '@lucide/vue'
 
-/* Selector de nivel de integrador: sin descuento, 10, 20 o 30 %. */
+/* Selector de nivel de integrador: sin descuento, 10, 20 o 25 %. */
 const props = defineProps<{ modelValue: number }>()
 const emit  = defineEmits<{ (e: 'update:modelValue', v: number): void }>()
 const opciones = [{ v: 0, label: 'No' }, ...[...NIVELES_INTEGRADOR].reverse().map(v => ({ v, label: `${v}%` }))]

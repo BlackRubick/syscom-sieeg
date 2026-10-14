@@ -19,15 +19,6 @@
           </template>
         </p>
       </div>
-      <!-- Botón Factura Global (solo visible en tab Órdenes) -->
-      <button v-if="tab==='orders' && !loadingOrders" @click="globalOpen=true" :disabled="!pendingForGlobal.length"
-        :style="{ height:'40px', padding:'0 18px', borderRadius:'11px', border:'1px solid rgba(245,158,11,0.35)', fontSize:'13px', fontWeight:700, cursor:!pendingForGlobal.length?'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'8px', transition:'all 0.2s', opacity:!pendingForGlobal.length?0.4:1,
-          background: 'linear-gradient(135deg,rgba(245,158,11,0.12),rgba(217,119,6,0.08))', color:'#B45309',
-          boxShadow: pendingForGlobal.length ? '0 4px 16px rgba(245,158,11,0.15)' : 'none' }">
-        <FileText :size="14" />
-        Factura Global
-        <span v-if="pendingForGlobal.length" style="padding:1px 7px;border-radius:20px;background:rgba(245,158,11,0.2);font-size:10px;font-weight:700;">{{ pendingForGlobal.length }}</span>
-      </button>
     </div>
 
     <!-- Tabs -->
@@ -272,13 +263,6 @@
     @created="onCfdiCreated"
   />
 
-  <!-- ══ Modal Factura Global ══ -->
-  <GlobalCfdiModal
-    :open="globalOpen"
-    :pending-orders="pendingForGlobal"
-    @close="globalOpen=false"
-    @created="onGlobalCreated"
-  />
 </template>
 
 <script setup lang="ts">
@@ -593,26 +577,6 @@ async function onCfdiCreated() {
     const data = await $fetch<{ orders: BillingOrder[] }>('/api/factura/orders')
     orders.value = data.orders
   } catch { /* silencioso */ }
-}
-
-/* ════════════════════════════════
-   FACTURA GLOBAL
-════════════════════════════════ */
-const globalOpen = ref(false)
-
-// Pedidos aprobados que no tienen CFDI individual ni global
-const pendingForGlobal = computed(() =>
-  orders.value
-    .filter(o => ['approved','processing','shipped','delivered'].includes(o.status) && !o.cfdiUid)
-    .map(o => ({ id: o.id, total: o.total }))
-)
-
-function onGlobalCreated() {
-  // Recargar órdenes para reflejar cfdiUid actualizado
-  cfdis.value = []
-  $fetch<{ orders: BillingOrder[] }>('/api/factura/orders').then(data => {
-    orders.value = data.orders
-  }).catch(() => {})
 }
 
 /* ── Formatters ── */

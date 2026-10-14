@@ -183,7 +183,7 @@
                     </span>
                   </div>
                   <div style="position:relative;">
-                    <input v-model.number="form.discountPct" type="number" min="0" max="100" step="0.5" placeholder="0"
+                    <input v-model.number="form.discountPct" type="number" min="0" :max="DESCUENTO_MAX" step="0.5" placeholder="0"
                       style="width:100%;height:40px;background:rgba(11,27,51,0.04);border:1px solid rgba(11,27,51,0.1);border-radius:10px;padding:0 40px 0 14px;font-size:13px;color:#0B1B33;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color 0.2s;"
                       @focus="e=>(e.currentTarget as HTMLElement).style.borderColor='rgba(21,112,239,0.45)'"
                       @blur="e=>(e.currentTarget as HTMLElement).style.borderColor='rgba(11,27,51,0.1)'" />
@@ -252,7 +252,7 @@
 
 <script setup lang="ts">
 // Importación explícita: el auto-import de Nuxt no registra esIntegrador
-import { esIntegrador, NIVELES_INTEGRADOR } from '~/utils/integrador'
+import { esIntegrador, NIVELES_INTEGRADOR, DESCUENTO_MAX } from '~/utils/integrador'
 import { Search, UserPlus, MoreVertical, Pencil, Trash2, X } from '@lucide/vue'
 import type { User } from '~/types'
 

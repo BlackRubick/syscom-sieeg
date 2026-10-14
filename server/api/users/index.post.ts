@@ -3,7 +3,7 @@ import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { createUserWithClientNumber } from '~/server/utils/clientNumber'
 import { vendeAClientes } from '~/server/utils/roles'
-import { nivelIntegrador } from '~/utils/integrador'
+import { nivelIntegrador, DESCUENTO_MAX } from '~/utils/integrador'
 import type { UserRole, UserStatus } from '@prisma/client'
 
 export default defineEventHandler(async (event) => {
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
     createdAt: today,
     avatar,
     // Integrador (10, 20 o 30 %) lo puede marcar el vendedor; cualquier otro % solo lo asigna administración
-    discountPct: nivelIntegrador(body.integrador) || (esVendedor ? 0 : Math.max(0, Math.min(100, Number(body.discountPct) || 0))),
+    discountPct: nivelIntegrador(body.integrador) || (esVendedor ? 0 : Math.max(0, Math.min(DESCUENTO_MAX, Number(body.discountPct) || 0))),
   }, { id:true, name:true, email:true, role:true, status:true, createdAt:true, lastLogin:true, avatar:true, clientNumber:true, discountPct:true })
 
   return { user }
