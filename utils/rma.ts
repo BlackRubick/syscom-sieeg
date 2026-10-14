@@ -25,7 +25,7 @@ export const RMA_ESTADO_KEYS = Object.keys(RMA_ESTADOS) as RmaEstado[]
 
 /** Garantía tal como la devuelve la API. */
 export interface Rma {
-  id: string; folio: string; status: RmaEstado; orderId: string | null; sku: string; productName: string; serie: string | null; quantity: number
+  id: string; folio: string; status: RmaEstado; orderId: string | null; orderFolio?: string | null; sku: string; productName: string; serie: string | null; quantity: number
   falla: string; accesorios: string | null; folioProveedor: string | null; resolucion: string | null; createdAt: string
   historial: Array<{ status: string; nota?: string; byName: string; at: string }>
   cliente: { name: string; email: string; clientNumber: number | null; razonSocial: string | null; telefono: string | null; mostrador: boolean }

@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   const format  = getRouterParam(event, 'format')
   if (format !== 'pdf' && format !== 'xml') throw createError({ statusCode: 400, message: 'Formato inválido' })
 
-  const order = await prisma.order.findUnique({ where: { id: getRouterParam(event, 'id')! }, select: { id: true, userId: true, cfdiUid: true } })
+  const order = await prisma.order.findUnique({ where: { id: getRouterParam(event, 'id')! }, select: { id: true, number: true, userId: true, cfdiUid: true } })
   const puede = !!order && (order.userId === session.userId || ['admin', 'approver'].includes(session.role))
   if (!puede) throw createError({ statusCode: 404, message: 'Pedido no encontrado' })
   if (!order!.cfdiUid) throw createError({ statusCode: 404, message: 'Este pedido todavía no tiene factura' })
@@ -17,6 +17,6 @@ export default defineEventHandler(async (event) => {
   if (!res.ok || !res.body) throw createError({ statusCode: 502, message: 'No se pudo obtener la factura. Intenta más tarde.' })
 
   setResponseHeader(event, 'Content-Type', format === 'pdf' ? 'application/pdf' : 'application/xml')
-  setResponseHeader(event, 'Content-Disposition', `attachment; filename="factura-PED-${order!.id.slice(-8).toUpperCase()}.${format}"`)
+  setResponseHeader(event, 'Content-Disposition', `attachment; filename="factura-orden-${order!.number}.${format}"`)
   return sendStream(event, res.body)
 })

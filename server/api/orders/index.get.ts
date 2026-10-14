@@ -2,6 +2,7 @@ import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { ORDER_INCLUDE, serializeOrder } from '~/server/utils/orderDto'
 import { parseClientNumber } from '~/utils/clientNumber'
+import { parseOrderNumber } from '~/utils/orderNumber'
 
 export default defineEventHandler(async (event) => {
   const session   = requireSession(event)
@@ -38,6 +39,7 @@ export default defineEventHandler(async (event) => {
         { syscomFolio:     { contains: search } },
         { seller: { name: { contains: search } } },
         ...(parseClientNumber(search) ? [{ user: { clientNumber: parseClientNumber(search)! } }] : []),
+        ...(parseOrderNumber(search) ? [{ number: parseOrderNumber(search)! }] : []),
       ],
     } : {}),
   }

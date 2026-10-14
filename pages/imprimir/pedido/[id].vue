@@ -37,7 +37,7 @@ const doc = computed(() => {
   const e = o.entrega
   return {
     tipo: 'Pedido' as const,
-    folio: `PED-${o.id.slice(-8).toUpperCase()}`,
+    folio: o.folio,
     fecha: new Date(o.createdAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' }),
     estado: ESTADO[o.status] ?? o.status,
     referencia: o.quoteNumber ? `Cotización ${o.quoteFolio}` : undefined,
@@ -62,5 +62,5 @@ const doc = computed(() => {
   }
 })
 
-useHead(() => ({ title: order.value ? `Pedido PED-${order.value.id.slice(-8).toUpperCase()} - SIEEG` : 'Pedido - SIEEG' }))
+useHead(() => ({ title: order.value ? `${order.value.folio} - SIEEG` : 'Pedido - SIEEG' }))
 </script>

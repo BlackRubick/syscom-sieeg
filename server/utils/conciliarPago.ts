@@ -2,6 +2,7 @@ import type { Order } from '@prisma/client'
 import prisma from '~/server/utils/prisma'
 import { getCharge, type OpenPayCharge } from '~/server/utils/openpay'
 import { approveOrder } from '~/server/utils/approveOrder'
+import { formatOrderNumber } from '~/utils/orderNumber'
 
 /**
  * Aplica al pedido el estado real del cargo en OpenPay (lo usan el webhook y la conciliación periódica).
@@ -31,7 +32,7 @@ async function avisarPago(order: Order) {
       userId,
       type:    'approval',
       title:   '💰 Pago recibido',
-      message: `Se recibió el pago de ${total} del pedido PED-${order.id.slice(-8).toUpperCase()}.`,
+      message: `Se recibió el pago de ${total} de la ${formatOrderNumber(order.number)}.`,
       orderId: order.id,
     })),
   }).catch(() => {})

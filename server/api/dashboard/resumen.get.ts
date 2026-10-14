@@ -1,5 +1,6 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
+import { formatOrderNumber } from '~/utils/orderNumber'
 
 const SURTIDOS = ['approved', 'processing', 'shipped', 'delivered'] as const
 
@@ -21,7 +22,7 @@ export default defineEventHandler(async (event) => {
     prisma.order.aggregate({ where: { status: { in: [...SURTIDOS] }, createdAt: { gte: iniPrev, lt: iniMes } }, _count: { _all: true }, _sum: { total: true } }),
     prisma.order.findMany({
       orderBy: { createdAt: 'desc' }, take: 6,
-      select: { id: true, total: true, status: true, paymentStatus: true, createdAt: true, user: { select: { name: true } } },
+      select: { id: true, number: true, total: true, status: true, paymentStatus: true, createdAt: true, user: { select: { name: true } } },
     }),
   ])
 
@@ -32,6 +33,6 @@ export default defineEventHandler(async (event) => {
     cotizaciones: { abiertas: cotizaciones._count._all, total: cotizaciones._sum.total ?? 0 },
     ventasMes:    { pedidos: mes._count._all, total: mes._sum.total ?? 0 },
     ventasMesAnterior: { pedidos: mesPrev._count._all, total: mesPrev._sum.total ?? 0 },
-    ultimos: ultimos.map(o => ({ id: o.id, folio: `PED-${o.id.slice(-8).toUpperCase()}`, cliente: o.user.name, total: o.total, status: o.status, paymentStatus: o.paymentStatus, createdAt: o.createdAt.toISOString() })),
+    ultimos: ultimos.map(o => ({ id: o.id, folio: formatOrderNumber(o.number), cliente: o.user.name, total: o.total, status: o.status, paymentStatus: o.paymentStatus, createdAt: o.createdAt.toISOString() })),
   }
 })

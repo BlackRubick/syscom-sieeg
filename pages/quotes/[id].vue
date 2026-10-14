@@ -50,7 +50,7 @@
           <div class="qd-kv"><span>Precios</span><b>{{ quote.status === 'open' ? `Del día (${fechaCorta(hoy)})` : 'Al momento de cotizar' }}</b></div>
           <div v-if="quote.status === 'open'" class="qd-kv"><span>Vigencia</span><b :style="{ color: cotizacionVencida(quote.createdAt) ? '#B91C1C' : undefined }">{{ cotizacionVencida(quote.createdAt) ? `Venció el ${venceCotizacion(quote.createdAt)}` : `Hasta el ${venceCotizacion(quote.createdAt)}` }}</b></div>
           <div v-if="quote.purchaseOrder" class="qd-kv"><span>Orden de compra</span><b>{{ quote.purchaseOrder }}</b></div>
-          <div v-if="quote.orderId" class="qd-kv no-print"><span>Pedido</span><b><NuxtLink :to="`/orders?pedido=${quote.orderId}`">PED-{{ quote.orderId.slice(-8).toUpperCase() }}</NuxtLink></b></div>
+          <div v-if="quote.orderId" class="qd-kv no-print"><span>Pedido</span><b><NuxtLink :to="`/orders?pedido=${quote.orderId}`">{{ quote.orderFolio || 'Ver pedido' }}</NuxtLink></b></div>
         </section>
       </div>
 
@@ -139,7 +139,7 @@ definePageMeta({ middleware: 'auth' })
 interface ItemPrecio extends OrderItem { disponible: boolean }
 interface Quote {
   id: string; folio: string; name: string | null; status: 'open' | 'converted' | 'cancelled'; items: OrderItem[]; total: number; notes: string | null; purchaseOrder: string | null
-  orderId: string | null; createdAt: string
+  orderId: string | null; orderFolio?: string | null; createdAt: string
   cliente: { id: string; name: string; email: string; clientNumber: number | null; mostrador: boolean; razonSocial: string | null; rfc: string | null; telefono: string | null; emailFacturacion: string | null }
   vendedor: { id: string; name: string; email: string } | null
 }

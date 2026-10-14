@@ -3,6 +3,7 @@ import prisma from '~/server/utils/prisma'
 import { RMA_INCLUDE, serializeRma, atiendeGarantias, texto, type RmaEvento } from '~/server/utils/rma'
 import { esMostrador } from '~/server/utils/mostrador'
 import { RMA_ESTADOS, RMA_ESTADO_KEYS, formatRmaNumber, type RmaEstado } from '~/utils/rma'
+import { conFolioPedido } from '~/server/utils/orderDto'
 
 /* Seguimiento de la garantía: cambio de estado (con nota), folio del proveedor y resolución. */
 export default defineEventHandler(async (event) => {
@@ -41,5 +42,5 @@ export default defineEventHandler(async (event) => {
       },
     })
   }
-  return { rma: serializeRma(actualizada) }
+  return { rma: await conFolioPedido(serializeRma(actualizada)) }
 })

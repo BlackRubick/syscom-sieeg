@@ -1,6 +1,7 @@
 import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { ORDER_INCLUDE, serializeOrder } from '~/server/utils/orderDto'
+import { formatOrderNumber } from '~/utils/orderNumber'
 
 const METODOS = ['transferencia', 'efectivo', 'tarjeta', 'cheque', 'otro'] as const
 
@@ -50,7 +51,7 @@ export default defineEventHandler(async (event) => {
       userId:  order.userId,
       type:    'order',
       title:   body.accion === 'pagado' ? 'Recibimos tu pago' : 'Reembolso registrado',
-      message: `Pedido PED-${id.slice(-8).toUpperCase()} por ${order.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}.`,
+      message: `${formatOrderNumber(order.number)} por ${order.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}.`,
       orderId: id,
     },
   })

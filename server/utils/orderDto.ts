@@ -1,6 +1,8 @@
+import prisma from '~/server/utils/prisma'
 import type { Prisma } from '@prisma/client'
 import { esMostrador } from '~/server/utils/mostrador'
 import { formatQuoteNumber } from '~/utils/quoteNumber'
+import { formatOrderNumber } from '~/utils/orderNumber'
 
 /* Forma única en que la API devuelve un pedido (lista, aprobación, reintento…). */
 
@@ -96,6 +98,8 @@ export function serializeOrder(o: OrderWithUser, isManager: boolean) {
 
   return {
     id:            o.id,
+    number:        o.number,
+    folio:         formatOrderNumber(o.number),
     userId:        o.userId,
     userName:      u.name,
     userEmail:     u.email,
@@ -130,4 +134,10 @@ export function serializeOrder(o: OrderWithUser, isManager: boolean) {
     createdAt:     o.createdAt.toISOString(),
     updatedAt:     o.updatedAt.toISOString(),
   }
+}
+
+/** Agrega el número de orden ("Orden #12") a algo que solo guarda el id del pedido (garantía, cotización). */
+export async function conFolioPedido<T extends { orderId: string | null }>(x: T): Promise<T & { orderFolio: string | null }> {
+  const o = x.orderId ? await prisma.order.findUnique({ where: { id: x.orderId }, select: { number: true } }) : null
+  return { ...x, orderFolio: o ? formatOrderNumber(o.number) : null }
 }

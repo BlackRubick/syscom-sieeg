@@ -2,6 +2,7 @@ import { requireSession } from '~/server/utils/session'
 import prisma from '~/server/utils/prisma'
 import { QUOTE_INCLUDE, serializeQuote, puedeVerCotizacion, preciosDelDia } from '~/server/utils/cotizacion'
 import type { OrderItem } from '~/types'
+import { conFolioPedido } from '~/server/utils/orderDto'
 
 /* Detalle de la cotización con precios del día para el cliente. */
 export default defineEventHandler(async (event) => {
@@ -12,5 +13,5 @@ export default defineEventHandler(async (event) => {
 
   // Solo las abiertas se recalculan; las convertidas o canceladas muestran lo que se guardó
   const precios = quote.status === 'open' ? await preciosDelDia(quote.userId, quote.items as unknown as OrderItem[]) : null
-  return { quote: serializeQuote(quote), precios }
+  return { quote: await conFolioPedido(serializeQuote(quote)), precios }
 })

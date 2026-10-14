@@ -32,7 +32,7 @@
       <div class="of-row">
       <div style="position:relative;flex:1;min-width:220px;max-width:380px;">
         <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#1570EF':'#5F6E84'" />
-        <input v-model="search" :placeholder="veTodos ? 'Buscar por pedido, cliente o número de cliente' : 'Buscar por número de pedido…'"
+        <input v-model="search" :placeholder="veTodos ? 'Buscar por # de orden, cliente o número de cliente' : 'Buscar por # de orden…'"
           @focus="searchFocus=true" @blur="searchFocus=false"
           :style="{ width:'100%', height:'40px', background:searchFocus?'rgba(21,112,239,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${searchFocus?'rgba(21,112,239,0.45)':'rgba(11,27,51,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
       </div>
@@ -68,7 +68,7 @@
 
       <template v-else>
         <div v-for="order in filtered" :key="order.id"
-          role="button" tabindex="0" :aria-label="`Ver pedido PED-${order.id.slice(-8).toUpperCase()}`"
+          role="button" tabindex="0" :aria-label="`Ver ${order.folio}`"
           @click="openDetail(order)" @keydown.enter.prevent="openDetail(order)" @keydown.space.prevent="openDetail(order)"
           :style="{ borderRadius:'14px', background:'linear-gradient(160deg,#FFFFFF,#F5F8FC)', border:'1px solid rgba(11,27,51,0.07)', overflow:'hidden', boxShadow:'0 3px 14px rgba(11,27,51,0.105)', transition:'all 0.18s', cursor:'pointer' }"
           @mouseenter="e => { (e.currentTarget as HTMLElement).style.border='1px solid rgba(21,112,239,0.18)'; (e.currentTarget as HTMLElement).style.transform='translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow='0 8px 24px rgba(11,27,51,0.14)' }"
@@ -80,7 +80,7 @@
 
             <div style="flex:1;min-width:0;">
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
-                <span style="font-size:12px;font-weight:700;color:#0B1B33;font-family:monospace;">PED-{{ order.id.slice(-8).toUpperCase() }}</span>
+                <span style="font-size:12px;font-weight:700;color:#0B1B33;font-family:monospace;">{{ order.folio }}</span>
                 <span :style="{ fontSize:'10px', fontWeight:600, padding:'2px 8px', borderRadius:'20px', background:statusCfg[order.status].bg, color:statusCfg[order.status].color }">{{ statusCfg[order.status].label }}</span>
                 <span :style="{ fontSize:'10px', fontWeight:600, padding:'2px 8px', borderRadius:'20px', background:priCfg[order.priority]?.bg??priCfg.normal.bg, color:priCfg[order.priority]?.color??priCfg.normal.color }">{{ priCfg[order.priority]?.label??'Normal' }}</span>
                 <!-- Pago -->
@@ -99,7 +99,7 @@
               <div v-if="order.syscomFolio" class="sy-row">
                 <span class="sy-folio" title="Folio del pedido en SYSCOM">SYSCOM {{ order.syscomFolio }}</span>
                 <span v-if="order.syscomEstado" class="sy-pill" :style="syscomStyle(order.syscomEstado.estado)" :title="order.syscomEstado.detalle">
-                  <span class="sy-dot" :style="{ background: syscomStyle(order.syscomEstado.estado).color }" />{{ order.syscomEstado.label }}
+                  <span class="sy-dot" :style="{ background: syscomStyle(order.syscomEstado.estado).color }" />{{ syscomLabel(order.syscomEstado) }}
                 </span>
                 <span v-else class="sy-pill sy-pill-muted">Consultando estado…</span>
                 <span v-if="order.syscomEstado?.guia" class="sy-guia">Guía {{ order.syscomEstado.guia }}</span>
@@ -176,7 +176,7 @@
             <div class="od-head-row">
               <div style="min-width:0;">
                 <div class="od-title-row">
-                  <span class="od-id">PED-{{ detail.id.slice(-8).toUpperCase() }}</span>
+                  <span class="od-id">{{ detail.folio }}</span>
                   <span class="od-pill" :style="{ background:statusCfg[detail.status].bg, color:statusCfg[detail.status].color }">{{ statusCfg[detail.status].label }}</span>
                   <span class="od-pill" :style="{ background:priCfg[detail.priority]?.bg??priCfg.normal.bg, color:priCfg[detail.priority]?.color??priCfg.normal.color }">Prioridad {{ (priCfg[detail.priority]?.label??'Normal').toLowerCase() }}</span>
                 </div>
@@ -303,7 +303,7 @@
                   Asignar cliente
                 </button>
                 <AsignarClienteModal v-model="asignando" :actual="detail.userId" :asignar="asignarCliente"
-                  :titulo="`Asignar el pedido PED-${detail.id.slice(-8).toUpperCase()}`" descripcion="El pedido pasa a nombre del cliente elegido y los precios se recalculan con su descuento. Se envía a su dirección fiscal." />
+                  :titulo="`Asignar la ${detail.folio}`" descripcion="El pedido pasa a nombre del cliente elegido y los precios se recalculan con su descuento. Se envía a su dirección fiscal." />
               </section>
               <section class="od-card">
                 <div class="od-row-between" style="margin-bottom:10px;">
@@ -338,7 +338,7 @@
                 <div style="display:flex;align-items:flex-start;gap:10px;">
                   <span class="od-status-dot" :style="{ background: syscomStyle(detail.syscomEstado.estado).color }" />
                   <div style="min-width:0;flex:1;">
-                    <div class="od-strong" :style="{ color: syscomStyle(detail.syscomEstado.estado).color }">{{ detail.syscomEstado.label }}</div>
+                    <div class="od-strong" :style="{ color: syscomStyle(detail.syscomEstado.estado).color }">{{ syscomLabel(detail.syscomEstado) }}</div>
                     <div v-if="detail.syscomEstado.detalle" class="od-muted">{{ detail.syscomEstado.detalle }}</div>
                   </div>
                   <span v-if="trackingJustUpdated" class="od-tag" style="background:rgba(34,197,94,0.15);color:#16A34A;">✓ Pedido actualizado</span>
@@ -501,6 +501,7 @@
 </template>
 
 <script setup lang="ts">
+import { parseOrderNumber } from '~/utils/orderNumber'
 import { Search, ChevronRight, Clock, Package, AlertCircle, ShoppingCart, User, X, Download, RefreshCw } from '@lucide/vue'
 import type { Order } from '~/types'
 
@@ -831,7 +832,7 @@ async function registrarPago(accion: 'pagado' | 'reembolsado') {
   if (!detail.value) return
   const referencia = await confirmar({
     titulo: accion === 'pagado' ? 'Registrar pago recibido' : 'Registrar reembolso',
-    mensaje: `${fmtCurrency(detail.value.total)} · PED-${detail.value.id.slice(-8).toUpperCase()}`,
+    mensaje: `${fmtCurrency(detail.value.total)} · ${detail.value.folio}`,
     aceptar: 'Registrar', pedirMotivo: accion === 'pagado' ? 'Referencia o folio de la transferencia (opcional)' : 'Referencia del reembolso (opcional)',
   })
   if (referencia === null) return
@@ -882,7 +883,7 @@ async function refrescarPrecio(id: string) {
 
 async function handleAction(action: 'approve' | 'reject') {
   if (!detail.value || actionLoading.value) return
-  const folio = `PED-${detail.value.id.slice(-8).toUpperCase()}`
+  const folio = detail.value.folio
   let motivo: string | null = ''
   if (action === 'approve') {
     const m = margen.value
@@ -926,7 +927,9 @@ const filtered = computed(() => orders.value.filter(o => {
   const q = search.value.toLowerCase()
   if (!q) return true
   const num = parseClientNumber(q)
+  const orden = parseOrderNumber(q)
   return o.id.toLowerCase().includes(q)
+    || (orden !== null && o.number === orden)
     || (o.userName ?? '').toLowerCase().includes(q)
     || (o.userEmail ?? '').toLowerCase().includes(q)
     || (num !== null && o.clientNumber === num)
@@ -989,6 +992,9 @@ const SYSCOM_COLORS: Record<string, { color: string; background: string }> = {
   entregado:      { color: '#16A34A', background: 'rgba(34,197,94,0.14)' },
   cancelado:      { color: '#DC2626', background: 'rgba(239,68,68,0.12)' },
 }
+// "Pendiente de pago" en SYSCOM es lo que SIEEG le debe a SYSCOM, no el pago del cliente
+const syscomLabel = (e: { estado: string; label: string }) =>
+  e.estado === 'pendiente_pago' ? (isManager.value ? 'Falta pagar a SYSCOM' : 'En preparación') : e.label
 const syscomStyle = (estado?: string) => SYSCOM_COLORS[estado ?? ''] ?? { color: '#5B6B82', background: 'rgba(91,107,130,0.12)' }
 
 const fmtCurrency = (n: number) => new Intl.NumberFormat('es-MX', { style:'currency', currency:'MXN' }).format(n)

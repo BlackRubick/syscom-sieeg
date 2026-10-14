@@ -4,6 +4,7 @@ import { QUOTE_INCLUDE, serializeQuote, puedeVerCotizacion, limpiarNombre } from
 import { resolverCliente, vendeAClientes } from '~/server/utils/roles'
 import { esMostrador } from '~/server/utils/mostrador'
 import { formatQuoteNumber } from '~/utils/quoteNumber'
+import { conFolioPedido } from '~/server/utils/orderDto'
 
 /* Cambiar el nombre, cancelar o (vendedor/admin) asignar a otro cliente una cotización abierta. */
 export default defineEventHandler(async (event) => {
@@ -19,7 +20,7 @@ export default defineEventHandler(async (event) => {
   if (!quote || !puedeVerCotizacion(session, quote)) throw createError({ statusCode: 404, message: 'Cotización no encontrada' })
   if (renombrar) {
     const actualizada = await prisma.quote.update({ where: { id }, data: { name: limpiarNombre(body.name) }, include: QUOTE_INCLUDE })
-    return { quote: serializeQuote(actualizada) }
+    return { quote: await conFolioPedido(serializeQuote(actualizada)) }
   }
   if (quote.status !== 'open') throw createError({ statusCode: 400, message: 'La cotización ya no está abierta' })
 
@@ -43,9 +44,9 @@ export default defineEventHandler(async (event) => {
         },
       })
     }
-    return { quote: serializeQuote(actualizada) }
+    return { quote: await conFolioPedido(serializeQuote(actualizada)) }
   }
 
   const actualizada = await prisma.quote.update({ where: { id }, data: { status: 'cancelled' }, include: QUOTE_INCLUDE })
-  return { quote: serializeQuote(actualizada) }
+  return { quote: await conFolioPedido(serializeQuote(actualizada)) }
 })

@@ -75,6 +75,8 @@ export interface OrderItem {
 
 export interface Order {
   id: string
+  number: number
+  folio: string
   userId: string
   userName?: string
   userEmail?: string

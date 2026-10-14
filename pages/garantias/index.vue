@@ -66,7 +66,7 @@
             <span>Producto</span>
             <select v-model="form.producto" class="rm-input">
               <option value="">Otro producto (capturar a mano)</option>
-              <optgroup v-for="o in pedidosCliente" :key="o.id" :label="`Pedido PED-${o.id.slice(-8).toUpperCase()} · ${fecha(o.createdAt)}`">
+              <optgroup v-for="o in pedidosCliente" :key="o.id" :label="`${o.folio} · ${fecha(o.createdAt)}`">
                 <option v-for="it in o.items" :key="`${o.id}|${it.productId}`" :value="`${o.id}|${it.productId}`">{{ it.sku }} — {{ it.name.slice(0, 70) }}</option>
               </optgroup>
             </select>
