@@ -49,44 +49,6 @@
         <!-- Controles -->
         <div class="filter-controls">
 
-          <!-- Sort -->
-          <div style="position:relative;display:flex;align-items:center;flex-shrink:0;">
-            <svg style="position:absolute;left:11px;pointer-events:none;color:#5F6E84;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="9" y2="18"/></svg>
-            <select v-model="sortBy" @change="pagina=1" class="filter-select">
-              <option v-for="o in SORT_OPTIONS" :key="o.value" :value="o.value" style="background:#FFFFFF;">{{ o.label }}</option>
-            </select>
-            <ChevronDown :size="12" color="#5F6E84" style="position:absolute;right:9px;pointer-events:none;" />
-          </div>
-
-          <!-- Marca -->
-          <div style="position:relative;flex-shrink:0;">
-            <button @click="openBrandDrop()" class="filter-btn" :class="{ active: activeBrandId }">
-              <div style="display:flex;align-items:center;gap:6px;overflow:hidden;">
-                <Tag :size="13" :stroke-width="1.8" />
-                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:85px;">
-                  {{ activeBrandId ? (brands.find(b=>b.id===activeBrandId)?.nombre ?? activeBrandId) : 'Marca' }}
-                </span>
-              </div>
-              <span v-if="activeBrandId" @click.stop="clearBrand()" class="filter-btn-x">×</span>
-              <ChevronDown v-else :size="12" color="#5F6E84" />
-            </button>
-            <Transition name="dropdown">
-              <div v-if="brandDropOpen" class="brand-dropdown">
-                <div style="padding:9px 9px 4px;">
-                  <input v-model="brandSearch" autofocus placeholder="Buscar marca…" class="brand-search" />
-                </div>
-                <div style="max-height:220px;overflow-y:auto;padding-bottom:6px;">
-                  <div v-if="loadingBrands" style="padding:16px;text-align:center;font-size:12px;color:#5F6E84;">Cargando marcas…</div>
-                  <button v-else v-for="b in filteredBrands" :key="b.id" @click="selectBrand(b.id)"
-                    class="brand-option" :class="{ selected: activeBrandId===b.id }">
-                    {{ b.nombre }}
-                  </button>
-                </div>
-              </div>
-            </Transition>
-            <div v-if="brandDropOpen" style="position:fixed;inset:0;z-index:40;" @click="brandDropOpen=false" />
-          </div>
-
           <!-- ══ CATEGORÍAS ══ -->
           <div style="position:relative;flex-shrink:0;">
             <button @click="catPanelOpen=!catPanelOpen" class="filter-btn cat-btn" :class="{ active: activeCategoryId }">
@@ -150,6 +112,44 @@
             </Transition>
 
             <div v-if="catPanelOpen && !isMobile" style="position:fixed;inset:0;z-index:48;" @click="catPanelOpen=false" />
+          </div>
+
+          <!-- Sort -->
+          <div style="position:relative;display:flex;align-items:center;flex-shrink:0;">
+            <svg style="position:absolute;left:11px;pointer-events:none;color:#5F6E84;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="9" y2="18"/></svg>
+            <select v-model="sortBy" @change="pagina=1" class="filter-select">
+              <option v-for="o in SORT_OPTIONS" :key="o.value" :value="o.value" style="background:#FFFFFF;">{{ o.label }}</option>
+            </select>
+            <ChevronDown :size="12" color="#5F6E84" style="position:absolute;right:9px;pointer-events:none;" />
+          </div>
+
+          <!-- Marca -->
+          <div style="position:relative;flex-shrink:0;">
+            <button @click="openBrandDrop()" class="filter-btn" :class="{ active: activeBrandId }">
+              <div style="display:flex;align-items:center;gap:6px;overflow:hidden;">
+                <Tag :size="13" :stroke-width="1.8" />
+                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:85px;">
+                  {{ activeBrandId ? (brands.find(b=>b.id===activeBrandId)?.nombre ?? activeBrandId) : 'Marca' }}
+                </span>
+              </div>
+              <span v-if="activeBrandId" @click.stop="clearBrand()" class="filter-btn-x">×</span>
+              <ChevronDown v-else :size="12" color="#5F6E84" />
+            </button>
+            <Transition name="dropdown">
+              <div v-if="brandDropOpen" class="brand-dropdown">
+                <div style="padding:9px 9px 4px;">
+                  <input v-model="brandSearch" autofocus placeholder="Buscar marca…" class="brand-search" />
+                </div>
+                <div style="max-height:220px;overflow-y:auto;padding-bottom:6px;">
+                  <div v-if="loadingBrands" style="padding:16px;text-align:center;font-size:12px;color:#5F6E84;">Cargando marcas…</div>
+                  <button v-else v-for="b in filteredBrands" :key="b.id" @click="selectBrand(b.id)"
+                    class="brand-option" :class="{ selected: activeBrandId===b.id }">
+                    {{ b.nombre }}
+                  </button>
+                </div>
+              </div>
+            </Transition>
+            <div v-if="brandDropOpen" style="position:fixed;inset:0;z-index:40;" @click="brandDropOpen=false" />
           </div>
 
           <!-- Chips activos -->
