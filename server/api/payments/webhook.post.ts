@@ -1,6 +1,6 @@
 import prisma from '~/server/utils/prisma'
 import { getCharge } from '~/server/utils/openpay'
-import { approveOrder } from '~/server/utils/approveOrder'
+import { conciliarPago } from '~/server/utils/conciliarPago'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
@@ -32,26 +32,7 @@ export default defineEventHandler(async (event) => {
   // Not our order (could be a test or old transaction) — ack anyway
   if (!order) return { ok: true }
 
-  if (body.type === 'charge.succeeded' && charge.status === 'completed') {
-    if (order.paymentStatus !== 'paid') {
-      await prisma.order.update({
-        where: { id: order.id },
-        data:  { paymentStatus: 'paid' },
-      })
-    }
-    // Un pago que llega tarde a un pedido cancelado no lo revive: queda pagado para reembolsar
-    if (order.status === 'pending') {
-      await approveOrder(order.id).catch(() => { /* queda pagado y pendiente; se aprueba a mano */ })
-    }
-  } else if (
-    (body.type === 'charge.failed' || body.type === 'charge.cancelled') &&
-    (charge.status === 'failed' || charge.status === 'cancelled')
-  ) {
-    await prisma.order.update({
-      where: { id: order.id },
-      data:  { paymentStatus: charge.status },
-    })
-  }
+  await conciliarPago(order, charge)
 
   return { ok: true }
 })
