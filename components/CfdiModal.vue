@@ -180,12 +180,6 @@
                     <button @click="emit('close')" style="height:38px;padding:0 18px;border-radius:9px;background:rgba(11,27,51,0.05);border:1px solid rgba(11,27,51,0.1);color:#5B6B82;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;">
                       Cancelar
                     </button>
-                    <button @click="preview" :disabled="previewing || loading" title="Ver cómo quedará la factura sin timbrar ni usar folio"
-                      :style="{ height:'38px', padding:'0 18px', borderRadius:'9px', background:'rgba(245,158,11,0.1)', border:'1px solid rgba(245,158,11,0.3)', color:'#B45309', fontSize:'13px', fontWeight:600, cursor: previewing||loading ? 'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'7px', opacity: previewing ? 0.7 : 1 }">
-                      <svg v-if="previewing" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-                      <Eye v-else :size="13" />
-                      {{ previewing ? 'Generando…' : 'Vista previa' }}
-                    </button>
                     <button @click="submit" :disabled="loading"
                       :style="{ height:'38px', padding:'0 22px', borderRadius:'9px', background: loading ? 'rgba(99,102,241,0.4)' : 'linear-gradient(135deg,#6366f1,#4f46e5)', border:'none', color:'#fff', fontSize:'13px', fontWeight:700, cursor: loading ? 'not-allowed':'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:'7px', opacity: loading ? 0.8 : 1 }">
                       <svg v-if="loading" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
@@ -205,7 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import { X, Plus, CheckCircle, FileCheck, FileDown, Eye } from '@lucide/vue'
+import { X, Plus, CheckCircle, FileCheck, FileDown } from '@lucide/vue'
 
 interface FiscalUser {
   id:               string
@@ -332,15 +326,6 @@ function buildBody() {
     comentarios:  comentarios.value.trim() || undefined,
     enviarCorreo: enviarCorreo.value,
   }
-}
-
-/* ── Vista previa (plantilla propia, no consume folio) ── */
-const { previewing, previewError, openPreview } = useCfdiPreview()
-watch(previewError, (msg) => { if (msg) error.value = msg })
-
-function preview() {
-  if (!validate()) return
-  openPreview({ tipo: 'individual', ...buildBody() })
 }
 
 /* ── Submit ── */
