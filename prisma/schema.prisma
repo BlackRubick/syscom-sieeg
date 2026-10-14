@@ -100,7 +100,7 @@ model User {
 
 model Order {
   id             String      @id @default(cuid())
-  // Consecutivo que ve la gente: "Orden #12"
+  // Consecutivo que ve la gente: "ORD#12"
   number         Int         @unique @default(autoincrement())
   userId         String      @map("user_id")
   user           User        @relation("OrderClient", fields: [userId], references: [id], onDelete: Cascade)

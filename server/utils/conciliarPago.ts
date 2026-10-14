@@ -32,7 +32,7 @@ async function avisarPago(order: Order) {
       userId,
       type:    'approval',
       title:   '💰 Pago recibido',
-      message: `Se recibió el pago de ${total} de la ${formatOrderNumber(order.number)}.`,
+      message: `Se recibió el pago de ${total} del pedido ${formatOrderNumber(order.number)}.`,
       orderId: order.id,
     })),
   }).catch(() => {})

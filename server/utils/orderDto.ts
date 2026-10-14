@@ -136,7 +136,7 @@ export function serializeOrder(o: OrderWithUser, isManager: boolean) {
   }
 }
 
-/** Agrega el número de orden ("Orden #12") a algo que solo guarda el id del pedido (garantía, cotización). */
+/** Agrega el número de orden ("ORD#12") a algo que solo guarda el id del pedido (garantía, cotización). */
 export async function conFolioPedido<T extends { orderId: string | null }>(x: T): Promise<T & { orderFolio: string | null }> {
   const o = x.orderId ? await prisma.order.findUnique({ where: { id: x.orderId }, select: { number: true } }) : null
   return { ...x, orderFolio: o ? formatOrderNumber(o.number) : null }

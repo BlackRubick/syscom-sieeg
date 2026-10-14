@@ -32,7 +32,7 @@
       <div class="of-row">
       <div style="position:relative;flex:1;min-width:220px;max-width:380px;">
         <Search :size="14" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;" :color="searchFocus?'#1570EF':'#5F6E84'" />
-        <input v-model="search" :placeholder="veTodos ? 'Buscar por # de orden, cliente o número de cliente' : 'Buscar por # de orden…'"
+        <input v-model="search" :placeholder="veTodos ? 'Buscar por ORD#, cliente o número de cliente' : 'Buscar por ORD#…'"
           @focus="searchFocus=true" @blur="searchFocus=false"
           :style="{ width:'100%', height:'40px', background:searchFocus?'rgba(21,112,239,0.06)':'rgba(11,27,51,0.04)', border:`1px solid ${searchFocus?'rgba(21,112,239,0.45)':'rgba(11,27,51,0.09)'}`, borderRadius:'10px', paddingLeft:'38px', paddingRight:'14px', fontSize:'13px', color:'#0B1B33', outline:'none', fontFamily:'inherit', boxSizing:'border-box', transition:'all 0.2s' }" />
       </div>
@@ -303,7 +303,7 @@
                   Asignar cliente
                 </button>
                 <AsignarClienteModal v-model="asignando" :actual="detail.userId" :asignar="asignarCliente"
-                  :titulo="`Asignar la ${detail.folio}`" descripcion="El pedido pasa a nombre del cliente elegido y los precios se recalculan con su descuento. Se envía a su dirección fiscal." />
+                  :titulo="`Asignar el pedido ${detail.folio}`" descripcion="El pedido pasa a nombre del cliente elegido y los precios se recalculan con su descuento. Se envía a su dirección fiscal." />
               </section>
               <section class="od-card">
                 <div class="od-row-between" style="margin-bottom:10px;">
