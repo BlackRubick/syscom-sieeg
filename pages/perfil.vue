@@ -55,6 +55,9 @@
       </div>
     </div>
 
+    <!-- Contador del integrador: compra mínima del mes para conservar el descuento -->
+    <IntegradorMeta v-if="metaInt?.meta" :meta="metaInt.meta" :fin-mes="metaInt.finMes" style="margin-bottom:16px;" />
+
     <!-- ══ GRID PRINCIPAL ══ -->
     <div style="display:grid;grid-template-columns:1fr 2fr;gap:16px;align-items:start;">
 
@@ -235,10 +238,12 @@
 </template>
 
 <script setup lang="ts">
+import type { MetaMensual } from '~/utils/integrador'
 definePageMeta({ middleware: 'auth' })
 useHead({ title: 'Mi perfil — SIEEG' })
 
 const auth      = useAuthStore()
+const { data: metaInt } = useFetch<{ meta: MetaMensual | null; finMes: string }>('/api/integrador/meta', { server: false, lazy: true })
 const showModal = ref(false)
 const copied    = ref(false)
 

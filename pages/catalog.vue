@@ -26,6 +26,9 @@
       </button>
     </div>
 
+    <!-- Contador del integrador: cuánto le falta este mes para conservar su descuento -->
+    <IntegradorMeta v-if="metaInt?.meta" :meta="metaInt.meta" :fin-mes="metaInt.finMes" class="cat-meta" />
+
     <!-- ══════════ FILTER PANEL ══════════ -->
     <div class="filter-panel">
       <div class="filter-accent-bar" />
@@ -375,6 +378,7 @@
 import { Search, ChevronDown, Package, AlertCircle, Loader2, LayoutGrid, Eye, Tag } from '@lucide/vue'
 import { fetchCategorias, fetchProductos, fetchMarcas } from '~/composables/useSyscom'
 import type { Product, SyscomCategoria } from '~/types'
+import type { MetaMensual } from '~/utils/integrador'
 
 definePageMeta({ middleware: 'auth' })
 useHead({ title: 'Catálogo — SIEEG' })
@@ -389,6 +393,7 @@ const vende = computed(() => ['admin', 'seller'].includes(auth.user?.role ?? '')
 const clienteVista = computed(() => vende.value && clienteCarrito.value ? clientes.value.find(c => c.id === clienteCarrito.value) ?? null : null)
 onMounted(async () => { if (vende.value && clienteCarrito.value && !clientes.value.length) { await cargarClientes(); if (clienteVista.value) loadProducts() } })
 const { isMobile } = useBreakpoint()
+const { data: metaInt } = useFetch<{ meta: MetaMensual | null; finMes: string }>('/api/integrador/meta', { server: false, lazy: true })
 
 // La búsqueda puede llegar desde el navbar (?q=...)
 const route            = useRoute()
@@ -778,6 +783,7 @@ function stockClass(p: Product) { return p.stock > 10 ? 'stock-ok' : p.stock > 0
 /* ── Utils ── */
 .spin { animation:spin 1.2s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
+.cat-meta { margin: 12px 0 0; }
 .cat-cliente { margin: 4px 0 0; font-size: 12.5px; color: #0B5BD3; }
 .cat-cliente a { color: #0B5BD3; font-weight: 600; }
 </style>

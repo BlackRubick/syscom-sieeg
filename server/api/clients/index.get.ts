@@ -3,6 +3,8 @@ import prisma from '~/server/utils/prisma'
 import { vendeAClientes } from '~/server/utils/roles'
 import { getMostradorId } from '~/server/utils/mostrador'
 import { parseClientNumber } from '~/utils/clientNumber'
+import { comprasDelMes } from '~/server/utils/comprasMes'
+import { metaMensual } from '~/utils/integrador'
 
 /* Clientes para vendedores y administración: selector del carrito y página Clientes.
    Incluye a todos los usuarios registrados (menos los dados de baja) y, primero, a "Mostrador · Público en general". */
@@ -38,12 +40,15 @@ export default defineEventHandler(async (event) => {
     },
   })
 
+  const compras = await comprasDelMes(clientes.map(c => c.id))
+
   return {
     clientes: clientes
       .map(c => ({
         id: c.id, name: c.name, email: c.email, clientNumber: c.clientNumber, role: c.role, status: c.status, createdAt: c.createdAt,
         fiscalCompleted: c.fiscalCompleted, razonSocial: c.fiscalRazonSocial, rfc: c.fiscalRfc, telefono: c.fiscalTelefono,
         discountPct: c.discountPct, pedidos: c._count.orders, cotizaciones: c._count.quotes, mostrador: c.id === mostradorId,
+        meta: metaMensual(c.discountPct, compras.get(c.id) ?? 0),
       }))
       .sort((a, b) => Number(b.mostrador) - Number(a.mostrador)),
   }

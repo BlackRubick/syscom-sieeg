@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { precioVenta, precioConMargen, costoSyscom } from '../server/utils/preciosPuros'
 import { envioDe, esEnvioBasico, desgloseTotales, totalDe, minimoEnvioConIva } from '../utils/orderTotals'
-import { esIntegrador, nivelIntegrador } from '../utils/integrador'
+import { esIntegrador, nivelIntegrador, metaMensual, mesEnCurso } from '../utils/integrador'
 import { formatGarantia } from '../utils/garantia'
 import { formatClientNumber, parseClientNumber } from '../utils/clientNumber'
 
@@ -63,4 +63,20 @@ test('número de cliente: solo el número y acepta el formato anterior', () => {
   assert.equal(parseClientNumber('CL-0012'), 12)
   assert.equal(parseClientNumber('0012'), 12)
   assert.equal(parseClientNumber('hola'), null)
+})
+
+test('integrador: compra mínima mensual por nivel (25 % → 5000, 20 % → 2800, 10 % → 1000)', () => {
+  assert.equal(metaMensual(0, 9000), null)
+  assert.deepEqual(metaMensual(25, 3200), { nivel: 25, minimo: 5000, comprado: 3200, falta: 1800, avance: 64, cumplida: false })
+  assert.equal(metaMensual(20, 2800)!.cumplida, true)
+  assert.equal(metaMensual(20, 2799.99)!.falta, 0.01)
+  assert.equal(metaMensual(10, 0)!.falta, 1000)
+  assert.equal(metaMensual(10, 4000)!.avance, 100)
+})
+
+test('mes en curso en hora de México', () => {
+  // 1 de noviembre 03:00 UTC = 31 de octubre 21:00 en México: todavía es octubre
+  const { inicio, fin } = mesEnCurso(new Date('2026-11-01T03:00:00Z'))
+  assert.equal(inicio.toISOString(), '2026-10-01T06:00:00.000Z')
+  assert.equal(fin.toISOString(), '2026-11-01T06:00:00.000Z')
 })

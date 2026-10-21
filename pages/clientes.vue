@@ -47,6 +47,7 @@
           <NuxtLink v-if="!c.fiscalCompleted && !c.mostrador" :to="`/fiscal?buscar=${encodeURIComponent(c.email)}`" class="cl-badge warn">Faltan datos fiscales →</NuxtLink>
           <span v-else-if="!c.mostrador" class="cl-badge ok">Datos fiscales completos</span>
         </div>
+        <IntegradorMeta v-if="c.meta" :meta="c.meta" compacto de-cliente />
         <div class="cl-item-actions">
           <button class="cl-btn cl-btn-primary" :disabled="c.status !== 'active'" @click="venderA(c)"><ShoppingCart :size="14" /> Cotizar / pedir</button>
           <button class="cl-btn cl-btn-ghost" @click="abrirFicha(c.id)"><IdCard :size="14" /> Ver / editar</button>
@@ -202,6 +203,7 @@
 <script setup lang="ts">
 // Importación explícita: el auto-import de Nuxt no registra esIntegrador
 import { esIntegrador, NIVELES_INTEGRADOR } from '~/utils/integrador'
+import type { MetaMensual } from '~/utils/integrador'
 import { Search, UserPlus, ShoppingCart, IdCard, Pencil } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
@@ -209,7 +211,7 @@ useHead({ title: 'Clientes — SIEEG' })
 
 interface Cliente {
   id: string; name: string; email: string; clientNumber: number | null; status: string; role: string; mostrador?: boolean
-  fiscalCompleted: boolean; razonSocial: string | null; rfc: string | null; pedidos: number; cotizaciones: number; discountPct: number
+  fiscalCompleted: boolean; razonSocial: string | null; rfc: string | null; pedidos: number; cotizaciones: number; discountPct: number; meta?: MetaMensual | null
 }
 
 interface Ficha {
