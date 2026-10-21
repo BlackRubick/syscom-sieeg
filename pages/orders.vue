@@ -97,7 +97,7 @@
                 </template>
               </div>
               <div v-if="order.syscomFolio" class="sy-row">
-                <span class="sy-folio" title="Folio del pedido en SYSCOM">SYSCOM {{ order.syscomFolio }}</span>
+                <span v-if="esPersonal" class="sy-folio" title="Folio del pedido en SYSCOM">SYSCOM {{ order.syscomFolio }}</span>
                 <span v-if="order.syscomEstado" class="sy-pill" :style="syscomStyle(order.syscomEstado.estado)" :title="order.syscomEstado.detalle">
                   <span class="sy-dot" :style="{ background: syscomStyle(order.syscomEstado.estado).color }" />{{ syscomLabel(order.syscomEstado) }}
                 </span>
@@ -324,14 +324,14 @@
             <section v-if="detail.syscomFolio" class="od-card od-card-ok">
               <div class="od-row-between">
                 <div>
-                  <div class="od-label" style="color:rgba(22,163,74,0.8);">Folio SYSCOM</div>
-                  <div class="od-folio">{{ detail.syscomFolio }}</div>
+                  <!-- El cliente no ve el folio de SYSCOM, solo el estado de su envío -->
+                  <div class="od-label" style="color:rgba(22,163,74,0.8);">{{ esPersonal ? 'Folio SYSCOM' : 'Estado del envío' }}</div>
+                  <div v-if="esPersonal" class="od-folio">{{ detail.syscomFolio }}</div>
                 </div>
-                <button class="od-btn od-btn-green" :disabled="trackingLoading" @click="fetchTracking">
-                  <svg v-if="trackingLoading" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-                  <RefreshCw v-else :size="12" />
-                  {{ trackingLoading ? 'Consultando…' : 'Actualizar estado' }}
-                </button>
+                <span v-if="trackingLoading" class="od-muted" style="display:flex;align-items:center;gap:6px;font-size:11px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                  Actualizando…
+                </span>
               </div>
 
               <div v-if="detail.syscomEstado" class="od-tracking">
@@ -352,9 +352,9 @@
                     <div class="od-log-note" style="margin:0;">{{ p.mensaje }}<span v-if="p.fecha && p.fecha !== '0'" class="od-muted"> · {{ p.fecha }}</span></div>
                   </li>
                 </ol>
-                <div v-if="detail.syscomEstado.consultado" class="od-muted" style="font-size:10.5px;">Consultado {{ fmtDateLong(detail.syscomEstado.consultado) }}</div>
+                <div v-if="detail.syscomEstado.consultado" class="od-muted" style="font-size:10.5px;">Actualizado {{ fmtDateLong(detail.syscomEstado.consultado) }}</div>
               </div>
-              <div v-else class="od-muted" style="margin-top:10px;">Aún no se ha consultado el estado en SYSCOM.</div>
+              <div v-else-if="!trackingLoading" class="od-muted" style="margin-top:10px;">{{ esPersonal ? 'Aún no se ha consultado el estado en SYSCOM.' : 'Tu pedido se está preparando.' }}</div>
               <div v-if="trackingError" class="od-reason">{{ trackingError }}</div>
 
               <!-- Costo SYSCOM vs venta (solo admin/approver) -->
@@ -470,7 +470,7 @@
                       <span class="od-text"><b>{{ entry.retry ? 'Reintento SYSCOM' : (entry.status === 'reasignado' ? 'Asignado a otro cliente' : entry.status === 'precio_actualizado' ? 'Precio actualizado' : entry.status === 'pago_registrado' ? 'Pago registrado' : entry.status === 'reembolso' ? 'Reembolso registrado' : statusCfg[entry.status]?.label ?? entry.status) }}</b> <span class="od-muted">por {{ entry.byName }}</span></span>
                       <span class="od-muted" style="white-space:nowrap;">{{ fmtDateLong(entry.at) }}</span>
                     </div>
-                    <div v-if="entry.syscomFolio" class="od-log-note" style="color:#16A34A;">Folio SYSCOM {{ entry.syscomFolio }}</div>
+                    <div v-if="entry.syscomFolio && esPersonal" class="od-log-note" style="color:#16A34A;">Folio SYSCOM {{ entry.syscomFolio }}</div>
                     <div v-if="entry.syscomError" class="od-log-note" style="color:#DC2626;">{{ entry.syscomError }}</div>
                     <div v-if="entry.note" class="od-log-note">{{ entry.note }}</div>
                     <div v-if="entry.status === 'precio_actualizado' && typeof entry.from === 'number' && typeof entry.to === 'number'" class="od-log-note">{{ fmtCurrency(entry.from) }} → {{ fmtCurrency(entry.to) }}</div>
@@ -511,6 +511,8 @@ useHead({ title: 'Pedidos — SIEEG' })
 
 const auth      = useAuthStore()
 const isManager = computed(() => auth.user?.role === 'admin' || auth.user?.role === 'approver')
+// Personal de SIEEG (no cliente): ve el folio de SYSCOM
+const esPersonal = computed(() => !!auth.user && auth.user.role !== 'buyer')
 // El vendedor ve los pedidos de todos los clientes (sin costos ni aprobación)
 const veTodos   = computed(() => isManager.value || auth.user?.role === 'seller')
 const puedeComprar = computed(() => auth.user?.role !== 'viewer')
@@ -814,6 +816,7 @@ function openDetail(order: Order) {
   // Pendiente y sin pagar: el servidor lo trae al precio del día de SYSCOM
   if (order.status === 'pending' && order.paymentStatus === 'unpaid' && !order.syscomFolio) refrescarPrecio(order.id).then(() => cargarMargen(order.id))
   else if (order.status === 'pending') cargarMargen(order.id)
+  if (estadoViejo(order)) fetchTracking()
 }
 
 // ── Margen estimado antes de aprobar (admin/aprobador) ──
@@ -957,6 +960,21 @@ function reemplazarOrden(o: Order) {
   if (idx >= 0) orders.value[idx] = o
   if (detail.value?.id === o.id) detail.value = o
 }
+
+// El estado SYSCOM se actualiza solo: al abrir el pedido y cada 5 min mientras la página está abierta
+const FRESCO_MS = 10 * 60_000
+const estadoViejo = (o: Order) => !!o.syscomFolio && !['cancelled', 'rejected'].includes(o.status)
+  && !['entregado', 'cancelado'].includes(o.syscomEstado?.estado ?? '')
+  && (!o.syscomEstado?.consultado || Date.now() - new Date(o.syscomEstado.consultado).getTime() > FRESCO_MS)
+let autoRefresco: ReturnType<typeof setInterval> | undefined
+onMounted(() => {
+  autoRefresco = setInterval(() => {
+    if (document.hidden) return
+    refrescarEstadosSyscom()
+    if (detail.value && estadoViejo(detail.value)) fetchTracking()
+  }, 5 * 60_000)
+})
+onBeforeUnmount(() => clearInterval(autoRefresco))
 
 async function fetchTracking() {
   if (!detail.value?.syscomFolio || trackingLoading.value) return

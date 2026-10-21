@@ -110,3 +110,31 @@ export async function actualizarEstadoSyscom(order: { id: string; syscomFolio: s
   })
   return { tracking, statusUpdated: avanzar ? destino : null }
 }
+
+const FRESCO_MS = 10 * 60_000
+
+/** Actualiza en lote los pedidos con folio que no han terminado en SYSCOM y no se consultaron en los últimos 10 min.
+   Los de hace más de 90 días ya no se consultan (SYSCOM nunca les marcó la entrega). */
+export async function refrescarEstadosSyscom(opts: { userId?: string; max: number }): Promise<number> {
+  const candidatos = await prisma.order.findMany({
+    where: {
+      syscomFolio: { not: null },
+      status:      { notIn: ['cancelled', 'rejected'] },
+      createdAt:   { gte: new Date(Date.now() - 90 * 24 * 60 * 60_000) },
+      ...(opts.userId ? { userId: opts.userId } : {}),
+      OR: [{ syscomStatusAt: null }, { syscomStatusAt: { lt: new Date(Date.now() - FRESCO_MS) } }],
+    },
+    select: { id: true, syscomFolio: true, status: true, syscomTracking: true },
+    orderBy: { syscomStatusAt: { sort: 'asc', nulls: 'first' } },
+    take: opts.max * 2,
+  })
+  const pendientes = candidatos
+    .filter(o => !ESTADOS_FINALES.includes((o.syscomTracking as { estado?: string } | null)?.estado as never))
+    .slice(0, opts.max)
+
+  let actualizados = 0
+  for (const o of pendientes) {
+    try { await actualizarEstadoSyscom(o); actualizados++ } catch { /* se reintenta en la próxima vuelta */ }
+  }
+  return actualizados
+}
