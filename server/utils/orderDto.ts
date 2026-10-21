@@ -84,11 +84,15 @@ export function serializeOrder(o: OrderWithUser, isManager: boolean) {
 
   // Estado en SYSCOM: el cliente solo ve el estado del envío; admin/approver ven folio de factura y pasos
   const tr = (o.syscomTracking ?? null) as Record<string, unknown> | null
+  // Si SIEEG ya marcó el pedido como entregado, SYSCOM (que tarda en actualizarse) no debe decir "En camino"
+  const entregadoLocal = !!tr && o.status === 'delivered' && tr.estado !== 'entregado'
   const syscomEstado = tr
     ? {
-        estado:     String(tr.estado ?? ''),
-        label:      String(tr.label ?? ''),
-        detalle:    String(tr.detalle ?? ''),
+        estado:     entregadoLocal ? 'entregado' : String(tr.estado ?? ''),
+        label:      entregadoLocal ? 'Entregado' : String(tr.label ?? ''),
+        detalle:    entregadoLocal
+          ? (isManager && tr.detalle ? `Marcado como entregado · SYSCOM aún reporta: ${String(tr.detalle)}` : 'Pedido entregado')
+          : String(tr.detalle ?? ''),
         fletera:    (tr.fletera as string | undefined) ?? null,
         guia:       (tr.guia as string | undefined) ?? null,
         consultado: (tr.consultado as string | undefined) ?? o.syscomStatusAt?.toISOString() ?? null,
