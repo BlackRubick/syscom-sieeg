@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { precioVenta, precioConMargen, costoSyscom } from '../server/utils/preciosPuros'
 import { envioDe, esEnvioBasico, desgloseTotales, totalDe, minimoEnvioConIva } from '../utils/orderTotals'
-import { esIntegrador, nivelIntegrador, metaMensual, mesEnCurso } from '../utils/integrador'
+import { esIntegrador, nivelIntegrador, metaMensual, mesEnCurso, nivelAlSubir, nivelAlCerrarMes } from '../utils/integrador'
 import { formatGarantia } from '../utils/garantia'
 import { formatClientNumber, parseClientNumber } from '../utils/clientNumber'
 
@@ -67,7 +67,9 @@ test('número de cliente: solo el número y acepta el formato anterior', () => {
 
 test('integrador: compra mínima mensual por nivel (25 % → 5000, 20 % → 2800, 10 % → 1000)', () => {
   assert.equal(metaMensual(0, 9000), null)
-  assert.deepEqual(metaMensual(25, 3200), { nivel: 25, minimo: 5000, comprado: 3200, falta: 1800, avance: 64, cumplida: false })
+  assert.deepEqual(metaMensual(25, 3200), { nivel: 25, minimo: 5000, comprado: 3200, falta: 1800, avance: 64, cumplida: false, bajaA: 20, sube: null })
+  assert.deepEqual(metaMensual(10, 500)!.sube, { nivel: 20, falta: 2300 })
+  assert.equal(metaMensual(10, 500)!.bajaA, 10)
   assert.equal(metaMensual(20, 2800)!.cumplida, true)
   assert.equal(metaMensual(20, 2799.99)!.falta, 0.01)
   assert.equal(metaMensual(10, 0)!.falta, 1000)
@@ -79,4 +81,29 @@ test('mes en curso en hora de México', () => {
   const { inicio, fin } = mesEnCurso(new Date('2026-11-01T03:00:00Z'))
   assert.equal(inicio.toISOString(), '2026-10-01T06:00:00.000Z')
   assert.equal(fin.toISOString(), '2026-11-01T06:00:00.000Z')
+})
+
+test('integrador: al cerrar el mes baja un nivel si no llegó (25 → 20 → 10) y nunca baja del 10', () => {
+  assert.equal(nivelAlCerrarMes(25, 4999), 20)
+  assert.equal(nivelAlCerrarMes(25, 5000), 25)
+  assert.equal(nivelAlCerrarMes(20, 1000), 10)
+  assert.equal(nivelAlCerrarMes(10, 0), 10)
+  assert.equal(nivelAlCerrarMes(20, 6000), 25)
+  assert.equal(nivelAlCerrarMes(0, 9000), 0)
+})
+
+test('integrador: sube en el momento al llegar al mínimo de un nivel más alto', () => {
+  assert.equal(nivelAlSubir(20, 5000), 25)
+  assert.equal(nivelAlSubir(10, 2800), 20)
+  assert.equal(nivelAlSubir(10, 5000), 25)
+  assert.equal(nivelAlSubir(10, 2799), 10)
+  assert.equal(nivelAlSubir(25, 0), 25)
+  assert.equal(nivelAlSubir(0, 9000), 0)
+})
+
+test('mes anterior y clave del mes', () => {
+  const ant = mesEnCurso(new Date('2026-11-01T07:00:00Z'), -1)
+  assert.equal(ant.clave, '2026-10')
+  assert.equal(ant.inicio.toISOString(), '2026-10-01T06:00:00.000Z')
+  assert.equal(mesEnCurso(new Date('2026-01-10T12:00:00Z'), -1).clave, '2025-12')
 })

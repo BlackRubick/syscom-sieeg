@@ -172,6 +172,8 @@ model SiteConfig {
   shippingFee      Float @default(200) @map("shipping_fee")
   // Envío básico (IVA incl.) cuando la compra alcanza el mínimo: el SAT no admite el concepto de envío en $0
   basicShippingFee Float @default(1.75) @map("basic_shipping_fee")
+  // Último mes ("2026-10") en que ya se bajó de nivel a los integradores que no llegaron a su mínimo
+  integradorMesCerrado String? @map("integrador_mes_cerrado") @db.VarChar(7)
 
   @@map("site_config")
 }

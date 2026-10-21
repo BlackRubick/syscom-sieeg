@@ -18,7 +18,13 @@ export function nivelIntegrador(v: unknown): number | null {
 /** Compra mínima del mes (pesos, IVA incluido, sin envío) para conservar cada nivel. */
 export const MINIMO_MENSUAL: Record<number, number> = { 25: 5000, 20: 2800, 10: 1000 }
 
-export interface MetaMensual { nivel: number; minimo: number; comprado: number; falta: number; avance: number; cumplida: boolean }
+export interface MetaMensual {
+  nivel: number; minimo: number; comprado: number; falta: number; avance: number; cumplida: boolean
+  /** Nivel al que baja si no llega al mínimo (igual al actual en 10 %) */
+  bajaA: number
+  /** Siguiente nivel y cuánto le falta para subir en este mes (null si ya está en el más alto) */
+  sube: { nivel: number; falta: number } | null
+}
 
 /** Avance del integrador hacia su compra mínima del mes; null si no es integrador. */
 export function metaMensual(discountPct: number | null | undefined, comprado: number): MetaMensual | null {
@@ -27,12 +33,37 @@ export function metaMensual(discountPct: number | null | undefined, comprado: nu
   const minimo = MINIMO_MENSUAL[nivel]!
   const c      = Math.round(Math.max(0, comprado) * 100) / 100
   const falta  = Math.round(Math.max(0, minimo - c) * 100) / 100
-  return { nivel, minimo, comprado: c, falta, avance: Math.min(100, Math.round(c / minimo * 100)), cumplida: falta === 0 }
+  const arriba = NIVELES_INTEGRADOR[NIVELES_INTEGRADOR.indexOf(nivel as typeof NIVELES_INTEGRADOR[number]) - 1]
+  return {
+    nivel, minimo, comprado: c, falta, avance: Math.min(100, Math.round(c / minimo * 100)), cumplida: falta === 0,
+    bajaA: nivelAlCerrarMes(nivel, 0),
+    sube: arriba ? { nivel: arriba, falta: Math.round(Math.max(0, MINIMO_MENSUAL[arriba]! - c) * 100) / 100 } : null,
+  }
 }
 
-/** Inicio y fin del mes en curso en hora de México (UTC−6, sin horario de verano). */
-export function mesEnCurso(ahora = new Date()): { inicio: Date; fin: Date } {
+/** Nivel más alto que alcanza una compra mensual (0 = ninguno). */
+export function nivelAlcanzado(comprado: number): number {
+  return NIVELES_INTEGRADOR.find(n => comprado >= MINIMO_MENSUAL[n]!) ?? 0
+}
+
+/** Durante el mes: si ya compró el mínimo de un nivel más alto, sube a ese nivel en ese momento. */
+export function nivelAlSubir(actual: number, comprado: number): number {
+  if (!esIntegrador(actual)) return actual
+  return Math.max(actual, nivelAlcanzado(comprado))
+}
+
+/** Al cerrar el mes: si no llegó a su mínimo baja un nivel (25 → 20 → 10, del 10 ya no baja). */
+export function nivelAlCerrarMes(actual: number, comprado: number): number {
+  if (!esIntegrador(actual)) return actual
+  if (comprado >= MINIMO_MENSUAL[actual]!) return nivelAlSubir(actual, comprado)
+  const i = NIVELES_INTEGRADOR.indexOf(actual as typeof NIVELES_INTEGRADOR[number])
+  return NIVELES_INTEGRADOR[Math.min(i + 1, NIVELES_INTEGRADOR.length - 1)]!
+}
+
+/** Mes en hora de México (UTC−6, sin horario de verano): desplazamiento 0 = el actual, −1 = el anterior. */
+export function mesEnCurso(ahora = new Date(), desplazamiento = 0): { inicio: Date; fin: Date; clave: string } {
   const mx = new Date(ahora.getTime() - 6 * 3600_000)
-  const y = mx.getUTCFullYear(), m = mx.getUTCMonth()
-  return { inicio: new Date(Date.UTC(y, m, 1, 6)), fin: new Date(Date.UTC(y, m + 1, 1, 6)) }
+  const inicio = new Date(Date.UTC(mx.getUTCFullYear(), mx.getUTCMonth() + desplazamiento, 1, 6))
+  const fin    = new Date(Date.UTC(mx.getUTCFullYear(), mx.getUTCMonth() + desplazamiento + 1, 1, 6))
+  return { inicio, fin, clave: `${inicio.getUTCFullYear()}-${String(inicio.getUTCMonth() + 1).padStart(2, '0')}` }
 }
