@@ -311,14 +311,9 @@
       <!-- Fila inferior -->
       <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
 
-        <!-- Información adicional -->
+        <!-- Comentarios a vendedor -->
         <div style="flex:1;min-width:280px;border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:20px;display:flex;flex-direction:column;gap:18px;">
           <div class="ct-info">
-            <div class="ct-info-title">Información adicional</div>
-            <label class="ct-info-field">
-              <span>Folio interno / Orden de compra (opcional):</span>
-              <input v-model="purchaseOrder" maxlength="60" class="ct-info-input" />
-            </label>
             <label class="ct-info-field">
               <span class="ct-info-row">Comentarios a vendedor <em>{{ notes.length }}/300</em></span>
               <textarea v-model="notes" maxlength="300" rows="4" class="ct-info-input ct-info-area"
@@ -367,7 +362,7 @@
             <div v-if="accionError" class="ct-error">{{ accionError }}</div>
             <div v-if="preview.loading" class="ct-note">{{ clienteId ? 'Calculando precios del cliente…' : 'Calculando tus precios…' }}</div>
             <div v-if="subeConCarrito" class="ct-sube">
-              🎉 Con este pedido {{ clienteId ? 'el cliente llega' : 'llegas' }} a la meta del mes: sale con <b>{{ preview.descuento }}%</b> de descuento (antes {{ preview.descuentoActual }}%).
+              Con este pedido {{ clienteId ? 'el cliente llega' : 'llegas' }} a la meta del mes: sale con <b>{{ preview.descuento }}%</b> de descuento (antes {{ preview.descuentoActual }}%).
             </div>
             <button v-if="clienteId" class="ct-btn ct-btn-primary" :disabled="!!accion || preview.loading" @click="generarPedidoCliente">
               <Package :size="15" /> {{ accion === 'pedido' ? 'Generando…' : clienteSel?.mostrador ? 'Generar pedido de mostrador' : `Generar pedido para ${clienteSel?.name.split(' ')[0] ?? 'el cliente'}` }}
@@ -607,8 +602,7 @@
 .ct-client { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:16px; padding:16px 20px; border-radius:16px; background:#fff; border:1px solid rgba(21,112,239,0.22); box-shadow:0 6px 18px rgba(21,112,239,0.06); }
 .ct-client-warn { flex-basis:100%; margin-top:0; padding:7px 10px; border-radius:8px; background:rgba(245,158,11,0.1); color:#92400E; font-size:12px; }
 .ct-client-pick { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-.ct-info { display:flex; flex-direction:column; gap:12px; margin:0 -20px -20px; padding:16px 20px 20px; border-top:1px solid rgba(11,27,51,0.07); background:#F7F9FC; border-radius:0 0 16px 16px; }
-.ct-info-title { font-size:13px; font-weight:700; color:#0B1B33; }
+.ct-info { display:flex; flex-direction:column; gap:12px; margin:-20px; padding:20px; background:#F7F9FC; border-radius:16px; }
 .ct-info-field { display:flex; flex-direction:column; gap:6px; font-size:12px; color:#5B6B82; }
 .ct-info-row { display:flex; justify-content:space-between; }
 .ct-info-row em { font-style:normal; font-size:10px; color:#5F6E84; }
@@ -660,8 +654,6 @@ useHead({ title: 'Carrito — SIEEG' })
 
 const cart      = useCartStore()
 const notes     = ref('')
-// Folio interno / orden de compra del cliente
-const purchaseOrder = ref('')
 const priority  = ref('normal') // ya no se elige en el carrito: todos los pedidos van con prioridad normal
 
 // ── States de resultado ──
@@ -752,11 +744,10 @@ async function confirmarPedido() {
   accion.value = 'confirmar'; accionError.value = ''
   try {
     await $fetch('/api/orders', {
-      method: 'POST', body: { items: cartItems(), priority: priority.value, notes: notes.value || undefined, purchaseOrder: purchaseOrder.value || undefined, quoteId: cart.quote?.id },
+      method: 'POST', body: { items: cartItems(), priority: priority.value, notes: notes.value || undefined, quoteId: cart.quote?.id },
     })
     await cart.clearCart()
     notes.value = ''
-    purchaseOrder.value = ''
     pedidoConfirmado.value = true
   } catch (e: any) {
     accionError.value = e?.data?.message ?? 'No se pudo enviar tu pedido'
@@ -767,11 +758,10 @@ async function guardarCotizacion() {
   accion.value = 'cotizacion'; accionError.value = ''
   try {
     const r = await $fetch<{ quote: { id: string } }>('/api/quotes', {
-      method: 'POST', body: { items: cartItems(), clientId: clienteId.value || undefined, notes: notes.value || undefined, purchaseOrder: purchaseOrder.value || undefined, name: nombreCotizacion.value || undefined },
+      method: 'POST', body: { items: cartItems(), clientId: clienteId.value || undefined, notes: notes.value || undefined, name: nombreCotizacion.value || undefined },
     })
     await cart.clearCart()
     notes.value = ''
-    purchaseOrder.value = ''
     nombreCotizacion.value = ''
     clienteId.value = ''
     await navigateTo(`/quotes/${r.quote.id}`)
@@ -785,11 +775,10 @@ async function generarPedidoCliente() {
   accion.value = 'pedido'; accionError.value = ''
   try {
     await $fetch('/api/orders', {
-      method: 'POST', body: { items: cartItems(), clientId: clienteId.value, priority: priority.value, notes: notes.value || undefined, purchaseOrder: purchaseOrder.value || undefined },
+      method: 'POST', body: { items: cartItems(), clientId: clienteId.value, priority: priority.value, notes: notes.value || undefined },
     })
     await cart.clearCart()
     notes.value = ''
-    purchaseOrder.value = ''
     clienteId.value = ''
     await navigateTo('/orders')
   } catch (e: any) {
@@ -982,7 +971,6 @@ async function handlePayCard() {
               items:           cartItems(),
               priority:        priority.value,
               notes:           notes.value || undefined,
-              purchaseOrder:   purchaseOrder.value || undefined,
               quoteId:         cart.quote?.id,
             },
           })
@@ -1053,7 +1041,6 @@ async function handlePaySpei() {
         items:    cartItems(),
         priority: priority.value,
         notes:    notes.value || undefined,
-        purchaseOrder: purchaseOrder.value || undefined,
         quoteId:  cart.quote?.id,
       },
     })
