@@ -311,27 +311,8 @@
       <!-- Fila inferior -->
       <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
 
-        <!-- Detalles de la orden -->
+        <!-- Información adicional -->
         <div style="flex:1;min-width:280px;border-radius:16px;background:linear-gradient(160deg,#FFFFFF,#F5F8FC);border:1px solid rgba(11,27,51,0.07);padding:20px;display:flex;flex-direction:column;gap:18px;">
-          <div style="font-size:13px;font-weight:700;color:#0B1B33;">Detalles de la orden</div>
-          <div>
-            <div style="font-size:10px;font-weight:600;color:#5F6E84;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Prioridad</div>
-            <div style="display:flex;gap:6px;">
-              <button v-for="p in priorities" :key="p.key" @click="priority = p.key"
-                :style="{
-                  flex:1, height:'34px', borderRadius:'9px', fontSize:'12px',
-                  fontWeight: priority === p.key ? 700 : 500, cursor:'pointer', fontFamily:'inherit',
-                  border: `1px solid ${priority === p.key ? p.border : 'rgba(11,27,51,0.07)'}`,
-                  background: priority === p.key ? p.bg : 'rgba(11,27,51,0.02)',
-                  color: priority === p.key ? p.color : '#5F6E84',
-                  transition:'all 0.15s'
-                }">{{ p.label }}</button>
-            </div>
-            <div :style="{ display:'flex', alignItems:'center', gap:'7px', marginTop:'8px', padding:'8px 11px', borderRadius:'9px', background: activePri.bg, border:`1px solid ${activePri.border}` }">
-              <div :style="{ width:'6px', height:'6px', borderRadius:'50%', background: activePri.color, flexShrink:0 }" />
-              <span :style="{ fontSize:'11px', fontWeight:600, color: activePri.color }">{{ priorityLabel }}</span>
-            </div>
-          </div>
           <div class="ct-info">
             <div class="ct-info-title">Información adicional</div>
             <label class="ct-info-field">
@@ -677,7 +658,7 @@ const cart      = useCartStore()
 const notes     = ref('')
 // Folio interno / orden de compra del cliente
 const purchaseOrder = ref('')
-const priority  = ref('normal')
+const priority  = ref('normal') // ya no se elige en el carrito: todos los pedidos van con prioridad normal
 
 // ── States de resultado ──
 const submitted  = ref(false)
@@ -708,16 +689,6 @@ const cardFocus = reactive({ holderName: false, number: false, expiry: false, cv
 
 const config = useRuntimeConfig()
 
-const priorities = [
-  { key:'low',    label:'Baja',    color:'#5B6B82', bg:'rgba(91,107,130,0.08)', border:'rgba(91,107,130,0.2)' },
-  { key:'normal', label:'Normal',  color:'#0B5BD3', bg:'rgba(21,112,239,0.09)',  border:'rgba(21,112,239,0.25)' },
-  { key:'high',   label:'Alta',    color:'#B45309', bg:'rgba(245,158,11,0.09)',  border:'rgba(245,158,11,0.25)' },
-  { key:'urgent', label:'Urgente', color:'#EF4444', bg:'rgba(239,68,68,0.09)',   border:'rgba(239,68,68,0.25)'  },
-]
-
-const activePri     = computed(() => priorities.find(p => p.key === priority.value)!)
-// Solo le indica la urgencia al vendedor: no hay tiempos garantizados
-const priorityLabel = computed(() => ({ urgent:'Urgente — lo atendemos primero', high:'Alta — le damos preferencia', normal:'Normal', low:'Baja — sin prisa' }[priority.value] ?? ''))
 // Envío: si la compra no llega al mínimo se cobra nuestro cargo (el servidor lo vuelve a calcular)
 const { data: shippingCfg } = useFetch<ShippingConfig>('/api/config/shipping', { default: () => ({ freeShippingMin: 1000, shippingFee: 200, basicShippingFee: ENVIO_BASICO }) })
 // ── Cliente (vendedor / admin) ──
