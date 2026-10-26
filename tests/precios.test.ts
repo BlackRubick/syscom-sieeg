@@ -94,6 +94,7 @@ test('integrador: al cerrar el mes baja un nivel si no llegó (25 → 20 → 10)
 
 test('integrador: sube en el momento al llegar al mínimo de un nivel más alto', () => {
   assert.equal(nivelAlSubir(20, 5000), 25)
+  assert.equal(nivelAlSubir(20, 3000 + 3000), 25) // dos compras de $3,000 en el mes suman para el 25 %
   assert.equal(nivelAlSubir(10, 2800), 20)
   assert.equal(nivelAlSubir(10, 5000), 25)
   assert.equal(nivelAlSubir(10, 2799), 10)

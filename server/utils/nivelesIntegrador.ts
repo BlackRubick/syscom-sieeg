@@ -9,16 +9,17 @@ async function cambiarNivel(userId: string, nivel: number, title: string, messag
   await prisma.notification.create({ data: { userId, type: 'alert', title, message } })
 }
 
-async function integradores() {
+async function integradores(userId?: string) {
   return prisma.user.findMany({
-    where: { role: 'buyer', status: { not: 'inactive' }, discountPct: { in: [...NIVELES_INTEGRADOR] } },
+    where: { role: 'buyer', status: { not: 'inactive' }, discountPct: { in: [...NIVELES_INTEGRADOR] }, ...(userId ? { id: userId } : {}) },
     select: { id: true, discountPct: true },
   })
 }
 
-/** Sube de nivel en el momento a quien ya compró este mes el mínimo de un nivel más alto. */
-export async function subirNiveles(): Promise<number> {
-  const users   = await integradores()
+/** Sube de nivel en el momento a quien ya compró este mes (sumando todos sus pedidos) el mínimo
+    de un nivel más alto. Con userId revisa solo a ese cliente (al aprobarse su pedido). */
+export async function subirNiveles(userId?: string): Promise<number> {
+  const users   = await integradores(userId)
   const compras = await comprasDelMes(users.map(u => u.id))
   let cambios = 0
   for (const u of users) {

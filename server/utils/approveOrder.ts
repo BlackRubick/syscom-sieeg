@@ -5,6 +5,7 @@ import type { OrderItem } from '~/types'
 import { ORDER_INCLUDE } from '~/server/utils/orderDto'
 import { trackingInicial } from '~/server/utils/syscomTracking'
 import { actualizarPreciosPendiente } from '~/server/utils/actualizarPrecios'
+import { subirNiveles } from '~/server/utils/nivelesIntegrador'
 
 const RFC_RE = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i
 const ESTADO_TEXTO: Record<string, string> = { rejected: 'rechazado', cancelled: 'cancelado', processing: 'en proceso', shipped: 'enviado', delivered: 'entregado' }
@@ -107,6 +108,9 @@ export async function approveOrder(
       orderId,
     },
   })
+
+  // Este pedido ya cuenta para su compra del mes: si con él llegó al mínimo de un nivel más alto, sube ya
+  await subirNiveles(existing.userId).catch(e => console.error('[integrador]', e?.message ?? e))
 
   return { order: updated, syscomError }
 }
