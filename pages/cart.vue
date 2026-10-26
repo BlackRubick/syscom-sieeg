@@ -362,7 +362,7 @@
             <div v-if="accionError" class="ct-error">{{ accionError }}</div>
             <div v-if="preview.loading" class="ct-note">{{ clienteId ? 'Calculando precios del cliente…' : 'Calculando tus precios…' }}</div>
             <div v-if="subeConCarrito" class="ct-sube">
-              Con este pedido {{ clienteId ? 'el cliente llega' : 'llegas' }} a la meta del mes: sale con <b>{{ preview.descuento }}%</b> de descuento.
+              Con este pedido {{ clienteId ? 'el cliente llega' : 'llegas' }} a la meta del mes: <b>{{ preview.descuento }}%</b> de descuento.
             </div>
             <button v-if="clienteId" class="ct-btn ct-btn-primary" :disabled="!!accion || preview.loading" @click="generarPedidoCliente">
               <Package :size="15" /> {{ accion === 'pedido' ? 'Generando…' : clienteSel?.mostrador ? 'Generar pedido de mostrador' : `Generar pedido para ${clienteSel?.name.split(' ')[0] ?? 'el cliente'}` }}
