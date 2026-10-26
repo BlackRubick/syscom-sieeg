@@ -1,5 +1,5 @@
 import prisma from '~/server/utils/prisma'
-import { getPricing, precioVenta } from '~/server/utils/pricing'
+import { getPricing, pricingDelPedido, precioVenta } from '~/server/utils/pricing'
 import { syscomGet } from '~/server/utils/syscom'
 import { totalDe, envioDe } from '~/utils/orderTotals'
 import { getShippingConfig } from '~/server/utils/shipping'
@@ -32,19 +32,22 @@ export function normalizarItems(items: unknown): OrderItem[] {
   })
 }
 
-/** Precio del día para el cliente. Un producto descontinuado o sin precio se marca no disponible (no truena). */
+/** Precio del día para el cliente (con el descuento que tendría el pedido, ver pricingDelPedido).
+    Un producto descontinuado o sin precio se marca no disponible (no truena). */
 export async function preciosDelDia(clientId: string, items: OrderItem[]) {
-  const pricing = await getPricing(clientId)
-  const cotizados: ItemCotizado[] = await Promise.all(items.map(async (item) => {
-    try {
-      const prod  = await syscomGet<SyscomProducto>(`/productos/${item.productId}`, { moneda: 'MXN' })
-      const price = precioVenta(prod, pricing)
-      const garantia = formatGarantia(prod.garantia)
-      return { ...item, price, ...(garantia ? { garantia } : {}), disponible: price > 0, existencia: Number(prod.total_existencia) || 0 }
-    } catch {
-      return { ...item, price: 0, disponible: false, existencia: 0 }
-    }
-  }))
+  const prods = await Promise.all(items.map(item =>
+    syscomGet<SyscomProducto>(`/productos/${item.productId}`, { moneda: 'MXN' }).catch(() => null)))
+  const [actual, pricing] = await Promise.all([
+    getPricing(clientId),
+    pricingDelPedido(clientId, prods.map((prod, i) => ({ prod, quantity: items[i]!.quantity }))),
+  ])
+  const cotizados: ItemCotizado[] = items.map((item, i) => {
+    const prod = prods[i]
+    if (!prod) return { ...item, price: 0, disponible: false, existencia: 0 }
+    const price = precioVenta(prod, pricing)
+    const garantia = formatGarantia(prod.garantia)
+    return { ...item, price, ...(garantia ? { garantia } : {}), disponible: price > 0, existencia: Number(prod.total_existencia) || 0 }
+  })
   const validos  = cotizados.filter(i => i.disponible)
   const subtotal = totalDe(validos)
   const envio    = envioDe(subtotal, await getShippingConfig())
@@ -54,6 +57,9 @@ export async function preciosDelDia(clientId: string, items: OrderItem[]) {
     envio,
     total: Math.round((subtotal + envio) * 100) / 100,
     noDisponibles: cotizados.length - validos.length,
+    // Descuento con el que sale (mayor al actual si con este pedido sube de nivel)
+    descuento: pricing.discountPct,
+    descuentoActual: actual.discountPct,
   }
 }
 

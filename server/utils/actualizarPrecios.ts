@@ -1,6 +1,6 @@
 import prisma from '~/server/utils/prisma'
 import { syscomGet } from '~/server/utils/syscom'
-import { getPricing, precioVenta } from '~/server/utils/pricing'
+import { pricingDelPedido, precioVenta } from '~/server/utils/pricing'
 import { getShippingConfig } from '~/server/utils/shipping'
 import { totalDe, envioDe } from '~/utils/orderTotals'
 import { formatGarantia } from '~/utils/garantia'
@@ -13,19 +13,19 @@ export async function actualizarPreciosPendiente(orderId: string): Promise<boole
   const order = await prisma.order.findUnique({ where: { id: orderId } })
   if (!order || order.status !== 'pending' || order.paymentStatus !== 'unpaid' || order.syscomFolio) return false
 
-  const pricing = await getPricing(order.userId)
   const antes   = order.items as unknown as OrderItem[]
-  const items   = await Promise.all(antes.map(async (item) => {
-    if (!/^\d+$/.test(String(item.productId))) return item
-    try {
-      const prod     = await syscomGet<SyscomProducto>(`/productos/${item.productId}`, { moneda: 'MXN' })
-      const price    = precioVenta(prod, pricing)
-      const garantia = formatGarantia(prod.garantia) || item.garantia
-      return { ...item, ...(price > 0 ? { price } : {}), ...(garantia ? { garantia } : {}) }
-    } catch {
-      return item
-    }
-  }))
+  const prods   = await Promise.all(antes.map(item => /^\d+$/.test(String(item.productId))
+    ? syscomGet<SyscomProducto>(`/productos/${item.productId}`, { moneda: 'MXN' }).catch(() => null)
+    : Promise.resolve(null)))
+  // Mismo descuento que al hacer el pedido: si con él junta el mínimo de un nivel más alto, lo conserva
+  const pricing = await pricingDelPedido(order.userId, prods.map((prod, i) => ({ prod, quantity: antes[i]!.quantity })))
+  const items   = antes.map((item, i) => {
+    const prod = prods[i]
+    if (!prod) return item
+    const price    = precioVenta(prod, pricing)
+    const garantia = formatGarantia(prod.garantia) || item.garantia
+    return { ...item, ...(price > 0 ? { price } : {}), ...(garantia ? { garantia } : {}) }
+  })
 
   const shippingFee = envioDe(totalDe(items), await getShippingConfig())
   const total       = Math.round((totalDe(items) + shippingFee) * 100) / 100

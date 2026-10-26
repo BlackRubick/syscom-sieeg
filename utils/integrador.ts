@@ -52,6 +52,14 @@ export function nivelAlSubir(actual: number, comprado: number): number {
   return Math.max(actual, nivelAlcanzado(comprado))
 }
 
+/** Nivel con el que sale un pedido nuevo: si lo comprado en el mes más este pedido (a los precios de ese
+    nivel, IVA incl. y sin envío) llega al mínimo de un nivel más alto, el mismo pedido ya lleva ese descuento. */
+export function nivelConCarrito(actual: number, comprado: number, totalAlNivel: (nivel: number) => number): number {
+  const base = nivelAlSubir(actual, comprado)
+  if (!esIntegrador(base)) return base
+  return NIVELES_INTEGRADOR.find(n => n > base && comprado + totalAlNivel(n) >= MINIMO_MENSUAL[n]!) ?? base
+}
+
 /** Al cerrar el mes: si no llegó a su mínimo baja un nivel (25 → 20 → 10, del 10 ya no baja). */
 export function nivelAlCerrarMes(actual: number, comprado: number): number {
   if (!esIntegrador(actual)) return actual

@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { precioVenta, precioConMargen, costoSyscom } from '../server/utils/preciosPuros'
 import { envioDe, esEnvioBasico, desgloseTotales, totalDe, minimoEnvioConIva } from '../utils/orderTotals'
-import { esIntegrador, nivelIntegrador, metaMensual, mesEnCurso, nivelAlSubir, nivelAlCerrarMes } from '../utils/integrador'
+import { esIntegrador, nivelIntegrador, metaMensual, mesEnCurso, nivelAlSubir, nivelAlCerrarMes, nivelConCarrito } from '../utils/integrador'
 import { formatGarantia } from '../utils/garantia'
 import { formatClientNumber, parseClientNumber } from '../utils/clientNumber'
 
@@ -100,6 +100,16 @@ test('integrador: sube en el momento al llegar al mínimo de un nivel más alto'
   assert.equal(nivelAlSubir(10, 2799), 10)
   assert.equal(nivelAlSubir(25, 0), 25)
   assert.equal(nivelAlSubir(0, 9000), 0)
+})
+
+test('integrador: el pedido que completa la meta de un nivel más alto ya sale con ese descuento', () => {
+  // Carrito que vale $2,000 con 10 % (a precio con margen de $2,222.22): con 20 % vale $1,777.78
+  const carrito = (n: number) => Math.round(2222.22 * (1 - n / 100) * 100) / 100
+  assert.equal(nivelConCarrito(10, 1190.82, carrito), 20)  // 1,190.82 + 1,777.78 ≥ 2,800
+  assert.equal(nivelConCarrito(10, 900, carrito), 10)      // 900 + 1,777.78 < 2,800
+  assert.equal(nivelConCarrito(20, 3000, n => 3000 * (1 - n / 100) / 0.8), 25) // $3,000 + $3,000 → 25 %
+  assert.equal(nivelConCarrito(25, 0, carrito), 25)
+  assert.equal(nivelConCarrito(0, 9000, carrito), 0)       // sin ser integrador no cambia
 })
 
 test('mes anterior y clave del mes', () => {

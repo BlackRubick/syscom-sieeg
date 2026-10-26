@@ -365,15 +365,18 @@
           </div>
           <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;">
             <div v-if="accionError" class="ct-error">{{ accionError }}</div>
-            <div v-if="preview.loading" class="ct-note">Calculando precios del cliente…</div>
+            <div v-if="preview.loading" class="ct-note">{{ clienteId ? 'Calculando precios del cliente…' : 'Calculando tus precios…' }}</div>
+            <div v-if="subeConCarrito" class="ct-sube">
+              🎉 Con este pedido {{ clienteId ? 'el cliente llega' : 'llegas' }} a la meta del mes: sale con <b>{{ preview.descuento }}%</b> de descuento (antes {{ preview.descuentoActual }}%).
+            </div>
             <button v-if="clienteId" class="ct-btn ct-btn-primary" :disabled="!!accion || preview.loading" @click="generarPedidoCliente">
               <Package :size="15" /> {{ accion === 'pedido' ? 'Generando…' : clienteSel?.mostrador ? 'Generar pedido de mostrador' : `Generar pedido para ${clienteSel?.name.split(' ')[0] ?? 'el cliente'}` }}
             </button>
-            <button v-else-if="!esVendedor && !pagoEnLinea" class="ct-btn ct-btn-primary" :disabled="!!accion" @click="confirmarPedido">
+            <button v-else-if="!esVendedor && !pagoEnLinea" class="ct-btn ct-btn-primary" :disabled="!!accion || preview.loading" @click="confirmarPedido">
               <Package :size="15" /> {{ accion === 'confirmar' ? 'Enviando…' : 'Confirmar pedido' }}
             </button>
             <div v-if="!esVendedor && !clienteId && !pagoEnLinea" class="ct-note">Te contactamos para el pago por transferencia y la entrega.</div>
-            <button v-else-if="!esVendedor && !clienteId" @click="openPaymentModal"
+            <button v-else-if="!esVendedor && !clienteId" :disabled="preview.loading" @click="openPaymentModal"
               style="width:100%;height:44px;border-radius:11px;border:none;cursor:pointer;background:linear-gradient(135deg,#1570EF,#0B5BD3);color:white;font-weight:700;font-size:13px;font-family:inherit;box-shadow:0 4px 18px rgba(21,112,239,0.32);display:flex;align-items:center;justify-content:center;gap:8px;">
               <CreditCard :size="15" /> Elegir método de pago
             </button>
@@ -619,6 +622,7 @@
 .ct-btn-ghost { border:1px solid rgba(11,27,51,0.14); background:#fff; color:#0B1B33; }
 .ct-btn-ghost:hover:not(:disabled) { background:#F5F8FC; }
 .ct-note { font-size:11.5px; color:#5F6E84; line-height:1.5; text-align:center; }
+.ct-sube { padding:9px 11px; border-radius:9px; background:#F1FBF4; border:1px solid #BBE5C8; font-size:12px; color:#166534; line-height:1.5; }
 .ct-sep { display:flex; align-items:center; gap:8px; margin:4px 0 -2px; font-size:11px; color:#5F6E84; }
 .ct-sep::before, .ct-sep::after { content:''; flex:1; height:1px; background:rgba(11,27,51,0.1); }
 .ct-name { width:100%; height:40px; padding:0 12px; border-radius:10px; border:1px solid rgba(11,27,51,0.14); background:#F5F8FC; font-size:12.5px; color:#0B1B33; font-family:inherit; outline:none; box-sizing:border-box; }
@@ -706,24 +710,28 @@ onMounted(async () => {
   if (!clienteId.value && mostrador.value) clienteId.value = mostrador.value.id
 })
 
-// Precios del cliente elegido (su descuento); sin cliente se usan los del catálogo
-const preview = reactive({ loading: false, precios: {} as Record<string, number> })
+// Precios del cliente elegido (su descuento); el integrador también los pide al servidor porque
+// si con este carrito junta el mínimo del mes de un nivel más alto, el pedido ya sale con ese descuento
+const integradorYo = computed(() => !vende.value && esIntegrador(auth.user?.discountPct))
+const conPreview   = computed(() => !!clienteId.value || integradorYo.value)
+const preview = reactive({ loading: false, precios: {} as Record<string, number>, descuento: 0, descuentoActual: 0 })
 let previewId = 0
 async function cargarPreview() {
   const id = ++previewId
-  if (!clienteId.value || !cart.items.length) { preview.precios = {}; return }
+  if (!conPreview.value || !cart.items.length) { Object.assign(preview, { precios: {}, descuento: 0, descuentoActual: 0 }); return }
   preview.loading = true
   try {
-    const r = await $fetch<{ items: Array<{ productId: string; price: number }> }>('/api/pricing/preview', {
-      method: 'POST', body: { clientId: clienteId.value, items: cartItems() },
+    const r = await $fetch<{ items: Array<{ productId: string; price: number }>; descuento: number; descuentoActual: number }>('/api/pricing/preview', {
+      method: 'POST', body: { clientId: clienteId.value || undefined, items: cartItems() },
     })
-    if (id === previewId) preview.precios = Object.fromEntries(r.items.map(i => [i.productId, i.price]))
-  } catch { if (id === previewId) preview.precios = {} } finally { if (id === previewId) preview.loading = false }
+    if (id === previewId) Object.assign(preview, { precios: Object.fromEntries(r.items.map(i => [i.productId, i.price])), descuento: r.descuento, descuentoActual: r.descuentoActual })
+  } catch { if (id === previewId) Object.assign(preview, { precios: {}, descuento: 0, descuentoActual: 0 }) } finally { if (id === previewId) preview.loading = false }
 }
-onMounted(() => watch([clienteId, () => cart.items.map(i => `${i.product.id}:${i.quantity}`).join()], cargarPreview, { immediate: true }))
+onMounted(() => watch([clienteId, conPreview, () => cart.items.map(i => `${i.product.id}:${i.quantity}`).join()], cargarPreview, { immediate: true }))
+const subeConCarrito = computed(() => preview.descuento > preview.descuentoActual && !preview.loading)
 
 function precioDe(item: { product: { id: string; price: number } }) {
-  return clienteId.value && preview.precios[item.product.id] != null ? preview.precios[item.product.id] : (item.product?.price ?? 0)
+  return conPreview.value && preview.precios[item.product.id] != null ? preview.precios[item.product.id]! : (item.product?.price ?? 0)
 }
 const totalCarrito  = computed(() => cart.items.reduce((s, i) => s + precioDe(i) * i.quantity, 0))
 const envio         = computed(() => envioDe(totalCarrito.value, shippingCfg.value))
