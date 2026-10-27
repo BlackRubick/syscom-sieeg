@@ -12,7 +12,6 @@
       <span>Compras acumuladas del mes: {{ mxn(meta.comprado) }} de {{ mxn(meta.minimo) }}</span>
       <span v-if="dias !== null">{{ dias === 1 ? 'Queda 1 día' : `Quedan ${dias} días` }}</span>
     </div>
-    <p v-if="!compacto && !meta.cumplida && meta.bajaA < meta.nivel" class="im-note">Si no {{ deCliente ? 'llega' : 'llegas' }} al mínimo, el 1 del próximo mes {{ deCliente ? 'su' : 'tu' }} descuento baja a {{ meta.bajaA }}%.</p>
   </div>
 </template>
 
@@ -36,7 +35,6 @@ const mxn = (n: number) => n.toLocaleString('es-MX', { style: 'currency', curren
 .im-fill { height: 100%; border-radius: 99px; background: #F59E0B; transition: width .4s ease; }
 .im.ok .im-fill { background: #16A34A; }
 .im-foot { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 11.5px; color: #5B6B82; }
-.im-note { margin: 0; font-size: 12px; color: #92400E; }
 .im.compacto { padding: 8px 10px; gap: 6px; }
 .im.compacto .im-head { font-size: 12px; }
 </style>
