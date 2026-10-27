@@ -448,7 +448,11 @@ const filteredCats = computed(() =>
 let debounceTimer: ReturnType<typeof setTimeout>
 watch(search, (v) => {
   clearTimeout(debounceTimer)
-  debounceTimer = setTimeout(() => { dSearch.value = v; pagina.value = 1 }, 400)
+  debounceTimer = setTimeout(() => {
+    // Una búsqueda nueva abarca todo el catálogo: no hay que quitar la categoría a mano
+    if (v.trim() && v !== dSearch.value) activeCategoryId.value = null
+    dSearch.value = v; pagina.value = 1
+  }, 400)
 })
 
 let loadId = 0

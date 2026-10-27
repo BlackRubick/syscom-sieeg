@@ -29,7 +29,8 @@
           <img src="/logosieeg.jpg" alt="SIEEG" />
         </NuxtLink>
 
-        <form class="sn-search" role="search" @submit.prevent="buscar">
+        <!-- Con sesión el catálogo trae su propio buscador; aquí solo para visitantes -->
+        <form v-if="!app" class="sn-search" role="search" @submit.prevent="buscar">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <input v-model="texto" type="search" :placeholder="app ? 'Buscar en el catálogo: producto, marca o modelo…' : '¿Qué buscas? Cámaras, alarmas, cable…'" aria-label="Buscar productos" maxlength="80" />
           <button type="submit">Buscar</button>
