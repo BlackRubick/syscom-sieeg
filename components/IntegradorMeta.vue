@@ -13,7 +13,6 @@
       <span v-if="dias !== null">{{ dias === 1 ? 'Queda 1 día' : `Quedan ${dias} días` }}</span>
     </div>
     <p v-if="!compacto && !meta.cumplida && meta.bajaA < meta.nivel" class="im-note">Si no {{ deCliente ? 'llega' : 'llegas' }} al mínimo, el 1 del próximo mes {{ deCliente ? 'su' : 'tu' }} descuento baja a {{ meta.bajaA }}%.</p>
-    <p v-if="meta.sube && meta.sube.falta > 0" class="im-note sube">Con {{ mxn(meta.sube.falta) }} más este mes {{ deCliente ? 'sube' : 'subes' }} a <b>{{ meta.sube.nivel }}%</b>.</p>
   </div>
 </template>
 
@@ -38,7 +37,6 @@ const mxn = (n: number) => n.toLocaleString('es-MX', { style: 'currency', curren
 .im.ok .im-fill { background: #16A34A; }
 .im-foot { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 11.5px; color: #5B6B82; }
 .im-note { margin: 0; font-size: 12px; color: #92400E; }
-.im-note.sube { color: #0B5BD3; }
 .im.compacto { padding: 8px 10px; gap: 6px; }
 .im.compacto .im-head { font-size: 12px; }
 </style>
