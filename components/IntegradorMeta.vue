@@ -3,13 +3,13 @@
     <div class="im-head">
       <component :is="meta.cumplida ? BadgeCheck : Target" :size="16" />
       <span v-if="meta.cumplida"><b>¡Descuento del {{ meta.nivel }}% asegurado este mes!</b></span>
-      <span v-else>{{ deCliente ? 'Le' : 'Te' }} faltan <b>{{ mxn(meta.falta) }}</b> para conservar {{ deCliente ? 'su' : 'tu' }} <b>{{ meta.nivel }}%</b> de descuento</span>
+      <span v-else>{{ deCliente ? 'Realice' : 'Realiza' }} una compra de <b>{{ mxn(meta.falta) }}</b> y {{ deCliente ? 'obtenga' : 'obtén' }} <template v-if="meta.nivel >= 25">el mayor descuento (<b>{{ meta.nivel }}%</b>)</template><template v-else>{{ deCliente ? 'su' : 'tu' }} <b>{{ meta.nivel }}%</b> de descuento</template></span>
     </div>
     <div class="im-bar" role="progressbar" :aria-valuenow="meta.avance" aria-valuemin="0" aria-valuemax="100">
       <div class="im-fill" :style="{ width: `${meta.avance}%` }" />
     </div>
     <div class="im-foot">
-      <span>{{ deCliente ? 'Lleva' : 'Llevas' }} {{ mxn(meta.comprado) }} de {{ mxn(meta.minimo) }} este mes</span>
+      <span>Compras acumuladas del mes: {{ mxn(meta.comprado) }} de {{ mxn(meta.minimo) }}</span>
       <span v-if="dias !== null">{{ dias === 1 ? 'Queda 1 día' : `Quedan ${dias} días` }}</span>
     </div>
     <p v-if="!compacto && !meta.cumplida && meta.bajaA < meta.nivel" class="im-note">Si no {{ deCliente ? 'llega' : 'llegas' }} al mínimo, el 1 del próximo mes {{ deCliente ? 'su' : 'tu' }} descuento baja a {{ meta.bajaA }}%.</p>
